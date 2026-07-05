@@ -1292,6 +1292,13 @@ namespace Apfelmus
         /// </summary>
         private const int MaxGradientSources = 8;
 
+        // Fuer den Mouse-Over-Tooltip der Partliste: Typ (Quellenzahl) je Streifenspalte plus die
+        // beim letzten Rendern verwendete Streifen-Geometrie (Spalten/Zeilen), damit sich aus der
+        // Cursorposition der zustaendige Part und damit die Quellenzahl ermitteln laesst.
+        private int[] _partlistTypes;
+        private int _partlistColumns;
+        private int _partlistRows;
+
         /// <summary>
         /// Delegatmethode zum Erzeugen/Erneuern der Downloadpartliste
         /// </summary>
@@ -1379,6 +1386,7 @@ namespace Apfelmus
             int totalColumns = rows * width;
 
             int[] strip = new int[totalColumns];
+            int[] types = new int[totalColumns];
 
             // Byte-Position -> Spaltenindex im Gesamtstreifen. Proportional in long-Arithmetik;
             // deckt grosse wie sehr kleine Dateien ab. Obergrenze ist totalColumns (NICHT
@@ -1405,6 +1413,7 @@ namespace Apfelmus
                 for (int column = fromColumn; column < toColumn; column++)
                 {
                     strip[column] = color;
+                    types[column] = parts[i].type;
                 }
             }
 
@@ -1433,6 +1442,11 @@ namespace Apfelmus
                     }
                 }
             }
+
+            // Typ je Spalte + Geometrie fuer den Mouse-Over-Tooltip merken.
+            _partlistTypes = types;
+            _partlistColumns = width;
+            _partlistRows = rows;
 
             // Streifen als width x rows umbrechen (row-major passt direkt zu WritePixels);
             // die Image-Control streckt das Bild anschliessend vertikal auf die volle Hoehe.
@@ -3434,6 +3448,62 @@ namespace Apfelmus
             }
 
             imgPartList.Source = null;
+        }
+
+        /// <summary>
+        /// Zeigt beim Ueberfahren des Partlisten-Balkens die Quellenzahl (Typ) des Parts unter
+        /// dem Cursor an. Die Cursorposition wird auf die beim Rendern gemerkte Streifen-Geometrie
+        /// (Spalten/Zeilen) abgebildet und daraus der Typ nachgeschlagen.
+        /// </summary>
+        private void imgPartList_MouseMove(object sender, MouseEventArgs e)
+        {
+            try
+            {
+                if (_partlistTypes == null || _partlistColumns <= 0 || _partlistRows <= 0 || imgPartList.Source == null)
+                {
+                    imgPartList.ToolTip = null;
+                    return;
+                }
+
+                double actualWidth = imgPartList.ActualWidth;
+                double actualHeight = imgPartList.ActualHeight;
+                if (actualWidth <= 0 || actualHeight <= 0)
+                {
+                    return;
+                }
+
+                Point p = e.GetPosition(imgPartList);
+                int column = (int)(p.X / actualWidth * _partlistColumns);
+                int row = (int)(p.Y / actualHeight * _partlistRows);
+                column = Math.Max(0, Math.Min(_partlistColumns - 1, column));
+                row = Math.Max(0, Math.Min(_partlistRows - 1, row));
+
+                int index = row * _partlistColumns + column;
+                if (index < 0 || index >= _partlistTypes.Length)
+                {
+                    return;
+                }
+
+                imgPartList.ToolTip = PartlistTooltipText(_partlistTypes[index]);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Fehler beim Anzeigen des Partlisten-Tooltips!", ex);
+            }
+        }
+
+        /// <summary>
+        /// Tooltip-Text zu einem Part-Typ: -1 = vorhanden/ueberprueft, sonst die Quellenzahl.
+        /// </summary>
+        private string PartlistTooltipText(int type)
+        {
+            if (type == -1)
+            {
+                return (TryFindResource("colorfinished") as string) ?? "vorhanden";
+            }
+
+            string sources = (TryFindResource("partlistsources") as string) ?? "Quellen";
+            return type + " " + sources;
         }
 
         /// <summary>

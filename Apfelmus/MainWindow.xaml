@@ -654,7 +654,7 @@
                             </ComboBox>
                         </StackPanel>
                     </StackPanel>
-                    <Image Name="imgPartList" Grid.Row="1" Grid.RowSpan="2" Grid.Column="1" Width="744" Height="120" VerticalAlignment="Bottom" HorizontalAlignment="Left" Stretch="Fill" SnapsToDevicePixels="True" RenderOptions.BitmapScalingMode="NearestNeighbor" />
+                    <Image Name="imgPartList" Grid.Row="1" Grid.RowSpan="2" Grid.Column="1" Width="744" Height="120" VerticalAlignment="Bottom" HorizontalAlignment="Left" Stretch="Fill" SnapsToDevicePixels="True" RenderOptions.BitmapScalingMode="NearestNeighbor" MouseMove="imgPartList_MouseMove" />
                 </Grid>
             </TabItem>
             <TabItem Name="tabUpload">

@@ -198,4 +198,5 @@
     <system:String x:Key="colorloaded">geladen</system:String>
     <system:String x:Key="colorfinished">überprüft</system:String>
     <system:String x:Key="partlistsize">Größe:</system:String>
+    <system:String x:Key="partlistsources">Quellen</system:String>
 </ResourceDictionary>
