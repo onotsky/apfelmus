@@ -236,6 +236,7 @@ namespace Apfelmus
             {
                 try
                 {
+                    FetchUploads();
                     Dispatcher.Invoke(updateUploadDataGrid, null);
                 }
                 catch (Exception ex)
@@ -329,6 +330,7 @@ namespace Apfelmus
             {
                 try
                 {
+                    FetchDownloads();
                     Dispatcher.Invoke(updateDownloadDataGrid, null);
                 }
                 catch (Exception ex)
@@ -356,6 +358,7 @@ namespace Apfelmus
             {
                 try
                 {
+                    FetchUsers();
                     Dispatcher.Invoke(updateUserDataGrid, null);
                 }
                 catch (Exception ex)
@@ -406,6 +409,7 @@ namespace Apfelmus
             {
                 try
                 {
+                    FetchServer();
                     Dispatcher.Invoke(updateServerlist, null);
                 }
                 catch (Exception ex)
@@ -466,6 +470,7 @@ namespace Apfelmus
             {
                 try
                 {
+                    FetchDownloadPartlist();
                     Dispatcher.Invoke(refreshDownloadPartlist, null);
                 }
                 catch (Exception ex)
@@ -491,6 +496,7 @@ namespace Apfelmus
                 {
                     if (selectedUser != null)
                     {
+                        FetchUserPartlist();
                         Dispatcher.Invoke(refreshUserPartlist, null);
                     }
                 }
@@ -1011,7 +1017,12 @@ namespace Apfelmus
         /// <summary>
         /// Delegatemethode zum Erneuern der Uploads
         /// </summary>
-        private void RefreshUploadDatagrid()
+        // === Datenbeschaffung fuer die Refresh-Threads ===
+        // Diese Fetch-Methoden holen die Daten per HTTP und laufen bewusst im WORKER-Thread.
+        // Die zugehoerige Refresh-/Create-Methode (reines UI-Update) wird danach per
+        // Dispatcher.Invoke auf den UI-Thread marshallt. So blockiert Netzwerk-I/O nie die GUI.
+
+        private void FetchUploads()
         {
             try
             {
@@ -1019,7 +1030,108 @@ namespace Apfelmus
                 {
                     appleJuice.Upload = (appleJuice.DeserializeToObj(webConnect.GetHttpResult(getModifiedUploads, config.UseCompression)) as AppleJuice).Upload;
                 }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Fehler beim Holen der Uploads!", ex);
+            }
+        }
 
+        private void FetchDownloads()
+        {
+            try
+            {
+                using (WebConnect webConnect = new WebConnect(config.HostName, config.Port))
+                {
+                    appleJuice.Download = (appleJuice.DeserializeToObj(webConnect.GetHttpResult(getModifiedDownloads, config.UseCompression)) as AppleJuice).Download;
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Fehler beim Holen der Downloads!", ex);
+            }
+        }
+
+        private void FetchUsers()
+        {
+            try
+            {
+                using (WebConnect webConnect = new WebConnect(config.HostName, config.Port))
+                {
+                    appleJuice.User = (appleJuice.DeserializeToObj(webConnect.GetHttpResult(getModifiedUser, config.UseCompression)) as AppleJuice).User;
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Fehler beim Holen der User!", ex);
+            }
+        }
+
+        private void FetchServer()
+        {
+            try
+            {
+                using (WebConnect webConnect = new WebConnect(config.HostName, config.Port))
+                {
+                    appleJuice.Server = (appleJuice.DeserializeToObj(webConnect.GetHttpResult(getModifiedServer, config.UseCompression)) as AppleJuice).Server;
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Fehler beim Holen der Serverliste!", ex);
+            }
+        }
+
+        private void FetchDownloadPartlist()
+        {
+            try
+            {
+                if (selectedDownload == null)
+                {
+                    return;
+                }
+
+                string getDownloadPartList = string.Format("/xml/downloadpartlist.xml?id={0}&password={1}&mode=zip", selectedDownload.Id, config.Password);
+                using (WebConnect webConnect = new WebConnect(config.HostName, config.Port))
+                {
+                    AppleJuice result = (AppleJuice)appleJuice.DeserializeToObj(webConnect.GetHttpResult(getDownloadPartList, config.UseCompression));
+                    appleJuice.Parts = result.Parts;
+                    appleJuice.FileInformation = result.FileInformation;
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Fehler beim Holen der DownloadPartListe!", ex);
+            }
+        }
+
+        private void FetchUserPartlist()
+        {
+            try
+            {
+                if (selectedUser == null)
+                {
+                    return;
+                }
+
+                string getUserPartList = string.Format("/xml/userpartlist.xml?id={0}&password={1}&mode=zip", selectedUser.Id, config.Password);
+                using (WebConnect webConnect = new WebConnect(config.HostName, config.Port))
+                {
+                    AppleJuice result = (AppleJuice)appleJuice.DeserializeToObj(webConnect.GetHttpResult(getUserPartList, config.UseCompression));
+                    appleJuice.Parts = result.Parts;
+                    appleJuice.FileInformation = result.FileInformation;
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Fehler beim Holen der UserPartListe!", ex);
+            }
+        }
+
+        private void RefreshUploadDatagrid()
+        {
+            try
+            {
                 CreateCurrentUploads();
                 CreateWaitingUploads();
             }
@@ -1073,11 +1185,6 @@ namespace Apfelmus
         {
             try
             {
-                using (WebConnect webConnect = new WebConnect(config.HostName, config.Port))
-                {
-                    appleJuice.Download = (appleJuice.DeserializeToObj(webConnect.GetHttpResult(getModifiedDownloads, config.UseCompression)) as AppleJuice).Download;
-                }
-
                 foreach (Download dLoad in appleJuice.Download)
                 {
                     int getActiveUsers = appleJuice.User.AsEnumerable().Where(a => a.DownloadId.Equals(dLoad.Id) && a.Status.Equals(7)).Count();
@@ -1167,11 +1274,6 @@ namespace Apfelmus
         {
             try
             {
-                using (WebConnect webConnect = new WebConnect(config.HostName, config.Port))
-                {
-                    appleJuice.User = (appleJuice.DeserializeToObj(webConnect.GetHttpResult(getModifiedUser, config.UseCompression)) as AppleJuice).User;
-                }
-
                 ObservableCollection<User> temp = new ObservableCollection<User>();
                 if (rBtnActive.IsChecked == true)
                 {
@@ -1220,11 +1322,6 @@ namespace Apfelmus
         {
             try
             {
-                using (WebConnect webConnect = new WebConnect(config.HostName, config.Port))
-                {
-                    appleJuice.Server = (appleJuice.DeserializeToObj(webConnect.GetHttpResult(getModifiedServer, config.UseCompression)) as AppleJuice).Server;
-                }
-
                 Server getConnectedServer = appleJuice.Server.AsEnumerable().Where(a => a.Id.Equals(appleJuice.NetworkInfo.ConnectedWithServerId)).First();
 
                 foreach (Server _server in appleJuice.Server)
@@ -1306,14 +1403,6 @@ namespace Apfelmus
         {
             try
             {
-                string getDownloadPartList = string.Format("/xml/downloadpartlist.xml?id={0}&password={1}&mode=zip", selectedDownload.Id, config.Password);
-
-                using (WebConnect webConnect = new WebConnect(config.HostName, config.Port))
-                {
-                    appleJuice.Parts = (appleJuice.DeserializeToObj(webConnect.GetHttpResult(getDownloadPartList, config.UseCompression)) as AppleJuice).Parts;
-                    appleJuice.FileInformation = (appleJuice.DeserializeToObj(webConnect.GetHttpResult(getDownloadPartList, config.UseCompression)) as AppleJuice).FileInformation;
-                }
-
                 IEnumerable<User> activeSources = users.Where(a => a.Status.Equals(7));
 
                 int width = (int)Math.Max(1, imgPartList.ActualWidth);
@@ -1338,14 +1427,6 @@ namespace Apfelmus
         {
             try
             {
-                string getUserPartList = string.Format("/xml/userpartlist.xml?id={0}&password={1}&mode=zip", selectedUser.Id, config.Password);
-
-                using (WebConnect webConnect = new WebConnect(config.HostName, config.Port))
-                {
-                    appleJuice.Parts = (appleJuice.DeserializeToObj(webConnect.GetHttpResult(getUserPartList, config.UseCompression)) as AppleJuice).Parts;
-                    appleJuice.FileInformation = (appleJuice.DeserializeToObj(webConnect.GetHttpResult(getUserPartList, config.UseCompression)) as AppleJuice).FileInformation;
-                }
-
                 int width = (int)Math.Max(1, imgPartList.ActualWidth);
                 int height = (int)Math.Max(1, imgPartList.ActualHeight);
 
