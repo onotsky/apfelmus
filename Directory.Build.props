@@ -1,0 +1,29 @@
+<Project>
+
+  <!--
+    Projektuebergreifende Einstellungen. MSBuild importiert automatisch die naechste
+    Directory.Build.props oberhalb jedes Projekts - hier liegt die EINE zentrale Stelle
+    fuer die Produktversion und die gemeinsamen Assembly-Metadaten.
+
+    Versionsschema: SemVer (Major.Minor.Patch)
+      - Patch (5.0.x)  -> Bugfix / kleine Aenderung  (bei jeder Aenderung hochzaehlen)
+      - Minor (5.x.0)  -> neue Funktion, abwaertskompatibel
+      - Major (x.0.0)  -> inkompatible Aenderung
+
+    <Version> setzt AssemblyVersion, FileVersion und InformationalVersion in einem Rutsch.
+    Assembly-Infos werden vom SDK generiert (kein handgepflegtes AssemblyInfo.cs mehr);
+    das automatisch aus dem TargetFramework abgeleitete SupportedOSPlatform-Attribut
+    (windows7.0) kommt dadurch ebenfalls automatisch -> kein CA1416-Workaround noetig.
+  -->
+  <PropertyGroup>
+    <Version>5.0.3</Version>
+    <Company>ZSoft</Company>
+    <Product>Apfelmus</Product>
+    <Authors>daredevil</Authors>
+    <Copyright>Copyright (c) ZSoft</Copyright>
+
+    <!-- InformationalVersion sauber als reines SemVer halten (kein +git-hash-Anhang). -->
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+  </PropertyGroup>
+
+</Project>

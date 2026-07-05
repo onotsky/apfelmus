@@ -8,7 +8,6 @@
     <AssemblyName>Apfelmus</AssemblyName>
     <ApplicationIcon>Apple-icon.ico</ApplicationIcon>
     <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
 
   <ItemGroup>

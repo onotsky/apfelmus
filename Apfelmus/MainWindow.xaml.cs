@@ -552,7 +552,8 @@ namespace Apfelmus
         {
             try
             {
-                appleJuice.GeneralInformation.Release = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+                appleJuice.GeneralInformation.Release = Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
+                    ?? Assembly.GetExecutingAssembly().GetName().Version.ToString();
                 lblCore.DataContext = appleJuice.GeneralInformation;
                 lblFiles.DataContext = nInfo;
                 lblFileSize.DataContext = nInfo;

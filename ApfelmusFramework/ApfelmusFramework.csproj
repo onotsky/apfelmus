@@ -7,7 +7,6 @@
     <RootNamespace>ApfelmusFramework</RootNamespace>
     <AssemblyName>ApfelmusFramework</AssemblyName>
     <ApplicationIcon>Images\Apple-icon.ico</ApplicationIcon>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
 
   <ItemGroup>
