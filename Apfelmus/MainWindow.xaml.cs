@@ -1275,8 +1275,9 @@ namespace Apfelmus
                 IEnumerable<User> activeSources = users.Where(a => a.Status.Equals(7));
 
                 int width = (int)Math.Max(1, imgPartList.ActualWidth);
+                int height = (int)Math.Max(1, imgPartList.ActualHeight);
 
-                WriteableBitmap bitmap = RenderPartList(appleJuice.FileInformation.Filesize, appleJuice.Parts, activeSources, width, isMainList: true);
+                WriteableBitmap bitmap = RenderPartList(appleJuice.FileInformation.Filesize, appleJuice.Parts, activeSources, width, height, isMainList: true);
                 if (bitmap != null)
                 {
                     imgPartList.Source = bitmap;
@@ -1304,8 +1305,9 @@ namespace Apfelmus
                 }
 
                 int width = (int)Math.Max(1, imgPartList.ActualWidth);
+                int height = (int)Math.Max(1, imgPartList.ActualHeight);
 
-                WriteableBitmap bitmap = RenderPartList(appleJuice.FileInformation.Filesize, appleJuice.Parts, null, width, isMainList: false);
+                WriteableBitmap bitmap = RenderPartList(appleJuice.FileInformation.Filesize, appleJuice.Parts, null, width, height, isMainList: false);
                 if (bitmap != null)
                 {
                     imgPartList.Source = bitmap;
@@ -1318,64 +1320,79 @@ namespace Apfelmus
         }
 
         /// <summary>
-        /// Rendert eine Part-/Verfuegbarkeitsliste als einzeilige Pixelreihe (1 x width). Die
-        /// vertikale Skalierung auf die Anzeigeflaeche uebernimmt bereits das
-        /// Stretch="Fill" der Image-Control in MainWindow.xaml - eine eigene Mehrzeilen-Logik
-        /// waere hier redundant. Statt pro appleJuice-Part einen Zielbereich zu fuellen, wird
-        /// je Bildspalte per Zwei-Zeiger-Vorschub der zustaendige Part bestimmt (inverses/
-        /// "backward" Mapping); dadurch bekommt jede Spalte genau einen eindeutigen Farbwert,
-        /// ohne dass sich uebereinanderliegende Fuellungen gegenseitig ueberschreiben koennen.
+        /// Rendert eine Part-/Verfuegbarkeitsliste wie das offizielle appleJuice-GUI: die Datei
+        /// wird ueber mehrere Zeilen umgebrochen (Zeile 0 = erstes Stueck, Zeile 1 = naechstes
+        /// usw.), wodurch die Aufloesung mit der Anzeigeflaeche skaliert (groessenabhaengig).
+        /// Es wird ein <c>width x zeilen</c>-Bitmap erzeugt; die vertikale Streckung auf die
+        /// volle Hoehe (jede Zeile -&gt; ca. 15 px) uebernimmt das Stretch="Fill" der Image-Control.
+        /// Jeder Part gilt von seiner FromPosition bis zur FromPosition des naechsten Parts
+        /// (letzter bis Dateiende) - so gibt es der Core die Liste vor.
         /// </summary>
-        private WriteableBitmap RenderPartList(long fileSize, List<Part> parts, IEnumerable<User> activeSources, int width, bool isMainList)
+        private WriteableBitmap RenderPartList(long fileSize, List<Part> parts, IEnumerable<User> activeSources, int width, int height, bool isMainList)
         {
-            if (width <= 0 || fileSize <= 0 || parts == null || parts.Count == 0)
+            if (width <= 0 || height <= 0 || fileSize <= 0 || parts == null || parts.Count == 0)
             {
                 return null;
             }
 
-            int[] row = new int[width];
+            // Mehrzeilige Packung: eine 15px-Zeile pro sichtbarer Textzeile, die Datei laeuft
+            // ueber alle Zeilen als ein durchgehender Streifen (width * rows Spalten insgesamt).
+            const int rowHeight = 15;
+            int rows = Math.Max(1, height / rowHeight);
+            int totalColumns = rows * width;
 
-            int partIndex = 0;
-            for (int column = 0; column < width; column++)
+            int[] strip = new int[totalColumns];
+
+            // Byte-Position -> Spaltenindex im Gesamtstreifen. Proportional in long-Arithmetik;
+            // deckt grosse wie sehr kleine Dateien ab (kein separater "miniFile"-Sonderfall noetig).
+            int ColumnForByte(long bytePosition)
             {
-                long columnMiddle = ((long)column * 2 + 1) * fileSize / (2 * width);
-
-                while (partIndex + 1 < parts.Count && parts[partIndex + 1].FromPosition <= columnMiddle)
-                {
-                    partIndex++;
-                }
-
-                row[column] = ToArgb(GetColorForType(parts[partIndex].type, isMainList));
+                long column = bytePosition * totalColumns / fileSize;
+                return (int)Math.Max(0, Math.Min(totalColumns - 1, column));
             }
 
-            // Aktive Uebertragungen (nur Hauptliste) ueberschreiben die Verfuegbarkeitsfarbe an
-            // ihrer Position - Orange fuer den bereits geladenen Bereich, Gelb als
-            // Positionsmarker, passend zur bestehenden Legende.
+            // Verfuegbarkeit: jeder Part faerbt [FromPosition, naechste FromPosition).
+            for (int i = 0; i < parts.Count; i++)
+            {
+                long from = parts[i].FromPosition;
+                long to = (i + 1 < parts.Count) ? parts[i + 1].FromPosition : fileSize;
+
+                int fromColumn = ColumnForByte(from);
+                int toColumn = (to >= fileSize) ? totalColumns : ColumnForByte(to);
+
+                int color = ToArgb(GetColorForType(parts[i].type, isMainList));
+                for (int column = fromColumn; column < toColumn; column++)
+                {
+                    strip[column] = color;
+                }
+            }
+
+            // Aktive Uebertragungen (nur Hauptliste) ueberlagern: Orange fuer den bereits
+            // geladenen Bereich, Gelb als Positionsmarker (passend zur Legende geladen/aktiv).
             if (isMainList && activeSources != null)
             {
+                int orange = ToArgb(Colors.Orange);
+                int yellow = ToArgb(Colors.Yellow);
+
                 foreach (User user in activeSources)
                 {
-                    int from = ColumnForBytePosition(user.DownloadFrom, fileSize, width);
-                    int position = ColumnForBytePosition(user.ActualDownloadPosition, fileSize, width);
+                    int fromColumn = ColumnForByte(user.DownloadFrom);
+                    int positionColumn = ColumnForByte(user.ActualDownloadPosition);
 
-                    for (int column = from; column < position; column++)
+                    for (int column = fromColumn; column < positionColumn; column++)
                     {
-                        row[column] = ToArgb(Colors.Orange);
+                        strip[column] = orange;
                     }
 
-                    row[position] = ToArgb(Colors.Yellow);
+                    strip[positionColumn] = yellow;
                 }
             }
 
-            WriteableBitmap bitmap = new WriteableBitmap(width, 1, 96, 96, PixelFormats.Bgra32, null);
-            bitmap.WritePixels(new Int32Rect(0, 0, width, 1), row, width * 4, 0);
+            // Streifen als width x rows umbrechen (row-major passt direkt zu WritePixels);
+            // die Image-Control streckt das Bild anschliessend vertikal auf die volle Hoehe.
+            WriteableBitmap bitmap = new WriteableBitmap(width, rows, 96, 96, PixelFormats.Bgra32, null);
+            bitmap.WritePixels(new Int32Rect(0, 0, width, rows), strip, width * 4, 0);
             return bitmap;
-        }
-
-        private static int ColumnForBytePosition(long bytePosition, long fileSize, int width)
-        {
-            long column = bytePosition * width / Math.Max(1, fileSize);
-            return (int)Math.Max(0, Math.Min(width - 1, column));
         }
 
         private static Color GetColorForType(int type, bool isMainList)
