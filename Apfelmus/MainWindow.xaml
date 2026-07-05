@@ -429,8 +429,8 @@
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*" />
-                        <RowDefinition Height="50" />
-                        <RowDefinition Height="100" />
+                        <RowDefinition Height="64" />
+                        <RowDefinition Height="116" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="220" />
@@ -581,14 +581,14 @@
                         <GridSplitter ShowsPreview="True" Grid.Row="1" HorizontalAlignment="Stretch" Height="3" Margin="0,1" />
 
                     </Grid>
-                    <GroupBox Grid.Row="1" Height="50" Header="User status" Width="200" HorizontalAlignment="Left">
+                    <GroupBox Grid.Row="1" Height="64" Header="User status" Width="200" HorizontalAlignment="Left">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
                             <RadioButton Name="rBtnActive" Content="Active" GroupName="User" Margin="5" IsChecked="True" Checked="rBtnActive_Checked" />
                             <RadioButton Name="rBtnWait" Content="Queue" GroupName="User" Margin="5" Checked="rBtnWait_Checked" />
                             <RadioButton Name="rBtnRest" Content="Rest" GroupName="User" Margin="5" Checked="rBtnRest_Checked" />
                         </StackPanel>
                     </GroupBox>
-                    <GroupBox Grid.Row="2" Grid.Column="0" Width="213" Height="100" HorizontalAlignment="Left" VerticalAlignment="Top" Header="Powerdownload" Grid.ColumnSpan="2">
+                    <GroupBox Grid.Row="2" Grid.Column="0" Width="213" Height="116" HorizontalAlignment="Left" VerticalAlignment="Top" Header="Powerdownload" Grid.ColumnSpan="2">
                         <DockPanel LastChildFill="False">
                             <TextBlock  DockPanel.Dock="Top" TextWrapping="Wrap" Padding="5"  Text="{DynamicResource powerdownload_text}" />
                             <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="5">

@@ -417,10 +417,10 @@
                 <ControlTemplate TargetType="{x:Type GroupBox}">
                     <Border Background="{DynamicResource SurfaceRaisedBrush}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" CornerRadius="4">
                         <DockPanel>
-                            <Border DockPanel.Dock="Top" Background="{DynamicResource HeaderBackgroundBrush}" CornerRadius="4,4,0,0" Padding="10,5">
+                            <Border DockPanel.Dock="Top" Background="{DynamicResource HeaderBackgroundBrush}" CornerRadius="4,4,0,0" Padding="8,2">
                                 <TextBlock Text="{TemplateBinding Header}" Foreground="{DynamicResource TextSecondaryBrush}" FontWeight="SemiBold" FontSize="11" />
                             </Border>
-                            <ContentPresenter Margin="10" />
+                            <ContentPresenter Margin="6,4" />
                         </DockPanel>
                     </Border>
                 </ControlTemplate>
