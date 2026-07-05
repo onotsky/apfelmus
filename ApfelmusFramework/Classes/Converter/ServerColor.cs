@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
 
@@ -9,7 +10,7 @@ namespace ApfelmusFramework.Classes.Converter
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             if ((bool)value)
-                return Brushes.LightGreen;
+                return Application.Current?.TryFindResource("StatusOkBrush") as Brush;
             else
                 return null;
         }

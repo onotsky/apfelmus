@@ -24,6 +24,13 @@
     <Color x:Key="ValueColor">#FF3FDB82</Color>
     <Color x:Key="DisabledColor">#FF5A636C</Color>
 
+    <!-- Status-Zeilenhintergruende (Downloads/Server/Suche): dezente Dunkeltoene, damit eine
+         markierte Zeile getoent bleibt statt hell aufzuleuchten. -->
+    <Color x:Key="StatusOkColor">#FF1F3A2A</Color>
+    <Color x:Key="StatusWarnColor">#FF3E3320</Color>
+    <Color x:Key="StatusErrorColor">#FF3E2226</Color>
+    <Color x:Key="StatusInfoColor">#FF1E2E40</Color>
+
     <SolidColorBrush x:Key="WindowBackgroundBrush" Color="{StaticResource WindowBackgroundColor}" />
     <SolidColorBrush x:Key="ChromeBackgroundBrush" Color="{StaticResource ChromeBackgroundColor}" />
     <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource SurfaceColor}" />
@@ -44,5 +51,10 @@
     <SolidColorBrush x:Key="ScrollThumbHoverBrush" Color="{StaticResource ScrollThumbHoverColor}" />
     <SolidColorBrush x:Key="ValueBrush" Color="{StaticResource ValueColor}" />
     <SolidColorBrush x:Key="DisabledBrush" Color="{StaticResource DisabledColor}" />
+
+    <SolidColorBrush x:Key="StatusOkBrush" Color="{StaticResource StatusOkColor}" />
+    <SolidColorBrush x:Key="StatusWarnBrush" Color="{StaticResource StatusWarnColor}" />
+    <SolidColorBrush x:Key="StatusErrorBrush" Color="{StaticResource StatusErrorColor}" />
+    <SolidColorBrush x:Key="StatusInfoBrush" Color="{StaticResource StatusInfoColor}" />
 
 </ResourceDictionary>

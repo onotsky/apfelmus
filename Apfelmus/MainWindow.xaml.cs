@@ -2750,7 +2750,11 @@ namespace Apfelmus
 
                 Setter setter = new Setter(BackgroundProperty, setterBind);
 
-                Style newStyle = new System.Windows.Style(typeof(DataGridRow));
+                Style newStyle = new System.Windows.Style(typeof(DataGridRow))
+                {
+                    // auf den impliziten DataGridRow-Style aufsetzen, damit Hover/Auswahl weiter greifen
+                    BasedOn = Application.Current.TryFindResource(typeof(DataGridRow)) as Style
+                };
                 newStyle.Setters.Add(setter);
 
                 DataGrid dGrid = new DataGrid

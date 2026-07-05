@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
 
@@ -11,13 +12,13 @@ namespace ApfelmusFramework.Classes.Converter
             switch ((int)value)
             {
                 case 1:
-                    return Brushes.Red;
+                    return Application.Current?.TryFindResource("StatusErrorBrush") as Brush;
                 case 14:
-                    return Brushes.LightGreen;
+                    return Application.Current?.TryFindResource("StatusOkBrush") as Brush;
                 case 17:
-                    return Brushes.Orange;
+                    return Application.Current?.TryFindResource("StatusWarnBrush") as Brush;
                 case 18:
-                    return Brushes.Blue;
+                    return Application.Current?.TryFindResource("StatusInfoBrush") as Brush;
                 default:
                     return null;
             }
