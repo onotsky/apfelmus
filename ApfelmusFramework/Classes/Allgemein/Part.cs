@@ -14,8 +14,11 @@ namespace ApfelmusFramework.Classes.Allgemein
 
     public class Part
     {
+        // long, weil der Core die Byte-Position als 64-Bit-Wert liefert (Java: getFromPosition()).
+        // Als int kippten die Positionen bei Downloads > 2 GB in den Overflow -> falsche/kaputte
+        // Partliste. Die Render-Logik in MainWindow.RenderPartList rechnet ohnehin mit long.
         [XmlAttribute(AttributeName = "fromposition")]
-        public int FromPosition
+        public long FromPosition
         {
             get;
             set;

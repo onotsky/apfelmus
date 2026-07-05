@@ -14,8 +14,11 @@ namespace ApfelmusFramework.Classes.Allgemein
 
     public class FileInformation
     {
+        // long, weil der Core die Dateigroesse als 64-Bit-Wert liefert (Java: Long.parseLong).
+        // Als int lief die XML-Deserialisierung bei Downloads > 2 GB in einen Overflow und die
+        // Partliste kam kaputt/leer an.
         [XmlAttribute(AttributeName = "filesize")]
-        public int Filesize
+        public long Filesize
         {
             get;
             set;
