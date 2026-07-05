@@ -197,4 +197,5 @@
     <system:String x:Key="coloractive">attivo</system:String>
     <system:String x:Key="colorloaded">caricato</system:String>
     <system:String x:Key="colorfinished">verificato</system:String>
+    <system:String x:Key="partlistsize">Dimensione:</system:String>
 </ResourceDictionary>

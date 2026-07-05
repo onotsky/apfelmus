@@ -1370,20 +1370,26 @@ namespace Apfelmus
                 return null;
             }
 
-            // Mehrzeilige Packung: eine 15px-Zeile pro sichtbarer Textzeile, die Datei laeuft
-            // ueber alle Zeilen als ein durchgehender Streifen (width * rows Spalten insgesamt).
-            const int rowHeight = 15;
+            // Mehrzeilige Packung: eine Zeile pro Balken-Zeile, die Datei laeuft ueber alle Zeilen
+            // als ein durchgehender Streifen (width * rows Spalten insgesamt). Die Zeilenhoehe ist
+            // ueber Config.PartlistRowHeight einstellbar - groesser = weniger, dafuer dickere
+            // Zeilen, die einzelnen Parts wirken dadurch groesser.
+            int rowHeight = (config != null && config.PartlistRowHeight > 0) ? config.PartlistRowHeight : 24;
             int rows = Math.Max(1, height / rowHeight);
             int totalColumns = rows * width;
 
             int[] strip = new int[totalColumns];
 
             // Byte-Position -> Spaltenindex im Gesamtstreifen. Proportional in long-Arithmetik;
-            // deckt grosse wie sehr kleine Dateien ab (kein separater "miniFile"-Sonderfall noetig).
+            // deckt grosse wie sehr kleine Dateien ab. Obergrenze ist totalColumns (NICHT
+            // totalColumns-1), damit ein End-Marker-Part bei fromposition == filesize null-breit
+            // bleibt statt eine rote Restspalte am Ende zu erzeugen.
             int ColumnForByte(long bytePosition)
             {
                 long column = bytePosition * totalColumns / fileSize;
-                return (int)Math.Max(0, Math.Min(totalColumns - 1, column));
+                if (column < 0) return 0;
+                if (column > totalColumns) return totalColumns;
+                return (int)column;
             }
 
             // Verfuegbarkeit: jeder Part faerbt [FromPosition, naechste FromPosition).
@@ -1393,7 +1399,7 @@ namespace Apfelmus
                 long to = (i + 1 < parts.Count) ? parts[i + 1].FromPosition : fileSize;
 
                 int fromColumn = ColumnForByte(from);
-                int toColumn = (to >= fileSize) ? totalColumns : ColumnForByte(to);
+                int toColumn = ColumnForByte(to);
 
                 int color = ToArgb(GetColorForType(parts[i].type, isMainList));
                 for (int column = fromColumn; column < toColumn; column++)
@@ -1419,7 +1425,12 @@ namespace Apfelmus
                         strip[column] = orange;
                     }
 
-                    strip[positionColumn] = yellow;
+                    // positionColumn kann totalColumns sein (Position == Dateiende) -> nur setzen,
+                    // wenn im gueltigen Bereich.
+                    if (positionColumn < totalColumns)
+                    {
+                        strip[positionColumn] = yellow;
+                    }
                 }
             }
 
@@ -1472,6 +1483,18 @@ namespace Apfelmus
         {
             try
             {
+                // Partlisten-Groesse aus der Config in die Auswahl uebernehmen (0 = alte Config -> Default 24).
+                int partlistSize = config.PartlistRowHeight > 0 ? config.PartlistRowHeight : 24;
+                config.PartlistRowHeight = partlistSize;
+                foreach (ComboBoxItem sizeItem in cbxPartlistSize.Items)
+                {
+                    if (sizeItem.Content?.ToString() == partlistSize.ToString())
+                    {
+                        cbxPartlistSize.SelectedItem = sizeItem;
+                        break;
+                    }
+                }
+
                 Server server = new Server();
                 foreach (Server serv in appleJuice.Server)
                 {
@@ -3411,6 +3434,30 @@ namespace Apfelmus
             }
 
             imgPartList.Source = null;
+        }
+
+        /// <summary>
+        /// Aendert die Zeilenhoehe des Partlisten-Balkens (Config.PartlistRowHeight). Der laufende
+        /// Refresh-Thread liest den Wert bei seinem naechsten Durchlauf und zeichnet neu.
+        /// </summary>
+        private void cbxPartlistSize_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                if (config != null
+                    && cbxPartlistSize.SelectedItem is ComboBoxItem item
+                    && int.TryParse(item.Content?.ToString(), out int size)
+                    && size > 0
+                    && size != config.PartlistRowHeight)
+                {
+                    config.PartlistRowHeight = size;
+                    ConfigSerializer.SerializeToFile(config);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Fehler beim Aendern der Partlisten-Groesse!", ex);
+            }
         }
 
         private void dGridDownloadInfos_SelectionChanged_1(object sender, SelectionChangedEventArgs e)

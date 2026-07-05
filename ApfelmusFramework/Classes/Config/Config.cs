@@ -90,5 +90,16 @@ namespace ApfelmusFramework.Classes.Config
             get { return theme; }
             set { theme = value; }
         }
+
+        private int partlistRowHeight;
+
+        // Hoehe (in Pixel) einer Zeile im Partlisten-Balken. Groesser = weniger, dafuer dickere
+        // Zeilen -> die einzelnen Parts wirken groesser. 0 = noch nicht gesetzt (alte Config) ->
+        // in MainWindow.RenderPartList wird dann ein Default verwendet.
+        public int PartlistRowHeight
+        {
+            get { return partlistRowHeight; }
+            set { partlistRowHeight = value; }
+        }
     }
 }

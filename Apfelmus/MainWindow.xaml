@@ -641,6 +641,18 @@
                                 <Rectangle Fill="Green" Width="6" Height="8" />
                             </StackPanel>
                         </Grid>
+                        <StackPanel Orientation="Horizontal" Margin="30,0,0,0" VerticalAlignment="Center">
+                            <Label Content="{DynamicResource partlistsize}" VerticalAlignment="Center" />
+                            <ComboBox Name="cbxPartlistSize" Width="55" VerticalAlignment="Center" SelectionChanged="cbxPartlistSize_SelectionChanged">
+                                <ComboBoxItem>12</ComboBoxItem>
+                                <ComboBoxItem>16</ComboBoxItem>
+                                <ComboBoxItem>20</ComboBoxItem>
+                                <ComboBoxItem>24</ComboBoxItem>
+                                <ComboBoxItem>30</ComboBoxItem>
+                                <ComboBoxItem>40</ComboBoxItem>
+                                <ComboBoxItem>60</ComboBoxItem>
+                            </ComboBox>
+                        </StackPanel>
                     </StackPanel>
                     <Image Name="imgPartList" Grid.Row="1" Grid.RowSpan="2" Grid.Column="1" Width="744" Height="120" VerticalAlignment="Bottom" HorizontalAlignment="Left" Stretch="Fill" SnapsToDevicePixels="True" RenderOptions.BitmapScalingMode="NearestNeighbor" />
                 </Grid>
