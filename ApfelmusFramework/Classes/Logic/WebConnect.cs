@@ -24,26 +24,23 @@ namespace ApfelmusFramework.Classes.Logic
         private int serverPort;
         private ILog logger;
 
-        // Pointer to an external unmanaged resource.
-        private IntPtr handle;
         // Other managed resource this class uses.
         private Component component = new Component();
         // Track whether Dispose has been called.
         private bool disposed = false;
 
         #region Constructors
-        public WebConnect(IntPtr handle)
+        // log4net EINMALIG konfigurieren. Frueher lief das in jedem Instanz-Ctor - bei den
+        // vielen WebConnect-Instanzen pro Poll-Zyklus unnoetige, teure Wiederholung.
+        static WebConnect()
         {
-            this.handle = handle;
             log4net.Config.XmlConfigurator.Configure();
-            logger = LogManager.GetLogger(typeof(WebConnect));
         }
 
         public WebConnect(string serverName, int serverPort)
         {
             this.serverName = serverName;
             this.serverPort = serverPort;
-            log4net.Config.XmlConfigurator.Configure();
             logger = LogManager.GetLogger(typeof(WebConnect));
         }
         #endregion
@@ -57,11 +54,15 @@ namespace ApfelmusFramework.Classes.Logic
 
                 byte[] bytesSent = Encoding.ASCII.GetBytes(request);
 
-                Socket s = GetSocket(serverName, serverPort);
-                if (s == null)
-                    return;
+                // using: Socket wird garantiert geschlossen (frueher blieb er offen -> Socket-/
+                // Handle-Leak bei jedem Aufruf, ueber die Zeit Ressourcen-Erschoepfung).
+                using (Socket s = GetSocket(serverName, serverPort))
+                {
+                    if (s == null)
+                        return;
 
-                s.Send(bytesSent, bytesSent.Length, 0);
+                    s.Send(bytesSent, bytesSent.Length, 0);
+                }
             }
             catch (Exception ex)
             {
@@ -83,8 +84,9 @@ namespace ApfelmusFramework.Classes.Logic
                 int count = 0;
                 string header = string.Empty;
 
-                Socket s = GetSocket(serverName, serverPort);
-
+                // using: Socket wird garantiert geschlossen (frueher Leak bei jedem Aufruf).
+                using (Socket s = GetSocket(serverName, serverPort))
+                {
                 if (s == null)
                     return null;
 
@@ -129,6 +131,7 @@ namespace ApfelmusFramework.Classes.Logic
                 {
                     return DecompressHttpResponse(zipBytes.ToArray());
                 }
+                }
             }
             catch (Exception ex)
             {
@@ -140,28 +143,39 @@ namespace ApfelmusFramework.Classes.Logic
 
         private Socket GetSocket(string hostName, int port)
         {
+            Socket socket2 = null;
             try
             {
-                IPAddress address = Dns.GetHostAddresses(serverName).First();
-                IPEndPoint remoteEP = new IPEndPoint(address, port);
-
-                Socket socket2 = new Socket(remoteEP.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-                // Timeouts, damit ein haengender/nicht antwortender Core den aufrufenden Thread
-                // nicht unbegrenzt blockiert. Ohne diese liefen Send/Receive ewig - der Such-
-                // bzw. UI-Thread blieb dann stehen.
-                socket2.ReceiveTimeout = 15000;
-                socket2.SendTimeout = 15000;
-                socket2.Connect(remoteEP);
-                if (socket2.Connected)
+                IPAddress address = Dns.GetHostAddresses(serverName).FirstOrDefault();
+                if (address == null)
                 {
-                    return socket2;
+                    return null;
                 }
 
+                IPEndPoint remoteEP = new IPEndPoint(address, port);
 
+                socket2 = new Socket(remoteEP.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                // Timeouts, damit ein haengender/nicht antwortender Core den aufrufenden Thread
+                // nicht unbegrenzt blockiert (Send/Receive liefen sonst ewig).
+                socket2.ReceiveTimeout = 15000;
+                socket2.SendTimeout = 15000;
+
+                // Connect mit Timeout: ohne diesen blockiert Connect bei nicht erreichbarem Core
+                // die OS-Standardzeit (~20 s). BeginConnect + WaitOne begrenzt das auf 5 s.
+                IAsyncResult connectResult = socket2.BeginConnect(remoteEP, null, null);
+                if (!connectResult.AsyncWaitHandle.WaitOne(5000) || !socket2.Connected)
+                {
+                    socket2.Close();
+                    return null;
+                }
+
+                socket2.EndConnect(connectResult);
+                return socket2;
             }
-            catch (SocketException ex)
+            catch (Exception ex)
             {
                 logger.Error("Fehler beim Aufbau der Socketverbindung!", ex);
+                socket2?.Close();
             }
 
             return null;
@@ -237,17 +251,10 @@ namespace ApfelmusFramework.Classes.Logic
         {
             try
             {
-                Socket s = GetSocket(serverName, serverPort);
-
-                if (s == null)
+                using (Socket s = GetSocket(serverName, serverPort))
                 {
-                    return false;
+                    return s != null;
                 }
-                else
-                {
-                    return true;
-                }
-
             }
             catch
             {
@@ -314,40 +321,15 @@ namespace ApfelmusFramework.Classes.Logic
         {
             if (!this.disposed)
             {
-                // If disposing equals true, dispose all managed 
-                // and unmanaged resources.
                 if (disposing)
                 {
-                    // Dispose managed resources.
+                    // Managed Ressourcen freigeben. Es gibt keine unmanaged Ressourcen mehr
+                    // (Sockets werden direkt in den Methoden per using geschlossen), daher auch
+                    // kein Finalizer noetig - das spart bei den vielen Instanzen GC-Druck.
                     component.Dispose();
                 }
-
-                // Call the appropriate methods to clean up 
-                // unmanaged resources here.
-                // If disposing is false, 
-                // only the following code is executed.
-                CloseHandle(handle);
-                handle = IntPtr.Zero;
             }
             disposed = true;
-        }
-
-        // Use interop to call the method necessary  
-        // to clean up the unmanaged resource.
-        [System.Runtime.InteropServices.DllImport("Kernel32")]
-        private extern static Boolean CloseHandle(IntPtr handle);
-
-        // Use C# destructor syntax for finalization code.
-        // This destructor will run only if the Dispose method 
-        // does not get called.
-        // It gives your base class the opportunity to finalize.
-        // Do not provide destructors in types derived from this class.
-        ~WebConnect()
-        {
-            // Do not re-create Dispose clean-up code here.
-            // Calling Dispose(false) is optimal in terms of
-            // readability and maintainability.
-            Dispose(false);
         }
     }
 }

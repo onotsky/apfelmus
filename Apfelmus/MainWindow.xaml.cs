@@ -438,7 +438,7 @@ namespace Apfelmus
 
 
                         string meldung = webConnect.GetHttpResult(getModifiedInfos, config.UseCompression);
-                        if (meldung.Contains("Passwort falsch"))
+                        if (meldung != null && meldung.Contains("Passwort falsch"))
                         {
                             MessageBox.Show("Passwort ist falsch!", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
                             Environment.Exit(10);
