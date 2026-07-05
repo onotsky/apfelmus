@@ -11,7 +11,7 @@ namespace ApfelmusFramework.Classes.Converter
             if ((bool)value)
                 return Brushes.LightGreen;
             else
-                return Brushes.White;
+                return null;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

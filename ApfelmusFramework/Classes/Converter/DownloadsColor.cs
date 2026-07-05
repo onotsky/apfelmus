@@ -19,7 +19,7 @@ namespace ApfelmusFramework.Classes.Converter
                 case 18:
                     return Brushes.Blue;
                 default:
-                    return Brushes.White;
+                    return null;
             }
         }
 
