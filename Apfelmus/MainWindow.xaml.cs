@@ -962,11 +962,24 @@ namespace Apfelmus
             {
                 using (WebConnect webConnect = new WebConnect(config.HostName, config.Port))
                 {
-                    appleJuice.Search = ((AppleJuice)appleJuice.DeserializeToObj(webConnect.GetHttpResult(getSearch, config.UseCompression))).Search;
-                    appleJuice.SearchEntry = ((AppleJuice)appleJuice.DeserializeToObj(webConnect.GetHttpResult(getSearch, config.UseCompression))).SearchEntry;
+                    // Suchergebnis nur EINMAL holen (frueher zweimal dieselbe URL).
+                    AppleJuice searchResult = (AppleJuice)appleJuice.DeserializeToObj(webConnect.GetHttpResult(getSearch, config.UseCompression));
+                    appleJuice.Search = searchResult.Search;
+                    appleJuice.SearchEntry = searchResult.SearchEntry;
+
+                    // Shares + Settings einmal pro Poll holen. Frueher lag das im
+                    // tempSearch_CollectionChanged-Handler und lief damit pro hinzugefuegtem
+                    // Treffer -> O(n) HTTP-Calls auf dem UI-Thread -> Programm fror beim Klick ein.
+                    appleJuice.Shares = (appleJuice.DeserializeToObj(webConnect.GetHttpResult(getShare, config.UseCompression)) as AppleJuice).Shares;
+                    settings = settings.DeserializeToObj(webConnect.GetHttpResult(getSettings, config.UseCompression)) as Settings;
                 }
 
-                Search _getSearch = appleJuice.Search.AsEnumerable().Where(a => a.id.Equals(id)).First();
+                Search _getSearch = appleJuice.Search.AsEnumerable().FirstOrDefault(a => a.id.Equals(id));
+                if (_getSearch == null)
+                {
+                    return;
+                }
+
                 searchInfo.FoundFiles = searchEntrys.Count();
                 searchInfo.Id = _getSearch.id;
                 searchInfo.OpenSearches = _getSearch.OpenSearches;
@@ -2797,6 +2810,7 @@ namespace Apfelmus
                     CanUserAddRows = false,
                     CanUserDeleteRows = false,
                     AutoGenerateColumns = false,
+                    IsReadOnly = true,
                     RowStyle = newStyle
                 };
 
@@ -2837,15 +2851,16 @@ namespace Apfelmus
 
         private void tempSearch_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            ObservableCollection<SearchEntry> sEntries = sender as ObservableCollection<SearchEntry>;
-
-            using (WebConnect webConnect = new WebConnect(config.HostName, config.Port))
+            // Shares/Settings holt bereits _startSearch einmal pro Poll. Hier NUR die neu
+            // hinzugekommenen Eintraege einfaerben - ohne HTTP und ohne Schleife ueber die
+            // gesamte (waehrend der Suche wachsende) Ergebnisliste. Genau diese beiden Dinge
+            // pro Add haben das Programm beim Klick ins DataGrid einfrieren lassen.
+            if (e.NewItems == null || appleJuice.Shares?.Share == null || settings?.share?.Directory == null)
             {
-                appleJuice.Shares = (appleJuice.DeserializeToObj(webConnect.GetHttpResult(getShare, config.UseCompression)) as AppleJuice).Shares;
-                settings = settings.DeserializeToObj(webConnect.GetHttpResult(getSettings, config.UseCompression)) as Settings;
+                return;
             }
 
-            foreach (SearchEntry newItem in sEntries)
+            foreach (SearchEntry newItem in e.NewItems.OfType<SearchEntry>())
             {
                 IEnumerable<Share> getShares = appleJuice.Shares.Share.Where(a => a.CheckSum.Equals(newItem.Checksum));
 
