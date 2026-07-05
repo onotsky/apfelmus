@@ -51,7 +51,5 @@ using System.Windows;
 // Sie können alle Werte angeben oder die standardmäßigen Build- und Revisionsnummern 
 // übernehmen, indem Sie "*" eingeben:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("4.1.1.*")]
-#pragma warning disable CS7035 // Die angegebene Versionszeichenfolge entspricht nicht dem empfohlenen Format: Hauptversion.Nebenversion.Build.Revision
-[assembly: AssemblyFileVersion(version: "4.1.1.*")]
-#pragma warning restore CS7035 // Die angegebene Versionszeichenfolge entspricht nicht dem empfohlenen Format: Hauptversion.Nebenversion.Build.Revision
+[assembly: AssemblyVersion("4.1.1.0")]
+[assembly: AssemblyFileVersion(version: "4.1.1.0")]
