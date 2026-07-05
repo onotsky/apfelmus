@@ -11,7 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="log4net" Version="2.0.15" />
+    <PackageReference Include="log4net" Version="3.3.2" />
     <!-- Fuer FilenameToImage.cs (Icon.ExtractAssociatedIcon) - unter .NET Core kein Teil des Basis-Frameworks mehr -->
     <PackageReference Include="System.Drawing.Common" Version="8.0.0" />
   </ItemGroup>
