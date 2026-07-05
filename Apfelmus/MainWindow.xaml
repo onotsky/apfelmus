@@ -224,7 +224,7 @@
                         <Button Name="btnShareCheck" Content="{DynamicResource sharecheck}" Margin="20,0,0,0" Click="btnShareCheck_Click" />
                     </StackPanel>
                     <Label Content="Verzeichnisse" Grid.Column="0" Grid.Row="1" Height="20" VerticalAlignment="Top" Margin="2" />
-                    <TreeView Name="tViewSharePaths"  Grid.Column="0" Grid.Row="1" Grid.RowSpan="2">
+                    <TreeView Name="tViewSharePaths"  Grid.Column="0" Grid.Row="1" Grid.RowSpan="2" SelectedItemChanged="tViewSharePaths_SelectedItemChanged">
                         <TreeView.Resources>
                             <conv:TypeToImage x:Key="TypeToImage" />
                             <HierarchicalDataTemplate DataType="{x:Type help:DirectoryChildren}" ItemsSource="{Binding Path=Childrens}">
@@ -258,7 +258,13 @@
                             </ContextMenu>
                         </TreeView.ContextMenu>
                     </TreeView>
-                    <DataGrid Grid.Row="1" Grid.Column="1"  Width="Auto" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.VirtualizationMode="Recycling" AutoGenerateColumns="false" SelectionUnit="FullRow" CanUserAddRows="False" CanUserDeleteRows="False" Name="dGridShares" SelectionMode="Extended" GridLinesVisibility="None" ColumnWidth="auto" MouseRightButtonDown="dGridShares_MouseRightButtonDown" Margin="2,0,0,0" KeyDown="DGridShares_KeyDown" >
+                    <DockPanel Grid.Row="1" Grid.Column="1" Margin="2,0,0,0">
+                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,3">
+                            <Label Content="{DynamicResource sharefilter}" VerticalAlignment="Center" />
+                            <TextBox Name="tbxShareFilter" Width="240" VerticalAlignment="Center" TextChanged="tbxShareFilter_TextChanged" />
+                            <Button Name="btnShareShowAll" Content="{DynamicResource shareshowall}" Margin="10,0,0,0" Click="btnShareShowAll_Click" />
+                        </StackPanel>
+                    <DataGrid Width="Auto" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.VirtualizationMode="Recycling" AutoGenerateColumns="false" SelectionUnit="FullRow" CanUserAddRows="False" CanUserDeleteRows="False" Name="dGridShares" SelectionMode="Extended" GridLinesVisibility="None" ColumnWidth="auto" MouseRightButtonDown="dGridShares_MouseRightButtonDown" KeyDown="DGridShares_KeyDown" >
                         <!--<DataGrid Grid.Row="1" Grid.Column="1"  Width="Auto" AutoGenerateColumns="false" SelectionUnit="FullRow" CanUserAddRows="False" CanUserDeleteRows="False" Name="dGridShares" SelectionMode="Extended" GridLinesVisibility="None" ColumnWidth="auto" MouseRightButtonDown="dGridShares_MouseRightButtonDown" Margin="2,0,0,0">-->
                         <DataGrid.Resources>
                             <conv:FilenameToImage x:Key="FilenameToImage" />
@@ -322,6 +328,7 @@
                             <DataGridTextColumn Header="{StaticResource searchr}" Width="100" Binding="{Binding Path=SearchCount}" />
                         </DataGrid.Columns>
                     </DataGrid>
+                    </DockPanel>
                     <GroupBox Grid.Column="1" Grid.Row="2" Header="{DynamicResource sharefolders}" Margin="5">
                         <StackPanel Name="sPanelShareFolders" Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5"/>
                     </GroupBox>

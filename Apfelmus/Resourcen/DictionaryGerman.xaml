@@ -200,4 +200,6 @@
     <system:String x:Key="partlistsize">Größe:</system:String>
     <system:String x:Key="partlistsources">Quellen</system:String>
     <system:String x:Key="partlistsizesetting">Partlisten-Größe:</system:String>
+    <system:String x:Key="sharefilter">Filter:</system:String>
+    <system:String x:Key="shareshowall">Alle</system:String>
 </ResourceDictionary>

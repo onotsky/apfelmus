@@ -82,6 +82,9 @@ namespace Apfelmus
 
         private ListCollectionView lcvShares;
         private SortDescription sdShares = new SortDescription("ShortFileName", ListSortDirection.Ascending);
+        // Filterzustand fuer die Share-Anzeige: Ordner (aus dem Baum) + Freitext (Dateiname).
+        private string _shareFilterFolder;
+        private string _shareFilterText = string.Empty;
 
         public static Config config;
         private ILog logger;
@@ -602,6 +605,7 @@ namespace Apfelmus
                 dGridServer.ItemsSource = server;
                 lcvShares = new ListCollectionView(_shares);
                 lcvShares.GroupDescriptions.Add(new PropertyGroupDescription("Path"));
+                lcvShares.Filter = ShareFilter;
                 dGridShares.ItemsSource = lcvShares;
                 lblCreditsValue.DataContext = info;
                 lblUploadsValue.DataContext = info;
@@ -1724,6 +1728,59 @@ namespace Apfelmus
             {
                 logger.Error("Fehler beim Setzen des Powerdownloads!", ex);
             }
+        }
+
+        /// <summary>
+        /// Filter-Praedikat der Share-Anzeige: zeigt einen Share nur, wenn er (a) zum im Baum
+        /// gewaehlten Ordner gehoert (falls einer gewaehlt ist) und (b) der Freitext im Dateinamen
+        /// vorkommt. So wird das Grid explorer-artig auf den aktuellen Ordner eingegrenzt.
+        /// </summary>
+        private bool ShareFilter(object item)
+        {
+            Share share = item as Share;
+            if (share == null)
+            {
+                return false;
+            }
+
+            if (!string.IsNullOrEmpty(_shareFilterFolder)
+                && !string.Equals(share.Path, _shareFilterFolder, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            if (!string.IsNullOrEmpty(_shareFilterText)
+                && (share.ShortFileName == null
+                    || share.ShortFileName.IndexOf(_shareFilterText, StringComparison.OrdinalIgnoreCase) < 0))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private void tbxShareFilter_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            _shareFilterText = tbxShareFilter.Text ?? string.Empty;
+            lcvShares?.Refresh();
+        }
+
+        /// <summary>
+        /// Auswahl eines Ordners im Baum grenzt das Grid auf diesen Ordner ein (explorer-artig).
+        /// </summary>
+        private void tViewSharePaths_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            DirectoryChildren dChild = tViewSharePaths.SelectedItem as DirectoryChildren;
+            _shareFilterFolder = dChild?.Dir?.Name;
+            lcvShares?.Refresh();
+        }
+
+        private void btnShareShowAll_Click(object sender, RoutedEventArgs e)
+        {
+            _shareFilterFolder = null;
+            tbxShareFilter.Text = string.Empty;
+            _shareFilterText = string.Empty;
+            lcvShares?.Refresh();
         }
 
         private void btnShareRefresh_Click(object sender, RoutedEventArgs e)
