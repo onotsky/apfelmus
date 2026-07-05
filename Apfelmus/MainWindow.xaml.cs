@@ -1252,22 +1252,9 @@ namespace Apfelmus
         }
 
         /// <summary>
-        /// Kontinuierlicher Blauverlauf fuer die Anzahl verfuegbarer Quellen (1 bis 10+),
-        /// analog zu PartList.COLOR_TYPE_1..COLOR_TYPE_10 in der appleJuice-Java-GUI.
+        /// Obergrenze fuer die Quellenanzahl-Faerbung; ab hier keine sichtbare Steigerung mehr.
         /// </summary>
-        private static readonly Color[] SourceGradient =
-        {
-            Color.FromRgb(225, 225, 250), // 1 Quelle
-            Color.FromRgb(200, 200, 250), // 2
-            Color.FromRgb(175, 175, 250), // 3
-            Color.FromRgb(150, 150, 250), // 4
-            Color.FromRgb(125, 125, 250), // 5
-            Color.FromRgb(100, 100, 250), // 6
-            Color.FromRgb(75, 75, 250),   // 7
-            Color.FromRgb(50, 50, 250),   // 8
-            Color.FromRgb(25, 25, 250),   // 9
-            Colors.Blue                   // 10+
-        };
+        private const int MaxGradientSources = 8;
 
         /// <summary>
         /// Delegatmethode zum Erzeugen/Erneuern der Downloadpartliste
@@ -1287,9 +1274,8 @@ namespace Apfelmus
                 IEnumerable<User> activeSources = users.Where(a => a.Status.Equals(7));
 
                 int width = (int)Math.Max(1, imgPartList.ActualWidth);
-                int height = (int)Math.Max(1, imgPartList.ActualHeight);
 
-                WriteableBitmap bitmap = RenderPartList(appleJuice.FileInformation.Filesize, appleJuice.Parts, activeSources, width, height, isMainList: true);
+                WriteableBitmap bitmap = RenderPartList(appleJuice.FileInformation.Filesize, appleJuice.Parts, activeSources, width, isMainList: true);
                 if (bitmap != null)
                 {
                     imgPartList.Source = bitmap;
@@ -1317,9 +1303,8 @@ namespace Apfelmus
                 }
 
                 int width = (int)Math.Max(1, imgPartList.ActualWidth);
-                int height = (int)Math.Max(1, imgPartList.ActualHeight);
 
-                WriteableBitmap bitmap = RenderPartList(appleJuice.FileInformation.Filesize, appleJuice.Parts, null, width, height, isMainList: false);
+                WriteableBitmap bitmap = RenderPartList(appleJuice.FileInformation.Filesize, appleJuice.Parts, null, width, isMainList: false);
                 if (bitmap != null)
                 {
                     imgPartList.Source = bitmap;
@@ -1332,73 +1317,64 @@ namespace Apfelmus
         }
 
         /// <summary>
-        /// Rendert eine Part-/Verfuegbarkeitsliste als Pixel-Raster. Die Aufloesung ergibt sich
-        /// aus der tatsaechlichen Panelgroesse zur Laufzeit (statt eines fest verdrahteten
-        /// 11160-Rechtecke-Rasters), analog zu DownloadPartListPanel.paintComponent() der
-        /// appleJuice-Java-GUI. Verfuegbarkeit und aktive Uebertragung werden als zwei
-        /// uebereinanderliegende Ebenen gezeichnet statt ueber verschachtelte
-        /// Prioritaets-Vergleiche pro Rechteck.
+        /// Rendert eine Part-/Verfuegbarkeitsliste als einzeilige Pixelreihe (1 x width). Die
+        /// vertikale Skalierung auf die Anzeigeflaeche uebernimmt bereits das
+        /// Stretch="Fill" der Image-Control in MainWindow.xaml - eine eigene Mehrzeilen-Logik
+        /// waere hier redundant. Statt pro appleJuice-Part einen Zielbereich zu fuellen, wird
+        /// je Bildspalte per Zwei-Zeiger-Vorschub der zustaendige Part bestimmt (inverses/
+        /// "backward" Mapping); dadurch bekommt jede Spalte genau einen eindeutigen Farbwert,
+        /// ohne dass sich uebereinanderliegende Fuellungen gegenseitig ueberschreiben koennen.
         /// </summary>
-        private WriteableBitmap RenderPartList(long fileSize, List<Part> parts, IEnumerable<User> activeSources, int width, int height, bool isMainList)
+        private WriteableBitmap RenderPartList(long fileSize, List<Part> parts, IEnumerable<User> activeSources, int width, bool isMainList)
         {
-            if (width <= 0 || height <= 0 || fileSize <= 0 || parts == null || parts.Count == 0)
+            if (width <= 0 || fileSize <= 0 || parts == null || parts.Count == 0)
             {
                 return null;
             }
 
-            const int rowHeight = 4;
-            int rows = Math.Max(1, height / rowHeight);
-            long totalPixels = (long)width * rows;
+            int[] row = new int[width];
 
-            double bytesPerPixel = fileSize / (double)totalPixels;
-            bool miniFile = bytesPerPixel < 1.0;
-            double pixelsPerByte = miniFile ? totalPixels / (double)fileSize : 0;
-
-            Func<long, long> toLinearPixel = bytePosition =>
+            int partIndex = 0;
+            for (int column = 0; column < width; column++)
             {
-                long pixel = miniFile
-                    ? (long)(bytePosition * pixelsPerByte)
-                    : (long)(bytePosition / bytesPerPixel);
-                return Math.Max(0, Math.Min(pixel, totalPixels));
-            };
+                long columnMiddle = ((long)column * 2 + 1) * fileSize / (2 * width);
 
-            int[] pixels = new int[totalPixels];
+                while (partIndex + 1 < parts.Count && parts[partIndex + 1].FromPosition <= columnMiddle)
+                {
+                    partIndex++;
+                }
 
-            // Ebene 1: Verfuegbarkeit je appleJuice-Part (Quellenanzahl -> Blauverlauf)
-            for (int i = 0; i < parts.Count; i++)
-            {
-                long from = parts[i].FromPosition;
-                long to = (i + 1 < parts.Count) ? parts[i + 1].FromPosition : fileSize;
-                FillRange(pixels, toLinearPixel(from), toLinearPixel(to), ToArgb(GetColorForType(parts[i].type, isMainList)));
+                row[column] = ToArgb(GetColorForType(parts[partIndex].type, isMainList));
             }
 
-            // Ebene 2: aktive Uebertragungen (nur Hauptliste) - Orange fuer bereits geladen,
-            // Gelb als aktueller Positionsmarker, wie im bisherigen Farbschema/Legende.
+            // Aktive Uebertragungen (nur Hauptliste) ueberschreiben die Verfuegbarkeitsfarbe an
+            // ihrer Position - Orange fuer den bereits geladenen Bereich, Gelb als
+            // Positionsmarker, passend zur bestehenden Legende.
             if (isMainList && activeSources != null)
             {
                 foreach (User user in activeSources)
                 {
-                    long from = toLinearPixel(user.DownloadFrom);
-                    long position = toLinearPixel(user.ActualDownloadPosition);
-                    FillRange(pixels, from, position, ToArgb(Colors.Orange));
-                    FillRange(pixels, position, position + 1, ToArgb(Colors.Yellow));
+                    int from = ColumnForBytePosition(user.DownloadFrom, fileSize, width);
+                    int position = ColumnForBytePosition(user.ActualDownloadPosition, fileSize, width);
+
+                    for (int column = from; column < position; column++)
+                    {
+                        row[column] = ToArgb(Colors.Orange);
+                    }
+
+                    row[position] = ToArgb(Colors.Yellow);
                 }
             }
 
-            WriteableBitmap bitmap = new WriteableBitmap(width, rows, 96, 96, PixelFormats.Bgra32, null);
-            bitmap.WritePixels(new Int32Rect(0, 0, width, rows), pixels, width * 4, 0);
+            WriteableBitmap bitmap = new WriteableBitmap(width, 1, 96, 96, PixelFormats.Bgra32, null);
+            bitmap.WritePixels(new Int32Rect(0, 0, width, 1), row, width * 4, 0);
             return bitmap;
         }
 
-        private static void FillRange(int[] pixels, long from, long to, int argb)
+        private static int ColumnForBytePosition(long bytePosition, long fileSize, int width)
         {
-            from = Math.Max(0, from);
-            to = Math.Min(pixels.Length, to);
-
-            for (long i = from; i < to; i++)
-            {
-                pixels[i] = argb;
-            }
+            long column = bytePosition * width / Math.Max(1, fileSize);
+            return (int)Math.Max(0, Math.Min(width - 1, column));
         }
 
         private static Color GetColorForType(int type, bool isMainList)
@@ -1406,7 +1382,7 @@ namespace Apfelmus
             if (type == -1)
             {
                 // Hauptliste: fertig/ueberprueft (Legende "colorfinished"); Quellliste: bei dieser
-                // Quelle vorhanden (Legende "coloravailable") - wie im bisherigen Farbschema.
+                // Quelle vorhanden (Legende "coloravailable") - bestehendes Apfelmus-Farbschema.
                 return isMainList ? Colors.Green : Colors.Blue;
             }
 
@@ -1415,8 +1391,20 @@ namespace Apfelmus
                 return Colors.Red;
             }
 
-            int index = Math.Min(type, SourceGradient.Length) - 1;
-            return SourceGradient[index];
+            return SourceCountToColor(type);
+        }
+
+        /// <summary>
+        /// Blauton fuer die Anzahl verfuegbarer Quellen: je mehr Quellen, desto dunkler/
+        /// gesaettigter das Blau. Formelbasiert statt einer festen Farbtabelle, gedeckelt bei
+        /// <see cref="MaxGradientSources"/>.
+        /// </summary>
+        private static Color SourceCountToColor(int sourceCount)
+        {
+            int clamped = Math.Max(1, Math.Min(sourceCount, MaxGradientSources));
+            double t = (clamped - 1) / (double)(MaxGradientSources - 1);
+            byte channel = (byte)Math.Round(220 - (t * 190));
+            return Color.FromRgb(channel, channel, 255);
         }
 
         private static int ToArgb(Color c)
