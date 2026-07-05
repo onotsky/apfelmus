@@ -146,6 +146,11 @@ namespace ApfelmusFramework.Classes.Logic
                 IPEndPoint remoteEP = new IPEndPoint(address, port);
 
                 Socket socket2 = new Socket(remoteEP.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                // Timeouts, damit ein haengender/nicht antwortender Core den aufrufenden Thread
+                // nicht unbegrenzt blockiert. Ohne diese liefen Send/Receive ewig - der Such-
+                // bzw. UI-Thread blieb dann stehen.
+                socket2.ReceiveTimeout = 15000;
+                socket2.SendTimeout = 15000;
                 socket2.Connect(remoteEP);
                 if (socket2.Connected)
                 {

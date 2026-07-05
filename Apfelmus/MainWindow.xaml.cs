@@ -60,6 +60,10 @@ namespace Apfelmus
         private Thread _refreshServer;
         private Thread _checkConnectionToCore;
         private Thread _searchThread;
+        // Kooperatives Stopp-Signal fuer den Such-Thread. Thread.Abort() gibt es unter .NET (Core)
+        // nicht mehr (wirft PlatformNotSupportedException) - der Thread muss selbst regelmaessig
+        // pruefen, ob er beendet werden soll.
+        private volatile bool _stopSearch;
         private Thread _refreshDownloadPartList;
         private Thread _refreshUserPartList;
         private DataGrid selectionDownloadGrid = new DataGrid();
@@ -252,17 +256,27 @@ namespace Apfelmus
         /// <param name="e"></param>
         private void _search_ThreadWorker(object obj)
         {
-            Search _getSearch = appleJuice.Search.AsEnumerable().Where(a => a.Running.Equals(true)).First();
+            ActivateButtons aButtons = new ActivateButtons(_activateButtons);
+
+            // FirstOrDefault statt First: findet sich keine laufende Suche (Race beim Start),
+            // wird der Thread sauber beendet statt mit einer Exception zu sterben.
+            Search _getSearch = appleJuice.Search.AsEnumerable().FirstOrDefault(a => a.Running.Equals(true));
+            if (_getSearch == null)
+            {
+                Dispatcher.Invoke(aButtons, null);
+                return;
+            }
+
             int id = _getSearch.id;
             object[] param = new object[] { (ObservableCollection<SearchEntry>)obj, id };
             UpdateSearchCollection uSearch = new UpdateSearchCollection(_startSearch);
-            ActivateButtons aButtons = new ActivateButtons(_activateButtons);
 
-            while ((Thread.CurrentThread.ThreadState & ThreadState.Running) == ThreadState.Running)
+            while (!_stopSearch)
             {
                 try
                 {
-                    if (!appleJuice.Search.AsEnumerable().Where(a => a.id.Equals(id)).First().Running)
+                    Search current = appleJuice.Search.AsEnumerable().FirstOrDefault(a => a.id.Equals(id));
+                    if (current == null || !current.Running)
                     {
                         break;
                     }
@@ -2483,9 +2497,10 @@ namespace Apfelmus
                 }
             }
 
-            if (_searchThread.IsAlive && _searchThread.Name.Contains(tItem.Tag.ToString()))
+            if (_searchThread != null && _searchThread.IsAlive && _searchThread.Name.Contains(tItem.Tag.ToString()))
             {
-                _searchThread.Abort();
+                // Kooperativ beenden statt Thread.Abort() (existiert unter .NET Core nicht mehr).
+                _stopSearch = true;
                 _activateButtons();
             }
         }
@@ -2726,6 +2741,7 @@ namespace Apfelmus
                 cTabItem.Tag = _getSearch.id;
                 cTabItem.Focus();
 
+                _stopSearch = false;
                 _searchThread = new Thread(new ParameterizedThreadStart(_search_ThreadWorker))
                 {
                     Name = "SearchWorker" + _getSearch.id,
