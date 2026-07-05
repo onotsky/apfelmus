@@ -9,10 +9,6 @@
     <ApplicationIcon>Apple-icon.ico</ApplicationIcon>
     <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <!-- BinarySerializer.cs (Config.dat) nutzt BinaryFormatter - unter .NET 8 nur noch per
-         Opt-in nutzbar und ab .NET 9 komplett entfernt. Langfristig auf XmlSerializer o.ae.
-         umstellen (siehe restliche DTOs im Projekt, die das schon so machen). -->
-    <EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
   </PropertyGroup>
 
   <ItemGroup>

@@ -20,6 +20,19 @@ Mehrsprachig (Deutsch/Englisch/Italienisch), umschaltbar über das Menü. Zwei F
 | `Apfelmus` | Die GUI selbst (Hauptfenster, Dialoge, Splashscreen) |
 | `ApfelmusFramework` | Core-Kommunikation (XML-API), Datenmodelle, Value-Converter, Theme-Verwaltung |
 | `WpfCustomControlLibrary1` | Eigenes `CloseableTabItem`-Control für die Such-Ergebnis-Tabs |
+| `ConfigMigrator` | Einmal-Kommandozeilentool zur Migration alter `Config.dat` (BinaryFormatter) auf `Config.xml` (XmlSerializer), siehe unten |
+
+## Konfigurationsmigration (Config.dat → Config.xml)
+
+Ältere Installationen speichern ihre Einstellungen in `%AppData%\Apfelmus\Config.dat` (per `BinaryFormatter`). Ab dieser Version verwendet Apfelmus stattdessen `Config.xml` (per `XmlSerializer`) – dadurch hat die App selbst keine `BinaryFormatter`-Abhängigkeit mehr, was `BinaryFormatter` ab .NET 9 ohnehin nicht mehr existiert.
+
+Beim ersten Start ohne vorhandene `Config.xml` legt Apfelmus einfach eine neue, leere Konfiguration an. Um stattdessen die bisherigen Einstellungen (Server, Passwort, Sprache, Theme, …) zu übernehmen, einmalig das Migrationstool ausführen:
+
+```
+dotnet run --project ConfigMigrator
+```
+
+Das Tool liest `Config.dat`, schreibt `Config.xml` im selben Ordner und benennt die alte Datei anschließend in `Config.dat.bak` um (sie wird nicht gelöscht).
 
 ## Bauen
 
@@ -35,7 +48,6 @@ dotnet build
 ## Bekannte Einschränkungen
 
 - Dateien müssen aktuell **unter 2 GB** bleiben (`Part.FromPosition` / `FileInformation.Filesize` sind als `int` statt `long` modelliert).
-- Die lokale Konfiguration (`Config.dat`) wird über `BinaryFormatter` serialisiert – das funktioniert nur bis einschließlich .NET 8 über einen expliziten Kompatibilitätsschalter und wird in .NET 9+ komplett entfernt. Eine Migration auf `XmlSerializer` (wie der Rest der Datenmodelle es bereits macht) steht noch aus.
 
 ## Verwandtes Projekt
 

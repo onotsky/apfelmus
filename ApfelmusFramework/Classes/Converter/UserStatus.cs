@@ -12,10 +12,10 @@ namespace ApfelmusFramework.Classes.Converter
 
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            if (string.IsNullOrEmpty(BinarySerializer.DeserializeFromFile().LanguageFile))
+            if (string.IsNullOrEmpty(ConfigSerializer.DeserializeFromFile().LanguageFile))
                 dict = LanguageDictionary.GetLanguageDictionary();
             else
-                dict = LanguageDictionary.GetLanguageDictionary(BinarySerializer.DeserializeFromFile().LanguageFile);
+                dict = LanguageDictionary.GetLanguageDictionary(ConfigSerializer.DeserializeFromFile().LanguageFile);
 
             switch ((int)value)
             {

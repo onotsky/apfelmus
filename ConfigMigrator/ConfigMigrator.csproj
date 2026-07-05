@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RootNamespace>ConfigMigrator</RootNamespace>
+    <AssemblyName>ConfigMigrator</AssemblyName>
+    <Nullable>disable</Nullable>
+    <!-- Einmal-Werkzeug fuer bestehende Installationen: liest die alte, per BinaryFormatter
+         serialisierte Config.dat und schreibt sie als Config.xml (ConfigSerializer-Format).
+         BinaryFormatter steckt bewusst NUR noch hier drin - Apfelmus und ApfelmusFramework
+         selbst haben keine BinaryFormatter-Abhaengigkeit mehr und sind damit frei, auf eine
+         neuere .NET-Version zu wechseln (ab .NET 9 gibt es BinaryFormatter gar nicht mehr). -->
+    <EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
+    <NoWarn>$(NoWarn);SYSLIB0011</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ApfelmusFramework\ApfelmusFramework.csproj" />
+  </ItemGroup>
+
+</Project>

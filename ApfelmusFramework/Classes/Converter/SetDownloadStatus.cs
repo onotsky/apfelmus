@@ -21,10 +21,10 @@ namespace ApfelmusFramework.Classes.Converter
         {
             try
             {
-                if (string.IsNullOrEmpty(BinarySerializer.DeserializeFromFile().LanguageFile))
+                if (string.IsNullOrEmpty(ConfigSerializer.DeserializeFromFile().LanguageFile))
                     dict = LanguageDictionary.GetLanguageDictionary();
                 else
-                    dict = LanguageDictionary.GetLanguageDictionary(BinarySerializer.DeserializeFromFile().LanguageFile);
+                    dict = LanguageDictionary.GetLanguageDictionary(ConfigSerializer.DeserializeFromFile().LanguageFile);
 
                 string[] valuesString = new string[values.Length];
 

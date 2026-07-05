@@ -18,15 +18,15 @@ namespace ApfelmusFramework.Classes.Converter
             try
             {
                 if ((int)value == 1)
-                    if (string.IsNullOrEmpty(BinarySerializer.DeserializeFromFile().LanguageFile))
+                    if (string.IsNullOrEmpty(ConfigSerializer.DeserializeFromFile().LanguageFile))
                         return LanguageDictionary.GetLanguageDictionary()["uploadstatus1"];
                     else
-                        return LanguageDictionary.GetLanguageDictionary(BinarySerializer.DeserializeFromFile().LanguageFile)["uploadstatus1"];
+                        return LanguageDictionary.GetLanguageDictionary(ConfigSerializer.DeserializeFromFile().LanguageFile)["uploadstatus1"];
                 else
-                    if (string.IsNullOrEmpty(BinarySerializer.DeserializeFromFile().LanguageFile))
+                    if (string.IsNullOrEmpty(ConfigSerializer.DeserializeFromFile().LanguageFile))
                         return LanguageDictionary.GetLanguageDictionary()["uploadstatus2"];
                     else
-                        return LanguageDictionary.GetLanguageDictionary(BinarySerializer.DeserializeFromFile().LanguageFile)["uploadstatus2"];
+                        return LanguageDictionary.GetLanguageDictionary(ConfigSerializer.DeserializeFromFile().LanguageFile)["uploadstatus2"];
             }
             catch
             {

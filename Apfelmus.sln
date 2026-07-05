@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloseableTab", "WpfCustomCo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApfelmusFramework", "ApfelmusFramework\ApfelmusFramework.csproj", "{DA17CBED-2033-40EA-8982-F8A092FAC033}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigMigrator", "ConfigMigrator\ConfigMigrator.csproj", "{F8C0E486-5298-49CF-AE7F-A618297C84F9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{DA17CBED-2033-40EA-8982-F8A092FAC033}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DA17CBED-2033-40EA-8982-F8A092FAC033}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DA17CBED-2033-40EA-8982-F8A092FAC033}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8C0E486-5298-49CF-AE7F-A618297C84F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8C0E486-5298-49CF-AE7F-A618297C84F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8C0E486-5298-49CF-AE7F-A618297C84F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8C0E486-5298-49CF-AE7F-A618297C84F9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

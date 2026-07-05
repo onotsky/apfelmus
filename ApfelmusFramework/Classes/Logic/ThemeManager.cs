@@ -46,7 +46,7 @@ namespace ApfelmusFramework.Classes.Logic
 
             try
             {
-                Config config = BinarySerializer.DeserializeFromFile();
+                Config config = ConfigSerializer.DeserializeFromFile();
                 if (!string.IsNullOrEmpty(config.Theme))
                 {
                     theme = config.Theme;

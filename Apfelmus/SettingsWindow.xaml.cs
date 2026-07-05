@@ -173,7 +173,7 @@ namespace Apfelmus
                 }
 
                 config.Password = CreateMd5Hash.GetMD5Hash(pBoxPassword.Password);
-                BinarySerializer.SerializeToFile(config);
+                ConfigSerializer.SerializeToFile(config);
 
                 pBoxPassword.Password = string.Empty;
             }
@@ -188,7 +188,7 @@ namespace Apfelmus
             try
             {
                 config.HideLoginWindow = false;
-                BinarySerializer.SerializeToFile(config);
+                ConfigSerializer.SerializeToFile(config);
 
             }
             catch (Exception ex)
@@ -231,7 +231,7 @@ namespace Apfelmus
                     }
 
                     config.ProtocolHandler = true;
-                    BinarySerializer.SerializeToFile(config);
+                    ConfigSerializer.SerializeToFile(config);
                 }
             }
             catch (Exception ex)
@@ -266,7 +266,7 @@ namespace Apfelmus
         private void ChangeRefreshRate()
         {
             config.RefreshRate = RefreshRateValue;
-            BinarySerializer.SerializeToFile(config);
+            ConfigSerializer.SerializeToFile(config);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

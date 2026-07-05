@@ -163,7 +163,7 @@ namespace Apfelmus
 
             try
             {
-                config = BinarySerializer.DeserializeFromFile();
+                config = ConfigSerializer.DeserializeFromFile();
                 if (config.LanguageFile != null)
                 {
                     Resources.MergedDictionaries.Add(LanguageDictionary.GetLanguageDictionary(config.LanguageFile));
@@ -2618,7 +2618,7 @@ namespace Apfelmus
             config.LanguageFile = "..\\Resourcen\\DictionaryGerman.xaml";
             dict.Source = new Uri(config.LanguageFile, UriKind.Relative);
             Resources.MergedDictionaries.Add(dict);
-            BinarySerializer.SerializeToFile(config);
+            ConfigSerializer.SerializeToFile(config);
         }
 
         private void English_Click(object sender, RoutedEventArgs e)
@@ -2628,7 +2628,7 @@ namespace Apfelmus
             config.LanguageFile = "..\\Resourcen\\DictionaryEnglish.xaml";
             dict.Source = new Uri(config.LanguageFile, UriKind.Relative);
             Resources.MergedDictionaries.Add(dict);
-            BinarySerializer.SerializeToFile(config);
+            ConfigSerializer.SerializeToFile(config);
         }
 
         private void Italian_Click(object sender, RoutedEventArgs e)
@@ -2638,21 +2638,21 @@ namespace Apfelmus
             config.LanguageFile = "..\\Resourcen\\DictionaryItalian.xaml";
             dict.Source = new Uri(config.LanguageFile, UriKind.Relative);
             Resources.MergedDictionaries.Add(dict);
-            BinarySerializer.SerializeToFile(config);
+            ConfigSerializer.SerializeToFile(config);
         }
 
         private void Dark_Click(object sender, RoutedEventArgs e)
         {
             config.Theme = ThemeManager.Dark;
             ThemeManager.Apply(config.Theme);
-            BinarySerializer.SerializeToFile(config);
+            ConfigSerializer.SerializeToFile(config);
         }
 
         private void Light_Click(object sender, RoutedEventArgs e)
         {
             config.Theme = ThemeManager.Light;
             ThemeManager.Apply(config.Theme);
-            BinarySerializer.SerializeToFile(config);
+            ConfigSerializer.SerializeToFile(config);
         }
 
         private void btnStartSearch_Click(object sender, RoutedEventArgs e)

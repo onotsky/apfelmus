@@ -4,13 +4,10 @@
 // </copyright>
 // <author>daredevil</author>
 //-----------------------------------------------------------------------
-using System;
-
 namespace ApfelmusFramework.Classes.Config
 {
 
 
-    [Serializable]
     public class Config
     {
         private string hostname;

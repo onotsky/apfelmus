@@ -47,7 +47,7 @@ namespace Apfelmus
         {
             try
             {
-                config = BinarySerializer.DeserializeFromFile();
+                config = ConfigSerializer.DeserializeFromFile();
                 if (config.RefreshRate.Equals(0))
                     config.RefreshRate = 1500;
             }
@@ -61,7 +61,7 @@ namespace Apfelmus
                 config.UseCompression = false;
                 config.RefreshRate = 1500;
                 config.LanguageFile = LanguageDictionary.GetURI();
-                BinarySerializer.SerializeToFile(config);
+                ConfigSerializer.SerializeToFile(config);
             }
         }
 
@@ -81,7 +81,7 @@ namespace Apfelmus
                     {
                         config.Password = CreateMd5Hash.GetMD5Hash(pbxPasswd.Password);
                         MainWindow.config = config;
-                        BinarySerializer.SerializeToFile(config);
+                        ConfigSerializer.SerializeToFile(config);
                         this.Close();
                     }
                     else
