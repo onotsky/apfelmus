@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Windows;
+using System.Windows.Shell;
 using ApfelmusFramework.Classes.Allgemein;
 using ApfelmusFramework.Classes.Config;
 using ApfelmusFramework.Classes.Directory;
@@ -61,6 +62,11 @@ namespace Apfelmus
         {
             this.DialogResult = false;
             this.Close();
+        }
+
+        private void TitleBarClose_Click(object sender, RoutedEventArgs e)
+        {
+            SystemCommands.CloseWindow(this);
         }
 
         private void OpenFolderWindow_Loaded_1(object sender, RoutedEventArgs e)

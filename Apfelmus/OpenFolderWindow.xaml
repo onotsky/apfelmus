@@ -3,9 +3,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:help="clr-namespace:ApfelmusFramework.Classes.Help;assembly=ApfelmusFramework"
         xmlns:conv="clr-namespace:ApfelmusFramework.Classes.Converter;assembly=ApfelmusFramework"
-        Title="" Height="300" Width="300" ResizeMode="NoResize" WindowStyle="ThreeDBorderWindow" Loaded="OpenFolderWindow_Loaded_1" Icon="/ApfelmusFramework;component/Images/Apple-icon.png">
+        Title="" Height="332" Width="300" ResizeMode="NoResize" WindowStyle="None" Loaded="OpenFolderWindow_Loaded_1" Icon="/ApfelmusFramework;component/Images/Apple-icon.png">
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="32" ResizeBorderThickness="0" GlassFrameThickness="0" CornerRadius="0" UseAeroCaptionButtons="False" />
+    </WindowChrome.WindowChrome>
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="32"/>
             <RowDefinition Height="30"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="40"/>
@@ -14,8 +18,27 @@
             <ColumnDefinition />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <Label Grid.Row="0" Grid.Column="0" Name="lblFolderBrowser" Content="{DynamicResource folderbrowser}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-        <TreeView Name="tViewFolderBrowser" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" >
+
+        <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Background="{DynamicResource SurfaceBrush}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="10,0,0,0" VerticalAlignment="Center">
+                <Image Source="/ApfelmusFramework;component/Images/Apple-icon.png" Width="16" Height="16" />
+                <TextBlock Text="Apfelmus" Margin="8,0,0,0" Foreground="{DynamicResource TextPrimaryBrush}" FontWeight="SemiBold" VerticalAlignment="Center" />
+            </StackPanel>
+            <Button Grid.Column="2" Name="btnTitleClose" Click="TitleBarClose_Click" Style="{StaticResource TitleBarCloseButtonStyle}" WindowChrome.IsHitTestVisibleInChrome="True">
+                <Grid Width="10" Height="10">
+                    <Line X1="0" Y1="0" X2="10" Y2="10" Stroke="{DynamicResource TextSecondaryBrush}" StrokeThickness="1.4" />
+                    <Line X1="0" Y1="10" X2="10" Y2="0" Stroke="{DynamicResource TextSecondaryBrush}" StrokeThickness="1.4" />
+                </Grid>
+            </Button>
+        </Grid>
+
+        <Label Grid.Row="1" Grid.Column="0" Name="lblFolderBrowser" Content="{DynamicResource folderbrowser}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <TreeView Name="tViewFolderBrowser" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" >
             <TreeView.Resources>
                 <conv:TypeToImage x:Key="TypeToImage" />
                 <HierarchicalDataTemplate DataType="{x:Type help:DirectoryChildren}" ItemsSource="{Binding Path=Childrens}">
@@ -26,7 +49,7 @@
                 </HierarchicalDataTemplate>
             </TreeView.Resources>
         </TreeView>
-        <Button Name="btnFolderBrowserOk" Grid.Row="2" Grid.Column="0" Margin="2" Content="{DynamicResource folderbrowserok}" Click="btnFolderBrowserOk_Click_1" />
-        <Button Name="btnFolderBrowserCancel" Grid.Row="2" Grid.Column="1" Margin="2" Content="{DynamicResource folderbrowsercancel}" Click="btnFolderBrowserCancel_Click_1" />
+        <Button Name="btnFolderBrowserOk" Grid.Row="3" Grid.Column="0" Margin="2" Content="{DynamicResource folderbrowserok}" Click="btnFolderBrowserOk_Click_1" />
+        <Button Name="btnFolderBrowserCancel" Grid.Row="3" Grid.Column="1" Margin="2" Content="{DynamicResource folderbrowsercancel}" Click="btnFolderBrowserCancel_Click_1" />
     </Grid>
 </Window>

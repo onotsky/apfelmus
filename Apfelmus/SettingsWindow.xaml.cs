@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Security.AccessControl;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Shell;
 using Config = ApfelmusFramework.Classes.Config.Config;
 using ApfelmusFramework.Classes.Settings;
 using ApfelmusFramework.Classes.Logic;
@@ -161,6 +162,11 @@ namespace Apfelmus
         private void btnCancelChangeSettings_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
+        }
+
+        private void TitleBarClose_Click(object sender, RoutedEventArgs e)
+        {
+            SystemCommands.CloseWindow(this);
         }
 
         private void ChangePassword()
