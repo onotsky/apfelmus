@@ -40,5 +40,5 @@ using System.Runtime.Versioning;
 // Sie können alle Werte angeben oder die standardmäßigen Build- und Revisionsnummern 
 // übernehmen, indem Sie "*" eingeben:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("5.0.0.0")]
-[assembly: AssemblyFileVersion("5.0.0.0")]
+[assembly: AssemblyVersion("5.0.0.1")]
+[assembly: AssemblyFileVersion("5.0.0.1")]
