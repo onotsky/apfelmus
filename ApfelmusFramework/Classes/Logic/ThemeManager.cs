@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Windows;
-using ApfelmusFramework.Classes.Config;
 using ApfelmusFramework.Classes.Serializer;
 
 namespace ApfelmusFramework.Classes.Logic
@@ -46,7 +45,7 @@ namespace ApfelmusFramework.Classes.Logic
 
             try
             {
-                Config config = ConfigSerializer.DeserializeFromFile();
+                Config.Config config = ConfigSerializer.DeserializeFromFile();
                 if (!string.IsNullOrEmpty(config.Theme))
                 {
                     theme = config.Theme;

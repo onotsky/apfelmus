@@ -1,6 +1,14 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
+
+// GenerateAssemblyInfo=false unterdrueckt die vom SDK sonst automatisch aus dem
+// TargetFramework (net8.0-windows7.0) erzeugte SupportedOSPlatform-Attribut - ohne dieses
+// Attribut kann der Plattform-Analyzer (CA1416) bei reinen Windows-APIs (z.B.
+// Icon.ExtractAssociatedIcon in FilenameToImage.cs) nicht erkennen, dass das Projekt bereits
+// auf Windows beschraenkt ist, und warnt trotzdem.
+[assembly: SupportedOSPlatform("windows7.0")]
 
 // Allgemeine Informationen über eine Assembly werden über die folgenden 
 // Attribute gesteuert. Ändern Sie diese Attributwerte, um die Informationen zu ändern,
