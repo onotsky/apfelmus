@@ -1395,6 +1395,9 @@ namespace Apfelmus
         private int[] _partlistTypes;
         private int _partlistColumns;
         private int _partlistRows;
+        // Eigenes, manuell gesteuertes Tooltip. Frueher wurde imgPartList.ToolTip bei jedem
+        // MouseMove gesetzt - das Standard-Tooltip blieb dadurch als (heller) Kasten haengen.
+        private System.Windows.Controls.ToolTip _partlistTooltip;
 
         /// <summary>
         /// Delegatmethode zum Erzeugen/Erneuern der Downloadpartliste
@@ -1464,7 +1467,13 @@ namespace Apfelmus
             // Zeilen, die einzelnen Parts wirken dadurch groesser.
             int rowHeight = (config != null && config.PartlistRowHeight > 0) ? config.PartlistRowHeight : 24;
             int rows = Math.Max(1, height / rowHeight);
-            int totalColumns = rows * width;
+
+            // Horizontale Aufloesung bewusst reduzieren: jede Bitmap-Spalte wird per Stretch="Fill"
+            // auf ~PartlistColumnPixels Anzeige-Pixel gestreckt -> die einzelnen Parts werden
+            // entsprechend breiter/blockiger (vorher 1px pro Spalte = sehr schmale Parts).
+            const int PartlistColumnPixels = 4;
+            int columnsPerRow = Math.Max(1, width / PartlistColumnPixels);
+            int totalColumns = rows * columnsPerRow;
 
             int[] strip = new int[totalColumns];
             int[] types = new int[totalColumns];
@@ -1526,13 +1535,13 @@ namespace Apfelmus
 
             // Typ je Spalte + Geometrie fuer den Mouse-Over-Tooltip merken.
             _partlistTypes = types;
-            _partlistColumns = width;
+            _partlistColumns = columnsPerRow;
             _partlistRows = rows;
 
-            // Streifen als width x rows umbrechen (row-major passt direkt zu WritePixels);
-            // die Image-Control streckt das Bild anschliessend vertikal auf die volle Hoehe.
-            WriteableBitmap bitmap = new WriteableBitmap(width, rows, 96, 96, PixelFormats.Bgra32, null);
-            bitmap.WritePixels(new Int32Rect(0, 0, width, rows), strip, width * 4, 0);
+            // Streifen als columnsPerRow x rows umbrechen (row-major passt direkt zu WritePixels);
+            // die Image-Control streckt das Bild anschliessend auf die volle Anzeigeflaeche.
+            WriteableBitmap bitmap = new WriteableBitmap(columnsPerRow, rows, 96, 96, PixelFormats.Bgra32, null);
+            bitmap.WritePixels(new Int32Rect(0, 0, columnsPerRow, rows), strip, columnsPerRow * 4, 0);
             return bitmap;
         }
 
@@ -3542,7 +3551,7 @@ namespace Apfelmus
             {
                 if (_partlistTypes == null || _partlistColumns <= 0 || _partlistRows <= 0 || imgPartList.Source == null)
                 {
-                    imgPartList.ToolTip = null;
+                    if (_partlistTooltip != null) _partlistTooltip.IsOpen = false;
                     return;
                 }
 
@@ -3565,11 +3574,35 @@ namespace Apfelmus
                     return;
                 }
 
-                imgPartList.ToolTip = PartlistTooltipText(_partlistTypes[index]);
+                if (_partlistTooltip == null)
+                {
+                    _partlistTooltip = new System.Windows.Controls.ToolTip
+                    {
+                        Placement = System.Windows.Controls.Primitives.PlacementMode.Relative,
+                        PlacementTarget = imgPartList,
+                        StaysOpen = true
+                    };
+                }
+
+                _partlistTooltip.Content = PartlistTooltipText(_partlistTypes[index]);
+                _partlistTooltip.HorizontalOffset = p.X + 14;
+                _partlistTooltip.VerticalOffset = p.Y + 16;
+                _partlistTooltip.IsOpen = true;
             }
             catch (Exception ex)
             {
                 logger.Error("Fehler beim Anzeigen des Partlisten-Tooltips!", ex);
+            }
+        }
+
+        /// <summary>
+        /// Schliesst das Partlisten-Tooltip, sobald der Cursor den Balken verlaesst.
+        /// </summary>
+        private void imgPartList_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (_partlistTooltip != null)
+            {
+                _partlistTooltip.IsOpen = false;
             }
         }
 
