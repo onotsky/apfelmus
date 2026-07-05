@@ -1,0 +1,24 @@
+# Build-Ausgaben
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+UpgradeLog*.htm
+
+# NuGet (SDK-Style-Projekte nutzen den globalen Cache, kein lokaler packages-Ordner noetig)
+packages/
+*.nupkg
+
+# ClickOnce-Reste / unbenutztes Signierzertifikat
+*.pfx
+
+# macOS
+.DS_Store
+
+# Sonstiges
+*.log

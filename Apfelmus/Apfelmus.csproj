@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>Apfelmus</RootNamespace>
+    <AssemblyName>Apfelmus</AssemblyName>
+    <ApplicationIcon>Apple-icon.ico</ApplicationIcon>
+    <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <!-- BinarySerializer.cs (Config.dat) nutzt BinaryFormatter - unter .NET 8 nur noch per
+         Opt-in nutzbar und ab .NET 9 komplett entfernt. Langfristig auf XmlSerializer o.ae.
+         umstellen (siehe restliche DTOs im Projekt, die das schon so machen). -->
+    <EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="log4net" Version="2.0.15" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ApfelmusFramework\ApfelmusFramework.csproj" />
+    <ProjectReference Include="..\WpfCustomControlLibrary1\CloseableTab.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Apple-icon.ico" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,32 @@
+﻿<Window x:Class="Apfelmus.OpenFolderWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:help="clr-namespace:ApfelmusFramework.Classes.Help;assembly=ApfelmusFramework"
+        xmlns:conv="clr-namespace:ApfelmusFramework.Classes.Converter;assembly=ApfelmusFramework"
+        Title="" Height="300" Width="300" ResizeMode="NoResize" WindowStyle="ThreeDBorderWindow" Loaded="OpenFolderWindow_Loaded_1" Icon="/ApfelmusFramework;component/Images/Apple-icon.png">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="40"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Label Grid.Row="0" Grid.Column="0" Name="lblFolderBrowser" Content="{DynamicResource folderbrowser}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <TreeView Name="tViewFolderBrowser" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" >
+            <TreeView.Resources>
+                <conv:TypeToImage x:Key="TypeToImage" />
+                <HierarchicalDataTemplate DataType="{x:Type help:DirectoryChildren}" ItemsSource="{Binding Path=Childrens}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="{Binding Path=Dir.Type,Converter={StaticResource TypeToImage}}" Width="18" Height="18" Margin="0,0,2,0"/>
+                        <TextBlock Text="{Binding Path=Dir.Name}" />
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+            </TreeView.Resources>
+        </TreeView>
+        <Button Name="btnFolderBrowserOk" Grid.Row="2" Grid.Column="0" Margin="2" Content="{DynamicResource folderbrowserok}" Click="btnFolderBrowserOk_Click_1" />
+        <Button Name="btnFolderBrowserCancel" Grid.Row="2" Grid.Column="1" Margin="2" Content="{DynamicResource folderbrowsercancel}" Click="btnFolderBrowserCancel_Click_1" />
+    </Grid>
+</Window>

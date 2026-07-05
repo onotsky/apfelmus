@@ -1,0 +1,18 @@
+﻿<Window x:Class="Apfelmus.TargetdirWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="TargetdirWindow" Height="100" Width="200" WindowStyle="None" ResizeMode="NoResize">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <TextBox Name="tbxTargetDir" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Height="23" Width="180" />
+        <Button Grid.Row="1" Grid.Column="0" Name="btnOk" Content="Ok" HorizontalAlignment="Center"  VerticalAlignment="Center" Width="90" Height="30" Click="btnOk_Click_1"/>
+        <Button Grid.Row="1" Grid.Column="1" Name="btnCancel" Content="Cancel" HorizontalAlignment="Center"  VerticalAlignment="Center" Width="90" Height="30" Click="btnCancel_Click_1"/>
+    </Grid>
+</Window>

@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>ApfelmusFramework</RootNamespace>
+    <AssemblyName>ApfelmusFramework</AssemblyName>
+    <ApplicationIcon>Images\Apple-icon.ico</ApplicationIcon>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="log4net" Version="2.0.15" />
+    <!-- Fuer FilenameToImage.cs (Icon.ExtractAssociatedIcon) - unter .NET Core kein Teil des Basis-Frameworks mehr -->
+    <PackageReference Include="System.Drawing.Common" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Images\**\*.png" />
+    <Resource Include="Images\**\*.ico" />
+  </ItemGroup>
+
+  <!--
+    Diese Ordner/Dateien lagen zwar im Repo, waren aber im alten (nicht-SDK-Style) Projekt NIE
+    im <Compile>-ItemGroup gelistet - also totes/verwaistes Scaffolding aus einem frueheren
+    Refactoring (u.a. mit Namespace-Bruechen, z.B. Classes/GetSession/GetSession.cs verweist auf
+    ein nicht existentes "Apfelmus.Interfaces"). Unter SDK-Style greift implizites Globbing
+    (**/*.cs), das diese Dateien sonst mit reinziehen und den Build brechen wuerde.
+  -->
+  <ItemGroup>
+    <Compile Remove="Classes\Dir\**\*.cs" />
+    <Compile Remove="Classes\DownloadPartlist\**\*.cs" />
+    <Compile Remove="Classes\GetObject\**\*.cs" />
+    <Compile Remove="Classes\UserPartList\**\*.cs" />
+    <Compile Remove="Classes\GetSession\GetSession.cs" />
+    <Compile Remove="Classes\Information\FileSystem.cs" />
+    <Compile Remove="Classes\Information\Information.cs" />
+    <Compile Remove="Classes\Logic\AppleJuice.cs" />
+    <Compile Remove="Classes\Modified\Informations.cs" />
+    <Compile Remove="Classes\Modified\Modified.cs" />
+    <Compile Remove="Classes\Share\MyDirectories.cs" />
+    <Compile Remove="Classes\Share\MyDirectories1.cs" />
+    <Compile Remove="Classes\Share\MyDirectories2.cs" />
+    <Compile Remove="Classes\Share\MyDirectories3.cs" />
+  </ItemGroup>
+
+</Project>

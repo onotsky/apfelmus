@@ -1,0 +1,200 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+    <!--StartWindow-->
+    <system:String x:Key="host">Hostname:</system:String>
+    <system:String x:Key="port">Port:</system:String>
+    <system:String x:Key="password">Password:</system:String>
+    <system:String x:Key="ok_start">Ok</system:String>
+    <system:String x:Key="cancel_start">Cancel</system:String>
+    <system:String x:Key="savepassword">Save password</system:String>
+    <system:String x:Key="compress">Compression</system:String>
+    <!--MainWindow-->
+    <!--Menu-->
+    <system:String x:Key="extras">Extras</system:String>
+    <system:String x:Key="settings">Settings</system:String>
+    <system:String x:Key="language">Language</system:String>
+    <system:String x:Key="german">German</system:String>
+    <system:String x:Key="english">English</system:String>
+    <system:String x:Key="italian">Italian</system:String>
+    <system:String x:Key="design">Theme</system:String>
+    <system:String x:Key="themedark">Dark</system:String>
+    <system:String x:Key="themelight">Light</system:String>
+    <system:String x:Key="core">Core</system:String>
+    <system:String x:Key="coreending">End core</system:String>
+    <!--SettingsWindow-->
+    <system:String x:Key="standard">Standard</system:String>
+    <system:String x:Key="temp">Temp directory:</system:String>
+    <system:String x:Key="incoming">Incoming Directory:</system:String>
+    <system:String x:Key="coreport">Core-Port:</system:String>
+    <system:String x:Key="xmlport">XML-Port:</system:String>
+    <system:String x:Key="nickname">Nickname:</system:String>
+    <system:String x:Key="connection">Connection</system:String>
+    <system:String x:Key="maxconnections">Max. connections:</system:String>
+    <system:String x:Key="uploadspeed">Max. upload speed in kb/s:</system:String>
+    <system:String x:Key="uploadslot">Kb/s per upload slot</system:String>
+    <system:String x:Key="downspeed">Max. download speed in kb/s:</system:String>
+    <system:String x:Key="newconnections">Max. new connections per 10 sec. (1&lt;=x&lt;=200):</system:String>
+    <system:String x:Key="sources">Max. number of sources per file:</system:String>
+    <system:String x:Key="autoconnect">Automatic connection:</system:String>
+    <system:String x:Key="showlogon">Show login window at startup:</system:String>
+    <system:String x:Key="passtab">Password</system:String>
+    <system:String x:Key="newpass">New Password:</system:String>
+    <system:String x:Key="ajlink">Ajfsp-Link linking with GUI:</system:String>
+    <system:String x:Key="refresh">Refreshrate of the GUI in ms:</system:String>
+    <system:String x:Key="admin">Please run the GUI as administrator, to write the value in the registry!</system:String>
+    <system:String x:Key="change">Apply changes</system:String>
+    <system:String x:Key="ok_settings">Ok</system:String>
+    <system:String x:Key="cancel_settings">Cancel</system:String>
+    <system:String x:Key="home">Home</system:String>
+    <system:String x:Key="share">My Share</system:String>
+    <system:String x:Key="search">Search</system:String>
+    <system:String x:Key="downloads">Downloads</system:String>
+    <system:String x:Key="uploads">Uploads</system:String>
+    <system:String x:Key="server">Server</system:String>
+    <system:String x:Key="transfer">Transfer</system:String>
+    <!--Home-->
+    <system:String x:Key="client">Your Client</system:String>
+    <system:String x:Key="gui">GUI:</system:String>
+    <system:String x:Key="_core">Core:</system:String>
+    <system:String x:Key="network">Network</system:String>
+    <system:String x:Key="user">User:</system:String>
+    <system:String x:Key="data">Files:</system:String>
+    <system:String x:Key="totalsize">Totalsize:</system:String>
+    <system:String x:Key="connections_home">Connections:</system:String>
+    <system:String x:Key="uploadqueue">Uploadqueue:</system:String>
+    <system:String x:Key="firewall_open">open</system:String>
+    <system:String x:Key="firewall_closed">closed</system:String>
+    <system:String x:Key="firewall">Firewall:</system:String>
+    <system:String x:Key="ip">External IP:</system:String>
+    <system:String x:Key="servername_home">Servername:</system:String>
+    <system:String x:Key="connectedsince">Connected since:</system:String>
+    <system:String x:Key="message">Server message:</system:String>
+    <!--MyShare-->
+    <system:String x:Key="shareview">Refresh share</system:String>
+    <system:String x:Key="datalist">New filelist</system:String>
+    <system:String x:Key="setpriority">Set priority</system:String>
+    <system:String x:Key="delpriority">Delete priority</system:String>
+    <system:String x:Key="sharecheck">Start share verification</system:String>
+    <system:String x:Key="sharename">Filename</system:String>
+    <system:String x:Key="sharesize">Size</system:String>
+    <system:String x:Key="sharepriority">Priority</system:String>
+    <system:String x:Key="lastrequest">Last request</system:String>
+    <system:String x:Key="downloadrequest">Download requests</system:String>
+    <system:String x:Key="searchrequest">Search requests</system:String>
+    <system:String x:Key="enablefolder">Share Folder with subdirectories</system:String>
+    <system:String x:Key="enablefolder2">Share Folder without subdirectories</system:String>
+    <system:String x:Key="sharefolders">Shared Folders:</system:String>
+    <!--Search-->
+    <system:String x:Key="searchstring">Search string:</system:String>
+    <system:String x:Key="startsearch">Start search</system:String>
+    <system:String x:Key="countsearches">Open searches:</system:String>
+    <system:String x:Key="foundfiles">Found files:</system:String>
+    <system:String x:Key="sumsearches">Scanned clients:</system:String>
+    <system:String x:Key="stopsearch">Stop Searching</system:String>
+    <system:String x:Key="clearsearch">Clear Search</system:String>
+    <system:String x:Key="filename_search">Filename</system:String>
+    <system:String x:Key="filesize_search">Size</system:String>
+    <system:String x:Key="user_count">User</system:String>
+    <system:String x:Key="searchstatus">Status:</system:String>
+    <system:String x:Key="link">Download File</system:String>
+    <!--Downloads-->
+    <system:String x:Key="filename_download">Filename</system:String>
+    <system:String x:Key="status_download">Status</system:String>
+    <system:String x:Key="download_size">Size</system:String>
+    <system:String x:Key="current_download_size">Transferred</system:String>
+    <system:String x:Key="download_speed">Speed</system:String>
+    <system:String x:Key="download_time">Remaining Time</system:String>
+    <system:String x:Key="download_percentages">Percent loaded</system:String>
+    <system:String x:Key="download_rest">Remaining size</system:String>
+    <system:String x:Key="powerdownload">Powerdownload</system:String>
+    <system:String x:Key="download_nick">Nickname</system:String>
+    <system:String x:Key="download_core">Core</system:String>
+    <system:String x:Key="powerdownload_text">How much do you want to pay for a maximum of 1 byte?</system:String>
+    <system:String x:Key="apply">Apply</system:String>
+    <!--DownloadContextMenu-->
+    <system:String x:Key="continue">Continue (F2)</system:String>
+    <system:String x:Key="break">Break (F3)</system:String>
+    <system:String x:Key="cancel_download">Cancel (F4)</system:String>
+    <system:String x:Key="rename">Rename (F6)</system:String>
+    <system:String x:Key="targetdir">Change targetdir (F7)</system:String>
+    <system:String x:Key="finished">Clean downloadlist (F5)</system:String>
+    <system:String x:Key="copylink">Copy selected link to clipboard (F8)</system:String>
+    <system:String x:Key="copylinks">Copy selected links to Clipboard (F10)</system:String>
+    <system:String x:Key="copysource">Copy selected link with source to clipboard (F9)</system:String>
+    <system:String x:Key="copysources">Copy selected links with source to clipboard (F11)</system:String>
+    <!--Uploads-->
+    <system:String x:Key="filename_upload">Filename</system:String>
+    <system:String x:Key="upload_status">Status</system:String>
+    <system:String x:Key="upload_nick">Nickname</system:String>
+    <system:String x:Key="upload_speed">Speed</system:String>
+    <system:String x:Key="upload_percentages">Percent loaded</system:String>
+    <system:String x:Key="waterlevel">Waterlevel</system:String>
+    <system:String x:Key="upload_priority">Priority</system:String>
+    <system:String x:Key="upload_core">Core</system:String>
+    <system:String x:Key="lastconnection">Last connection</system:String>
+    <!--Server-->
+    <system:String x:Key="servername">Servername</system:String>
+    <system:String x:Key="serverhostname">Host</system:String>
+    <system:String x:Key="serverport">Port</system:String>
+    <system:String x:Key="lastseen">Last seen</system:String>
+    <system:String x:Key="connections">Connections</system:String>
+    <!--ServerContextMenu-->
+    <system:String x:Key="connectserver">Connect</system:String>
+    <system:String x:Key="addserver">Refresh list</system:String>
+    <system:String x:Key="copyserverlink">Copy link to clipboard</system:String>
+    <system:String x:Key="delete">Delete</system:String>
+    <system:String x:Key="connectmessage">They are less than 30 minutes connected to the server. If you really want to reconnect, you'll take a lock!</system:String>
+    <!--Uploadstatus-->
+    <system:String x:Key="uploadstatus1">active data transmission</system:String>
+    <system:String x:Key="uploadstatus2">in Queue</system:String>
+    <!--UserStatus-->
+    <system:String x:Key="userstatus1">unasked</system:String>
+    <system:String x:Key="userstatus2">trying to connect</system:String>
+    <system:String x:Key="userstatus3">to old version</system:String>
+    <system:String x:Key="userstatus4">can not open file</system:String>
+    <system:String x:Key="userstatus5">in Queue</system:String>
+    <system:String x:Key="userstatus6">any usable parts</system:String>
+    <system:String x:Key="userstatus7">transmission</system:String>
+    <system:String x:Key="userstatus8">no space on disk</system:String>
+    <system:String x:Key="userstatus9">completed</system:String>
+    <system:String x:Key="userstatus11">Unable to connect to</system:String>
+    <system:String x:Key="userstatus12">try indirect connection</system:String>
+    <system:String x:Key="userstatus13">pause</system:String>
+    <system:String x:Key="userstatus14">queue is full</system:String>
+    <system:String x:Key="userstatus15">own limit is reached</system:String>
+    <system:String x:Key="userstatus16">ejected by the server</system:String>
+    <system:String x:Key="userstatus17">undefined</system:String>
+    <system:String x:Key="userstatus18">rest</system:String>
+    <!--DownloadStatus-->
+    <system:String x:Key="downloadstatus0">search</system:String>
+    <system:String x:Key="downloadstatus1">temp fault</system:String>
+    <system:String x:Key="downloadstatus2">transfer</system:String>
+    <system:String x:Key="downloadstatus12">complete</system:String>
+    <system:String x:Key="downloadstatus13">Failed to complete</system:String>
+    <system:String x:Key="downloadstatus14">ready</system:String>
+    <system:String x:Key="downloadstatus15">break off</system:String>
+    <system:String x:Key="downloadstatus16">in preparation</system:String>
+    <system:String x:Key="downloadstatus17">canceled</system:String>
+    <system:String x:Key="downloadstatus18">pause</system:String>
+    <system:String x:Key="downloadstatus19">undefined</system:String>
+    <!--RenameDownloadWindow-->
+    <system:String x:Key="renamefilename">New filename</system:String>
+    <system:String x:Key="renameok">Rename</system:String>
+    <system:String x:Key="renamecancel">Cancel</system:String>
+    <system:String x:Key="stringchange">Character change:</system:String>
+    <system:String x:Key="oldstring">Old character:</system:String>
+    <system:String x:Key="newstring">New character:</system:String>
+    <system:String x:Key="stringdelete">To delete character:</system:String>
+    <!--OpenFolderWindow-->
+    <system:String x:Key="folderbrowser">Select Folder:</system:String>
+    <system:String x:Key="folderbrowserok">Accept</system:String>
+    <system:String x:Key="folderbrowsercancel">Cancel</system:String>
+    <!--Partlist-->
+    <system:String x:Key="partlist">Update partlist</system:String>
+    <system:String x:Key="colorunavailable">unavailable</system:String>
+    <system:String x:Key="coloravailable">available</system:String>
+    <system:String x:Key="coloractive">active</system:String>
+    <system:String x:Key="colorloaded">loaded</system:String>
+    <system:String x:Key="colorfinished">checked</system:String>
+</ResourceDictionary>
