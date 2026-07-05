@@ -21,7 +21,16 @@
             <TabItem>
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                        <Image Source="/ApfelmusFramework;component/Images/Standard-icon.png" Width="18" Height="18" />
+                        <Viewbox Width="18" Height="18">
+                            <Canvas Width="18" Height="18">
+                                <Rectangle Canvas.Left="8" Canvas.Top="0" Width="2" Height="4" Fill="{DynamicResource TextSecondaryBrush}" />
+                                <Rectangle Canvas.Left="8" Canvas.Top="14" Width="2" Height="4" Fill="{DynamicResource TextSecondaryBrush}" />
+                                <Rectangle Canvas.Left="0" Canvas.Top="8" Width="4" Height="2" Fill="{DynamicResource TextSecondaryBrush}" />
+                                <Rectangle Canvas.Left="14" Canvas.Top="8" Width="4" Height="2" Fill="{DynamicResource TextSecondaryBrush}" />
+                                <Ellipse Canvas.Left="3" Canvas.Top="3" Width="12" Height="12" Stroke="{DynamicResource TextSecondaryBrush}" StrokeThickness="2" />
+                                <Ellipse Canvas.Left="7" Canvas.Top="7" Width="4" Height="4" Fill="{DynamicResource TextSecondaryBrush}" />
+                            </Canvas>
+                        </Viewbox>
                         <TextBlock Text="{DynamicResource standard}" Margin="7,2,0,0"/>
                     </StackPanel>
                 </TabItem.Header>
@@ -92,7 +101,14 @@
             <TabItem>
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                        <Image Source="/ApfelmusFramework;component/Images/connection.png" Width="18" Height="18" />
+                        <Viewbox Width="18" Height="18">
+                            <Canvas Width="18" Height="18">
+                                <Line X1="6" Y1="1" X2="6" Y2="6" Stroke="{DynamicResource TextSecondaryBrush}" StrokeThickness="2" StrokeStartLineCap="Round" />
+                                <Line X1="12" Y1="1" X2="12" Y2="6" Stroke="{DynamicResource TextSecondaryBrush}" StrokeThickness="2" StrokeStartLineCap="Round" />
+                                <Rectangle Canvas.Left="4" Canvas.Top="6" Width="10" Height="6" RadiusX="2" RadiusY="2" Stroke="{DynamicResource TextSecondaryBrush}" StrokeThickness="2" />
+                                <Line X1="9" Y1="12" X2="9" Y2="17" Stroke="{DynamicResource TextSecondaryBrush}" StrokeThickness="2" StrokeStartLineCap="Round" />
+                            </Canvas>
+                        </Viewbox>
                         <TextBlock Text="{DynamicResource connection}" Margin="5,2,0,0"/>
                     </StackPanel>
                 </TabItem.Header>
@@ -195,7 +211,13 @@
             <TabItem>
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                        <Image Source="/ApfelmusFramework;component/Images/password-icon.png" Width="18" Height="18" />
+                        <Viewbox Width="18" Height="18">
+                            <Canvas Width="18" Height="18">
+                                <Ellipse Canvas.Left="5" Canvas.Top="2" Width="8" Height="8" Stroke="{DynamicResource TextSecondaryBrush}" StrokeThickness="2" />
+                                <Rectangle Canvas.Left="3" Canvas.Top="8" Width="12" Height="9" RadiusX="1.5" RadiusY="1.5" Fill="{DynamicResource TextSecondaryBrush}" />
+                                <Ellipse Canvas.Left="8" Canvas.Top="11.5" Width="2" Height="2" Fill="{DynamicResource SurfaceBrush}" />
+                            </Canvas>
+                        </Viewbox>
                         <TextBlock Text="{DynamicResource passtab}" Margin="5,2,0,0"/>
                     </StackPanel>
                 </TabItem.Header>
@@ -229,7 +251,13 @@
             <TabItem GotFocus="TabItem_GotFocus" LostFocus="TabItem_LostFocus">
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
-                        <Image Source="/ApfelmusFramework;component/Images/user-icon.png" Width="18" Height="18"/>
+                        <Viewbox Width="18" Height="18">
+                            <Canvas Width="18" Height="18">
+                                <Rectangle Canvas.Left="1" Canvas.Top="2" Width="16" Height="11" RadiusX="1" RadiusY="1" Stroke="{DynamicResource TextSecondaryBrush}" StrokeThickness="2" />
+                                <Line X1="9" Y1="13" X2="9" Y2="16" Stroke="{DynamicResource TextSecondaryBrush}" StrokeThickness="2" />
+                                <Line X1="5" Y1="16" X2="13" Y2="16" Stroke="{DynamicResource TextSecondaryBrush}" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" />
+                            </Canvas>
+                        </Viewbox>
                         <TextBlock Text="GUI" Margin="5,2,0,0"/>
                     </StackPanel>
                 </TabItem.Header>
