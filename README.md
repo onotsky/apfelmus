@@ -51,4 +51,8 @@ dotnet build
 
 ## Verwandtes Projekt
 
-`gui-java` ist der offizielle, plattformübergreifende appleJuice-Client (Java/Swing) für dasselbe Protokoll.
+`gui-java` ([applejuicenetz/gui-java](https://github.com/applejuicenetz/gui-java)) ist der offizielle, plattformübergreifende appleJuice-Client (Java/Swing) für dasselbe Protokoll. Der Algorithmus zur Part-/Verfügbarkeitsanzeige bei Downloads (`RenderPartList` in `MainWindow.xaml.cs`) wurde von dort portiert.
+
+## Lizenz
+
+GPL-2.0-or-later, siehe [LICENSE](LICENSE). Grund: Die Part-/Verfügbarkeitsanzeige wurde aus `gui-java` portiert, das selbst unter GPLv2 steht – als abgeleitetes Werk (GPLv2 zählt Übersetzung/Portierung ausdrücklich als „modification“) muss Apfelmus als Ganzes unter GPL weitergegeben werden.
