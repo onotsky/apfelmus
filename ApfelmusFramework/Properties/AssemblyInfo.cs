@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 
 // GenerateAssemblyInfo=false unterdrueckt die vom SDK sonst automatisch aus dem
-// TargetFramework (net8.0-windows7.0) erzeugte SupportedOSPlatform-Attribut - ohne dieses
+// TargetFramework (net10.0-windows7.0) erzeugte SupportedOSPlatform-Attribut - ohne dieses
 // Attribut kann der Plattform-Analyzer (CA1416) bei reinen Windows-APIs (z.B.
 // Icon.ExtractAssociatedIcon in FilenameToImage.cs) nicht erkennen, dass das Projekt bereits
 // auf Windows beschraenkt ist, und warnt trotzdem.
@@ -40,5 +40,5 @@ using System.Runtime.Versioning;
 // Sie können alle Werte angeben oder die standardmäßigen Build- und Revisionsnummern 
 // übernehmen, indem Sie "*" eingeben:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("5.0.0.0")]
+[assembly: AssemblyFileVersion("5.0.0.0")]

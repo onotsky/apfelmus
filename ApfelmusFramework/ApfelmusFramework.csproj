@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFramework>net8.0-windows7.0</TargetFramework>
+    <TargetFramework>net10.0-windows7.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <RootNamespace>ApfelmusFramework</RootNamespace>
     <AssemblyName>ApfelmusFramework</AssemblyName>
@@ -13,7 +13,7 @@
   <ItemGroup>
     <PackageReference Include="log4net" Version="3.3.2" />
     <!-- Fuer FilenameToImage.cs (Icon.ExtractAssociatedIcon) - unter .NET Core kein Teil des Basis-Frameworks mehr -->
-    <PackageReference Include="System.Drawing.Common" Version="8.0.0" />
+    <PackageReference Include="System.Drawing.Common" Version="10.0.9" />
   </ItemGroup>
 
   <ItemGroup>

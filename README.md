@@ -36,7 +36,7 @@ Das Tool liest `Config.dat`, schreibt `Config.xml` im selben Ordner und benennt 
 
 ## Bauen
 
-Zielplattform ist **.NET 8 (`net8.0-windows`) mit WPF – ausschließlich unter Windows**. WPF hat keine Cross-Plattform-Runtime, das gilt unabhängig von .NET Framework vs. .NET (Core).
+Zielplattform ist **.NET 10 (`net10.0-windows7.0`) mit WPF – ausschließlich unter Windows**. WPF hat keine Cross-Plattform-Runtime, das gilt unabhängig von .NET Framework vs. .NET (Core).
 
 Voraussetzung: Visual Studio 2022 (oder neuer) mit der Workload „.NET-Desktopentwicklung“.
 
