@@ -199,4 +199,5 @@
     <system:String x:Key="colorfinished">verificato</system:String>
     <system:String x:Key="partlistsize">Dimensione:</system:String>
     <system:String x:Key="partlistsources">fonti</system:String>
+    <system:String x:Key="partlistsizesetting">Dimensione partlist:</system:String>
 </ResourceDictionary>

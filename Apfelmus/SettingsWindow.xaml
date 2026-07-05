@@ -288,6 +288,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="40"/>
                         <RowDefinition Height="40"/>
+                        <RowDefinition Height="40"/>
                     </Grid.RowDefinitions>
                     <StackPanel Grid.Row="0" Orientation="Horizontal">
                         <Grid>
@@ -311,6 +312,24 @@
                             </Grid.ColumnDefinitions>
                             <Label Grid.Column="0" Content="{DynamicResource refresh}" VerticalAlignment="Center"/>
                             <ComboBox Grid.Column="1" Name="comboBoxRefreshRate" ItemsSource="{Binding Path=RefreshRateValues}" SelectedValue="{Binding Path=RefreshRateValue}" DisplayMemberPath="Value" SelectedValuePath="Key" Width="60" VerticalAlignment="Center" HorizontalAlignment="Left" />
+                        </Grid>
+                    </StackPanel>
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" FlowDirection="LeftToRight">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="250"/>
+                                <ColumnDefinition Width="300"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0" Content="{DynamicResource partlistsizesetting}" VerticalAlignment="Center"/>
+                            <ComboBox Grid.Column="1" Name="comboBoxPartlistSize" Width="60" VerticalAlignment="Center" HorizontalAlignment="Left">
+                                <ComboBoxItem>12</ComboBoxItem>
+                                <ComboBoxItem>16</ComboBoxItem>
+                                <ComboBoxItem>20</ComboBoxItem>
+                                <ComboBoxItem>24</ComboBoxItem>
+                                <ComboBoxItem>30</ComboBoxItem>
+                                <ComboBoxItem>40</ComboBoxItem>
+                                <ComboBoxItem>60</ComboBoxItem>
+                            </ComboBox>
                         </Grid>
                     </StackPanel>
                 </Grid>

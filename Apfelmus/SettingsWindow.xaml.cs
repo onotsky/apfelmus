@@ -67,6 +67,8 @@ namespace Apfelmus
                     RefreshRateValue = 1500;
                 else
                     RefreshRateValue = config.RefreshRate;
+
+                SelectPartlistSize();
             }
             catch (Exception ex)
             {
@@ -86,6 +88,8 @@ namespace Apfelmus
                     ChangePassword();
                 if (config.RefreshRate != RefreshRateValue)
                     ChangeRefreshRate();
+
+                ChangePartlistSize();
             }
             catch (Exception ex)
             {
@@ -258,6 +262,8 @@ namespace Apfelmus
                     ChangePassword();
                 if (config.RefreshRate != RefreshRateValue)
                     ChangeRefreshRate();
+
+                ChangePartlistSize();
             }
             catch (Exception ex)
             {
@@ -273,6 +279,38 @@ namespace Apfelmus
         {
             config.RefreshRate = RefreshRateValue;
             ConfigSerializer.SerializeToFile(config);
+        }
+
+        /// <summary>
+        /// Waehlt in der Partlisten-Groesse-ComboBox den zur Config passenden Eintrag aus
+        /// (0 = alte Config -> Default 24).
+        /// </summary>
+        private void SelectPartlistSize()
+        {
+            int size = config.PartlistRowHeight > 0 ? config.PartlistRowHeight : 24;
+            foreach (System.Windows.Controls.ComboBoxItem item in comboBoxPartlistSize.Items)
+            {
+                if (item.Content?.ToString() == size.ToString())
+                {
+                    comboBoxPartlistSize.SelectedItem = item;
+                    break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Uebernimmt die gewaehlte Partlisten-Zeilenhoehe in die Config und speichert sie.
+        /// </summary>
+        private void ChangePartlistSize()
+        {
+            if (comboBoxPartlistSize.SelectedItem is System.Windows.Controls.ComboBoxItem item
+                && int.TryParse(item.Content?.ToString(), out int size)
+                && size > 0
+                && config.PartlistRowHeight != size)
+            {
+                config.PartlistRowHeight = size;
+                ConfigSerializer.SerializeToFile(config);
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

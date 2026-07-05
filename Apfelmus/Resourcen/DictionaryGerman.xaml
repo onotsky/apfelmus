@@ -199,4 +199,5 @@
     <system:String x:Key="colorfinished">überprüft</system:String>
     <system:String x:Key="partlistsize">Größe:</system:String>
     <system:String x:Key="partlistsources">Quellen</system:String>
+    <system:String x:Key="partlistsizesetting">Partlisten-Größe:</system:String>
 </ResourceDictionary>
