@@ -33,6 +33,7 @@ namespace Apfelmus
     using System.Windows.Input;
     using System.Windows.Media;
     using System.Windows.Media.Imaging;
+    using System.Windows.Shell;
     using System.Windows.Threading;
 
 
@@ -2518,6 +2519,28 @@ namespace Apfelmus
         private void MenuItem_Click_1(object sender, RoutedEventArgs e)
         {
             Share _tempShare = (Share)dGridShares.SelectedItem;
+        }
+
+        private void TitleBarMinimize_Click(object sender, RoutedEventArgs e)
+        {
+            SystemCommands.MinimizeWindow(this);
+        }
+
+        private void TitleBarMaximizeRestore_Click(object sender, RoutedEventArgs e)
+        {
+            if (WindowState == WindowState.Maximized)
+            {
+                SystemCommands.RestoreWindow(this);
+            }
+            else
+            {
+                SystemCommands.MaximizeWindow(this);
+            }
+        }
+
+        private void TitleBarClose_Click(object sender, RoutedEventArgs e)
+        {
+            SystemCommands.CloseWindow(this);
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)

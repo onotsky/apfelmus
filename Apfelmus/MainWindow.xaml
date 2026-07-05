@@ -6,18 +6,91 @@
         xmlns:src="clr-namespace:ApfelmusFramework.Classes.Share;assembly=ApfelmusFramework"
         xmlns:help="clr-namespace:ApfelmusFramework.Classes.Help;assembly=ApfelmusFramework"
         xmlns:props="clr-namespace:Apfelmus.Properties"
-        Title="Apfelmus" Loaded="Window_Loaded" Width="{Binding Source={x:Static props:Settings.Default}, Path=WindowWidth}" Height="{Binding Source={x:Static props:Settings.Default}, Path=WindowHeight}" Left="{Binding Source={x:Static props:Settings.Default}, Path=WindowLeft}" Top="{Binding Source={x:Static props:Settings.Default}, Path=WindowTop}" WindowState="{Binding Source={x:Static props:Settings.Default}, Path=WindowState}" Icon="/ApfelmusFramework;component/Images/Apple-icon.png" Closing="Window_Closing" SizeChanged="MainWindow_SizeChanged" LocationChanged="MainWindow_LocationChanged" StateChanged="MainWindow_StateChanged">
+        Title="Apfelmus" Loaded="Window_Loaded" Width="{Binding Source={x:Static props:Settings.Default}, Path=WindowWidth}" Height="{Binding Source={x:Static props:Settings.Default}, Path=WindowHeight}" Left="{Binding Source={x:Static props:Settings.Default}, Path=WindowLeft}" Top="{Binding Source={x:Static props:Settings.Default}, Path=WindowTop}" WindowState="{Binding Source={x:Static props:Settings.Default}, Path=WindowState}" Icon="/ApfelmusFramework;component/Images/Apple-icon.png" WindowStyle="None" Closing="Window_Closing" SizeChanged="MainWindow_SizeChanged" LocationChanged="MainWindow_LocationChanged" StateChanged="MainWindow_StateChanged">
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="32" ResizeBorderThickness="5" GlassFrameThickness="0" CornerRadius="0" UseAeroCaptionButtons="False" />
+    </WindowChrome.WindowChrome>
     <Window.Resources>
-        <ResourceDictionary Source="/Resourcen/ProgressBarWithText.xaml" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Resourcen/ProgressBarWithText.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <Style x:Key="TitleBarButtonStyle" TargetType="{x:Type Button}">
+                <Setter Property="Width" Value="36" />
+                <Setter Property="Height" Value="32" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Button}">
+                            <Border x:Name="Bd" Background="{TemplateBinding Background}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ControlBackgroundBrush}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="TitleBarCloseButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource TitleBarButtonStyle}">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Button}">
+                            <Border x:Name="Bd" Background="{TemplateBinding Background}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Bd" Property="Background" Value="#FFE81123" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ResourceDictionary>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="32"/>
             <RowDefinition Height="25"/>
             <RowDefinition Height="25"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="25"/>
         </Grid.RowDefinitions>
-        <Menu Grid.Row="0">
+
+        <Grid Grid.Row="0" Background="{DynamicResource SurfaceBrush}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="10,0,0,0" VerticalAlignment="Center">
+                <Image Source="/ApfelmusFramework;component/Images/Apple-icon.png" Width="18" Height="18" />
+                <TextBlock Text="Apfelmus" Margin="8,0,0,0" Foreground="{DynamicResource TextPrimaryBrush}" FontWeight="SemiBold" VerticalAlignment="Center" />
+            </StackPanel>
+            <StackPanel Grid.Column="2" Orientation="Horizontal" WindowChrome.IsHitTestVisibleInChrome="True">
+                <Button Name="btnTitleMinimize" Click="TitleBarMinimize_Click" Style="{StaticResource TitleBarButtonStyle}">
+                    <Line X1="0" Y1="5" X2="10" Y2="5" Stroke="{DynamicResource TextSecondaryBrush}" StrokeThickness="1.4" />
+                </Button>
+                <Button Name="btnTitleMaximize" Click="TitleBarMaximizeRestore_Click" Style="{StaticResource TitleBarButtonStyle}">
+                    <Rectangle Width="9" Height="9" Stroke="{DynamicResource TextSecondaryBrush}" StrokeThickness="1.2" />
+                </Button>
+                <Button Name="btnTitleClose" Click="TitleBarClose_Click" Style="{StaticResource TitleBarCloseButtonStyle}">
+                    <Grid Width="10" Height="10">
+                        <Line X1="0" Y1="0" X2="10" Y2="10" Stroke="{DynamicResource TextSecondaryBrush}" StrokeThickness="1.4" />
+                        <Line X1="0" Y1="10" X2="10" Y2="0" Stroke="{DynamicResource TextSecondaryBrush}" StrokeThickness="1.4" />
+                    </Grid>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <Menu Grid.Row="1">
             <MenuItem Name="mItemExtras" Header="{DynamicResource extras}">
                 <MenuItem Header="{DynamicResource settings}" Click="MenuItem_Click">
                     <MenuItem.Icon>
@@ -69,12 +142,12 @@
                 </MenuItem>
             </MenuItem>
         </Menu>
-        <StackPanel Grid.Row="1" Orientation="Horizontal" Height="25">
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Height="25">
             <Label Content="AJLink:" Margin="5,0"/>
             <TextBox Name="tbxDownload" MinWidth="800" Width="Auto"/>
             <Button Name="btnDownload" Content="{DynamicResource transfer}" Width="100" Margin="5,0" Click="btnDownload_Click" HorizontalAlignment="Right" />
         </StackPanel>
-        <TabControl Grid.Row="2" Name="tabControl" Margin="0,5,0,0">
+        <TabControl Grid.Row="3" Name="tabControl" Margin="0,5,0,0">
             <TabItem Name="tabStart">
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -807,7 +880,7 @@
                 </DockPanel>
             </TabItem>
         </TabControl>
-        <StatusBar Grid.Row="3" Height="25" FlowDirection="RightToLeft">
+        <StatusBar Grid.Row="4" Height="25" FlowDirection="RightToLeft">
             <StatusBar.Resources>
                 <conv:FileSizeConverter1 x:Key="FileSizeConverter1" />
                 <conv:FileSizeConverter4 x:Key="FileSizeConverter4" />
