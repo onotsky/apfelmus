@@ -55,7 +55,7 @@ namespace Apfelmus
         private Thread _updateUploads;
         private Thread _updateInformation;
         private Thread _updateDownloads;
-        private Thread _updateUsers;
+        private volatile Thread _updateUsers;
         private Thread _listenArguments;
         private Thread _refreshServer;
         private Thread _checkConnectionToCore;
@@ -64,8 +64,8 @@ namespace Apfelmus
         // nicht mehr (wirft PlatformNotSupportedException) - der Thread muss selbst regelmaessig
         // pruefen, ob er beendet werden soll.
         private volatile bool _stopSearch;
-        private Thread _refreshDownloadPartList;
-        private Thread _refreshUserPartList;
+        private volatile Thread _refreshDownloadPartList;
+        private volatile Thread _refreshUserPartList;
         private DataGrid selectionDownloadGrid = new DataGrid();
         private Download selectedDownload = new Download();
         private DataGrid selectionUserGrid = new DataGrid();
@@ -349,7 +349,10 @@ namespace Apfelmus
         {
             UpdateUserDataGrid updateUserDataGrid = new UpdateUserDataGrid(RefreshUserDatagrid);
 
-            while ((Thread.CurrentThread.ThreadState & ThreadState.Running) == ThreadState.Running)
+            // Laeuft, solange dieser Thread der "aktuelle" ist. Wird das Feld auf null gesetzt
+            // oder durch einen neuen Thread ersetzt, beendet sich der alte selbst - kooperativ,
+            // da es Thread.Abort() unter .NET (Core) nicht mehr gibt (PlatformNotSupportedException).
+            while (Thread.CurrentThread == _updateUsers)
             {
                 try
                 {
@@ -457,7 +460,9 @@ namespace Apfelmus
         {
             RefreshDownloadPartlist refreshDownloadPartlist = new RefreshDownloadPartlist(CreateDownloadPartlist);
 
-            while ((Thread.CurrentThread.ThreadState & ThreadState.Running) == ThreadState.Running)
+            // Kooperativ beenden: laeuft nur, solange dieser Thread der aktuelle ist (Feld auf null
+            // setzen / neu zuweisen stoppt den alten). Thread.Abort() gibt es unter .NET nicht mehr.
+            while (Thread.CurrentThread == _refreshDownloadPartList)
             {
                 try
                 {
@@ -478,7 +483,9 @@ namespace Apfelmus
         {
             RefreshUserPartList refreshUserPartlist = new RefreshUserPartList(CreateUserPartlist);
 
-            while ((Thread.CurrentThread.ThreadState & ThreadState.Running) == ThreadState.Running)
+            // Kooperativ beenden: laeuft nur, solange dieser Thread der aktuelle ist (Feld auf null
+            // setzen / neu zuweisen stoppt den alten). Thread.Abort() gibt es unter .NET nicht mehr.
+            while (Thread.CurrentThread == _refreshUserPartList)
             {
                 try
                 {
@@ -1891,7 +1898,7 @@ namespace Apfelmus
                 {
                     if ((_updateUsers.ThreadState & ThreadState.Running) == ThreadState.Running)
                     {
-                        _updateUsers.Abort();
+                        _updateUsers = null;
                     }
                 }
 
@@ -1899,7 +1906,7 @@ namespace Apfelmus
                 {
                     if ((_refreshUserPartList.ThreadState & ThreadState.Running) == ThreadState.Running)
                     {
-                        _refreshUserPartList.Abort();
+                        _refreshUserPartList = null;
                     }
                 }
 
@@ -1907,7 +1914,7 @@ namespace Apfelmus
                 {
                     if ((_refreshDownloadPartList.ThreadState & ThreadState.Running) == ThreadState.Running)
                     {
-                        _refreshDownloadPartList.Abort();
+                        _refreshDownloadPartList = null;
                     }
                 }
 
@@ -1936,7 +1943,7 @@ namespace Apfelmus
                         {
                             if ((_refreshDownloadPartList.ThreadState & ThreadState.Running) == ThreadState.Running)
                             {
-                                _refreshDownloadPartList.Abort();
+                                _refreshDownloadPartList = null;
                             }
                         }
 
@@ -2081,7 +2088,7 @@ namespace Apfelmus
                 {
                     if ((_refreshDownloadPartList.ThreadState & ThreadState.Running) == ThreadState.Running)
                     {
-                        _refreshDownloadPartList.Abort();
+                        _refreshDownloadPartList = null;
                     }
                 }
 
@@ -2089,7 +2096,7 @@ namespace Apfelmus
                 {
                     if ((_refreshUserPartList.ThreadState & ThreadState.Running) == ThreadState.Running)
                     {
-                        _refreshUserPartList.Abort();
+                        _refreshUserPartList = null;
                     }
                 }
 
@@ -2215,7 +2222,7 @@ namespace Apfelmus
             {
                 if ((_refreshDownloadPartList.ThreadState & ThreadState.Running) == ThreadState.Running)
                 {
-                    _refreshDownloadPartList.Abort();
+                    _refreshDownloadPartList = null;
                 }
             }
 
@@ -2223,7 +2230,7 @@ namespace Apfelmus
             {
                 if ((_refreshUserPartList.ThreadState & ThreadState.Running) == ThreadState.Running)
                 {
-                    _refreshUserPartList.Abort();
+                    _refreshUserPartList = null;
                 }
             }
 
@@ -3070,7 +3077,7 @@ namespace Apfelmus
             {
                 if ((_refreshUserPartList.ThreadState & ThreadState.Running) == ThreadState.Running)
                 {
-                    _refreshUserPartList.Abort();
+                    _refreshUserPartList = null;
                 }
             }
 
@@ -3083,7 +3090,7 @@ namespace Apfelmus
             {
                 if ((_refreshUserPartList.ThreadState & ThreadState.Running) == ThreadState.Running)
                 {
-                    _refreshUserPartList.Abort();
+                    _refreshUserPartList = null;
                 }
             }
 
@@ -3096,7 +3103,7 @@ namespace Apfelmus
             {
                 if ((_refreshUserPartList.ThreadState & ThreadState.Running) == ThreadState.Running)
                 {
-                    _refreshUserPartList.Abort();
+                    _refreshUserPartList = null;
                 }
             }
 
@@ -3391,7 +3398,7 @@ namespace Apfelmus
             {
                 if ((_refreshDownloadPartList.ThreadState & ThreadState.Running) == ThreadState.Running)
                 {
-                    _refreshDownloadPartList.Abort();
+                    _refreshDownloadPartList = null;
                 }
             }
 
@@ -3399,7 +3406,7 @@ namespace Apfelmus
             {
                 if ((_refreshUserPartList.ThreadState & ThreadState.Running) == ThreadState.Running)
                 {
-                    _refreshUserPartList.Abort();
+                    _refreshUserPartList = null;
                 }
             }
 
@@ -3412,7 +3419,7 @@ namespace Apfelmus
             {
                 if ((_refreshDownloadPartList.ThreadState & ThreadState.Running) == ThreadState.Running)
                 {
-                    _refreshDownloadPartList.Abort();
+                    _refreshDownloadPartList = null;
                 }
             }
 
@@ -3420,7 +3427,7 @@ namespace Apfelmus
             {
                 if ((_refreshUserPartList.ThreadState & ThreadState.Running) == ThreadState.Running)
                 {
-                    _refreshUserPartList.Abort();
+                    _refreshUserPartList = null;
                 }
             }
 
@@ -3451,7 +3458,7 @@ namespace Apfelmus
                         {
                             if ((_refreshDownloadPartList.ThreadState & ThreadState.Running) == ThreadState.Running)
                             {
-                                _refreshDownloadPartList.Abort();
+                                _refreshDownloadPartList = null;
                             }
                         }
 
@@ -3459,7 +3466,7 @@ namespace Apfelmus
                         {
                             if ((_refreshUserPartList.ThreadState & ThreadState.Running) == ThreadState.Running)
                             {
-                                _refreshUserPartList.Abort();
+                                _refreshUserPartList = null;
                             }
                         }
 
