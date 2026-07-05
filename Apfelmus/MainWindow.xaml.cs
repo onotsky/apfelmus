@@ -2601,35 +2601,57 @@ namespace Apfelmus
         {
             try
             {
-                if (dGridShares.Items.Count > 0)
+                if (dGridShares.Items.Count == 0)
                 {
-                    if (Regex.IsMatch((e as KeyEventArgs).Key.ToString(), @"^[a-zA-Z]+$"))
-                    {
-                        foreach (Share share in dGridShares.Items)
-                        {
-                            if (!(dGridShares.SelectedItem as Share).ShortFileName.StartsWith((e as KeyEventArgs).Key.ToString()))
-                            {
-                                if (share.ShortFileName.StartsWith((e as KeyEventArgs).Key.ToString()))
-                                {
-                                    dGridShares.SelectedItem = share;
-                                    dGridShares.ScrollIntoView(share);
-                                    break;
-                                }
-                            }
-                            else
-                            {
-                                dGridShares.SelectedIndex += 1;
-                                dGridShares.ScrollIntoView(dGridShares.SelectedItem);
-                                break;
-                            }
+                    return;
+                }
 
+                KeyEventArgs keyArgs = e as KeyEventArgs;
+                if (keyArgs == null)
+                {
+                    return;
+                }
+
+                string key = keyArgs.Key.ToString();
+                if (!Regex.IsMatch(key, @"^[a-zA-Z]+$"))
+                {
+                    return;
+                }
+
+                // Aktuell selektierter Share (kann null sein: nichts ausgewaehlt oder Gruppen-Header).
+                Share selected = dGridShares.SelectedItem as Share;
+                bool selectedMatchesKey = selected?.ShortFileName != null
+                    && selected.ShortFileName.StartsWith(key, StringComparison.OrdinalIgnoreCase);
+
+                foreach (Share share in dGridShares.Items.OfType<Share>())
+                {
+                    if (!selectedMatchesKey)
+                    {
+                        // Noch nichts Passendes ausgewaehlt -> ersten Treffer selektieren.
+                        if (share.ShortFileName != null && share.ShortFileName.StartsWith(key, StringComparison.OrdinalIgnoreCase))
+                        {
+                            dGridShares.SelectedItem = share;
+                            dGridShares.ScrollIntoView(share);
+                            break;
                         }
+                    }
+                    else
+                    {
+                        // Bereits ein Treffer selektiert -> zum naechsten Eintrag weiterspringen
+                        // (nicht ueber das Listenende hinaus).
+                        int next = dGridShares.SelectedIndex + 1;
+                        if (next < dGridShares.Items.Count)
+                        {
+                            dGridShares.SelectedIndex = next;
+                            dGridShares.ScrollIntoView(dGridShares.SelectedItem);
+                        }
+                        break;
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.ToString());
+                logger.Error("Fehler bei der Tastaturnavigation im Share-Grid!", ex);
             }
         }
         private void SearchLink_Click(object sender, RoutedEventArgs e)
