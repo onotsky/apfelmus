@@ -31,11 +31,13 @@ namespace ApfelmusFramework.Classes.Logic
 
             // MD5 Hash aus dem String berechnen. Dazu muss der string in ein Byte[]
             // zerlegt werden. Danach muss das Resultat wieder zurück in ein string.
-            MD5 md5 = new MD5CryptoServiceProvider();
-            byte[] buffer = Encoding.Default.GetBytes(textToHash);
-            byte[] result = md5.ComputeHash(buffer);
+            using (MD5 md5 = MD5.Create())
+            {
+                byte[] buffer = Encoding.Default.GetBytes(textToHash);
+                byte[] result = md5.ComputeHash(buffer);
 
-            return System.BitConverter.ToString(result).Replace("-", string.Empty);
+                return System.BitConverter.ToString(result).Replace("-", string.Empty);
+            }
         }
     }
 }

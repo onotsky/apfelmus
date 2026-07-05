@@ -7,7 +7,7 @@
 namespace Apfelmus
 {
     using ApfelmusFramework.Classes.Allgemein;
-    using ApfelmusFramework.Classes.Config;
+    using Config = ApfelmusFramework.Classes.Config.Config;
     using ApfelmusFramework.Classes.Directory;
     using ApfelmusFramework.Classes.ExtensionSort;
     using ApfelmusFramework.Classes.Help;

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Security.AccessControl;
 using System.Windows;
 using System.Windows.Media;
-using ApfelmusFramework.Classes.Config;
+using Config = ApfelmusFramework.Classes.Config.Config;
 using ApfelmusFramework.Classes.Settings;
 using ApfelmusFramework.Classes.Logic;
 using ApfelmusFramework.Classes.Serializer;

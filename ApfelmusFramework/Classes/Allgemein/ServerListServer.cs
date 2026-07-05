@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -29,13 +29,14 @@ namespace ApfelmusFramework.Classes.Allgemein
 
         private XmlSerializer serializer = new XmlSerializer(typeof(Serverlist));
 
+        private static readonly HttpClient httpClient = new HttpClient();
+
         public object DeserializeToObj(string xmlStr)
         {
             try
             {
-                WebClient client = new WebClient();
-                //string data = "<?xml version=\"1.0\"?>";
-                string data = Encoding.Default.GetString(client.DownloadData(xmlStr));
+                byte[] responseBytes = httpClient.GetByteArrayAsync(xmlStr).GetAwaiter().GetResult();
+                string data = Encoding.Default.GetString(responseBytes);
 
                 using (Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(data)))
                 {
