@@ -11,7 +11,9 @@ using ApfelmusFramework.Classes.Settings;
 namespace Apfelmus
 {
     /// <summary>
-    /// Interaktionslogik für OpenFolderWindow.xaml
+    /// Dialog zum Auswaehlen eines vom Core freigegebenen Verzeichnisses ueber einen Ordnerbaum
+    /// (TreeView). Die ersten beiden Ebenen werden beim Laden geholt, tiefere Ebenen lazy ueber
+    /// DirectoryChildren. Der gewaehlte Pfad steht nach OK in SelectedPath (DialogResult == true).
     /// </summary>
     public partial class OpenFolderWindow : Window
     {
@@ -75,6 +77,9 @@ namespace Apfelmus
             tViewFolderBrowser.ItemsSource = item;
         }
 
+        // Holt die Wurzelverzeichnisse (directory.xml) und deren direkte Unterordner als erste zwei
+        // Baumebenen. Fehlende Pfade werden unter Beachtung des Core-Separators (Windows "\\" vs.
+        // Linux "/") zusammengesetzt; alles Tiefere laedt DirectoryChildren erst beim Aufklappen.
         private void GenerateFirstTreeItem()
         {
             using (WebConnect webConnect = new WebConnect(config.HostName, config.Port))

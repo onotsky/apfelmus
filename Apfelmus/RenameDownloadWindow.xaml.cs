@@ -6,7 +6,9 @@ using ApfelmusFramework.Classes.Logic;
 namespace Apfelmus
 {
     /// <summary>
-    /// Interaktionslogik für RenameDownload.xaml
+    /// Dialog zum Umbenennen eines Downloads. Erlaubt zusaetzlich das Ersetzen bzw. Loeschen einer
+    /// Teilzeichenkette im Namen (jeweils ohne die Endung anzutasten) und schickt den neuen Namen
+    /// per /function/renamedownload an den Core.
     /// </summary>
     public partial class RenameDownloadWindow : Window
     {

@@ -16,7 +16,10 @@ using log4net;
 namespace Apfelmus
 {
     /// <summary>
-    /// Interaktionslogik für SettingsWindow.xaml
+    /// Einstellungsdialog mit den Reitern Standard, Verbindung, Passwort und GUI. Aendert sowohl
+    /// Core-Einstellungen (settings.xml, z.B. Verzeichnisse, Limits, Passwort) als auch lokale
+    /// Client-Optionen (Sprache, Refresh-Rate, Partlisten-Groesse) und registriert optional den
+    /// ajfsp://-Protokollhandler in der Registry. INotifyPropertyChanged versorgt die Bindings.
     /// </summary>
     public partial class SettingsWindow : Window, INotifyPropertyChanged
     {

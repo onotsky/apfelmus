@@ -4,7 +4,9 @@ using System.ComponentModel;
 namespace Apfelmus
 {
     /// <summary>
-    /// Interaktionslogik für Window1.xaml
+    /// Eigener, themekonformer Startbildschirm. Ein BackgroundWorker fuellt den Fortschrittsbalken
+    /// in zehn Schritten (~4 s) und schliesst das Fenster danach - rein visuelles Intro, keine
+    /// Ladelogik dahinter.
     /// </summary>
     public partial class OwnSplashScreen : Window
     {

@@ -15,7 +15,9 @@ using System.Windows.Shapes;
 namespace Apfelmus
 {
     /// <summary>
-    /// Interaktionslogik für TargetdirWindow.xaml
+    /// Kleiner Dialog zur Eingabe eines Zielunterverzeichnisses fuer einen Download. Der Text muss
+    /// nicht-leer sein (sonst rote Markierung); das Ergebnis steht nach OK in <see cref="TargetDir"/>
+    /// (DialogResult == true).
     /// </summary>
     public partial class TargetdirWindow : Window
     {

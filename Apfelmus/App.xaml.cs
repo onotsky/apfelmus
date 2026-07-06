@@ -5,7 +5,9 @@ using ApfelmusFramework.Classes.Logic;
 namespace Apfelmus
 {
     /// <summary>
-    /// Interaktionslogik für "App.xaml"
+    /// Anwendungseinstieg. Setzt beim Start das gespeicherte Theme, richtet die Single-Instance-
+    /// Erkennung ein (weitere Starts - z.B. aus einem ajfsp://-Link - reichen ihre Argumente per
+    /// Named Pipe an die laufende Instanz weiter) und oeffnet das Hauptfenster.
     /// </summary>
     public partial class App : Application
     {

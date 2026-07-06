@@ -16,7 +16,10 @@ using System.Windows.Input;
 namespace Apfelmus
 {
     /// <summary>
-    /// Interaktionslogik für MainWindow.xaml
+    /// Login-Fenster (Klasse BaseWindow): Eingabe von Host, Port und Passwort. Prueft per
+    /// WebConnect.CheckSocket die Erreichbarkeit des Cores, speichert das Passwort als MD5-Hex in der
+    /// Config und uebergibt sie an das MainWindow. CheckConfig legt beim ersten Start eine
+    /// Standard-Config an (127.0.0.1:9851).
     /// </summary>
     public partial class BaseWindow : Window
     {
