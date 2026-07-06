@@ -12,6 +12,10 @@ namespace ApfelmusFramework.Classes.Modified
     using System.Text;
     using System.Xml.Serialization;
 
+    /// <summary>
+    /// Ein von einer Quelle angebotener Dateiname samt der User-Id, die ihn meldet. Ein Download
+    /// kann bei verschiedenen Quellen unter unterschiedlichen Namen bekannt sein.
+    /// </summary>
     public class FileName
     {
         [XmlAttribute(AttributeName = "name")]

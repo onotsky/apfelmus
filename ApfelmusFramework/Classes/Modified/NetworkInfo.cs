@@ -15,6 +15,11 @@ namespace ApfelmusFramework.Classes.Modified
 using System.Windows.Media;
     
 
+    /// <summary>
+    /// Netzwerkweite Kennzahlen und Verbindungsinfos des Cores (u.a. Anzahl Nutzer/Dateien im Netz,
+    /// eigene IP, Firewall-Status, verbundener Server). Wird im Uebersichts-/Netzwerk-Bereich
+    /// angezeigt; INotifyPropertyChanged haelt die Bindings aktuell.
+    /// </summary>
     public class NetworkInfo : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;

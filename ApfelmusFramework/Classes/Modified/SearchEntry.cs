@@ -12,6 +12,11 @@ namespace ApfelmusFramework.Classes.Modified
     using System.Text;
     using System.Xml.Serialization;
 
+    /// <summary>
+    /// Ein einzelnes Suchergebnis (Treffer) zu einer Suche: Pruefsumme, Groesse und der von der
+    /// Quelle gemeldete Dateiname. SearchColor markiert den Anzeige-Status (z.B. schon geladen).
+    /// Hinweis: Size ist int -&gt; Dateien &gt;= 2 GB werden nicht korrekt abgebildet (bekannte Grenze).
+    /// </summary>
     public class SearchEntry
     {
         [XmlAttribute(AttributeName = "id")]

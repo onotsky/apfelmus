@@ -14,6 +14,10 @@ namespace ApfelmusFramework.Classes.Modified
     using System.Text;
     using System.Xml.Serialization;
 
+    /// <summary>
+    /// Delta-Eintrag eines Downloads: dessen Id samt den zugehoerigen User-Ids (den aktuell
+    /// an diesem Download beteiligten Quellen) aus modified.xml.
+    /// </summary>
     public class DownloadId
     {
         [XmlAttribute(AttributeName = "id")]

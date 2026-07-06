@@ -13,6 +13,10 @@ namespace ApfelmusFramework.Classes.Modified
     using System.Text;
     using System.Xml.Serialization;
 
+    /// <summary>
+    /// Eine Gegenstelle/Quelle im Netz (Nickname, ID, Verbindungsdaten, Credits, Status) - z.B. die
+    /// an einem Download beteiligten Nutzer. INotifyPropertyChanged haelt die Bindings aktuell.
+    /// </summary>
     public class User : INotifyPropertyChanged
     {
         private int id;

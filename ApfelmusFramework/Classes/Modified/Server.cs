@@ -14,7 +14,8 @@ namespace ApfelmusFramework.Classes.Modified
     using System.Xml.Serialization;
 
     /// <summary>
-    /// Objekt das die Serverinformationen repräsentiert
+    /// Ein Server der Serverliste (Host, Port, Nutzer-/Dateizahlen, Verbindungsstatus). Der aktuell
+    /// verbundene Server wird im GUI hervorgehoben. INotifyPropertyChanged haelt die Bindings aktuell.
     /// </summary>
     public class Server : INotifyPropertyChanged
     {

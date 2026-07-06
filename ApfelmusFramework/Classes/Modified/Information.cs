@@ -13,6 +13,11 @@ namespace ApfelmusFramework.Classes.Modified
     using System.Xml.Serialization;
     using System.ComponentModel;
 
+    /// <summary>
+    /// Clientbezogene Kennzahlen des Cores (u.a. Credits, Sitzungs-/Gesamt-Up-/Download), wie sie
+    /// im Start-/Uebersichts-Tab angezeigt werden. INotifyPropertyChanged aktualisiert die Bindings
+    /// bei jedem Refresh. Credits sind long (Betraege koennen 2 GB uebersteigen).
+    /// </summary>
     public class Information : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;

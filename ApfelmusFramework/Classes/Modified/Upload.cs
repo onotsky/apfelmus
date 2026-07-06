@@ -14,6 +14,11 @@ namespace ApfelmusFramework.Classes.Modified
     using System.Xml.Serialization;
 
 
+    /// <summary>
+    /// Ein laufender Upload an eine andere Quelle (Datei, Ziel-Nutzer, uebertragene Menge,
+    /// Geschwindigkeit, Status). Wird im Upload-Tab angezeigt; INotifyPropertyChanged haelt die
+    /// Bindings aktuell.
+    /// </summary>
     public class Upload : INotifyPropertyChanged
     {
         [XmlAttribute(AttributeName = "id")]

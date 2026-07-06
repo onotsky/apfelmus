@@ -13,6 +13,11 @@ namespace ApfelmusFramework.Classes.Modified
     using System.Text;
     using System.Xml.Serialization;
 
+    /// <summary>
+    /// Sammelcontainer der im modified.xml-Delta gemeldeten Ids, gruppiert nach Server-, Upload-
+    /// und Download-Eintraegen (jeweils mit ihren untergeordneten Ids). Dient dem inkrementellen
+    /// Abgleich der GUI-Listen.
+    /// </summary>
     public class Ids
     {
         [XmlElementAttribute(ElementName = "serverid")]

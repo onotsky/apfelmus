@@ -12,6 +12,7 @@ namespace ApfelmusFramework.Classes.Modified
     using System.Text;
     using System.Xml.Serialization;
 
+    /// <summary>Verweis auf einen Server ueber seine Id im modified.xml-Delta.</summary>
     public class ServerId
     {
         [XmlAttribute(AttributeName = "id")]

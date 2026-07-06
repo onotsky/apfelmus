@@ -13,7 +13,9 @@ namespace ApfelmusFramework.Classes.Modified
     using System.Xml.Serialization;
 
     /// <summary>
-    /// Objekt das die Dateisuche repräsentiert
+    /// Repraesentiert eine laufende oder abgeschlossene Dateisuche: Suchtext, Id sowie die vom Core
+    /// gelieferten Zaehler (offene/gesamte Teilsuchen, gefundene Dateien) und ob sie noch laeuft.
+    /// Je Suche wird im GUI ein eigener Ergebnis-Tab gefuehrt.
     /// </summary>
     public class Search
     {

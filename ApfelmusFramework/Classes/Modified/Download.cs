@@ -13,6 +13,13 @@ namespace ApfelmusFramework.Classes.Modified
     using System.Xml.Serialization;
     using System.ComponentModel;
 
+    /// <summary>
+    /// Datenmodell eines laufenden/bekannten Downloads, wie ihn der Core in modified.xml liefert.
+    /// Die per [XmlAttribute] markierten Eigenschaften werden direkt aus dem XML deserialisiert;
+    /// die uebrigen (Speed, Percentages, DownloadedFilesize, TimeToEnd, ...) werden im GUI aus
+    /// weiteren Abfragen befuellt. Implementiert INotifyPropertyChanged, damit die DataGrid-Bindings
+    /// sich bei jedem Refresh aktualisieren.
+    /// </summary>
     public class Download : INotifyPropertyChanged
     {
         [XmlAttribute(AttributeName = "id")]
@@ -187,6 +194,8 @@ namespace ApfelmusFramework.Classes.Modified
             }
         }
 
+        // Der Core meldet Status 0 ("wartend") auch dann, wenn bereits aktive Quellen liefern.
+        // Fuer die Anzeige wird dieser Fall auf Status 2 ("laedt") gehoben.
         private int GetStatus()
         {
             if (status == 0 && activeUsers > 0)

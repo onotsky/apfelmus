@@ -12,6 +12,7 @@ namespace ApfelmusFramework.Classes.Modified
     using System.Text;
     using System.Xml.Serialization;
 
+    /// <summary>Verweis auf einen Upload ueber seine Id im modified.xml-Delta.</summary>
     public class UploadId
     {
         [XmlAttribute(AttributeName = "id")]
