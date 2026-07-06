@@ -40,7 +40,12 @@ namespace Apfelmus
 
 
     /// <summary>
-    /// Interaktionslogik für Window1.xaml
+    /// Hauptfenster der Anwendung mit allen Tabs (Uebersicht, Suche, Downloads, Uploads, Share,
+    /// Server). Haelt die vom Core gepollten Datencollections, startet die Hintergrund-Threads, die
+    /// den Core zyklisch abfragen (siehe Region ThreadMethods), und aktualisiert ueber Dispatcher die
+    /// Bindings. Nutzt eine eigene Titelleiste (WindowChrome, WindowStyle=None), damit auch sie dem
+    /// App-Theme folgt. Die Klasse ist bewusst nach Regionen gegliedert:
+    /// Fields/Properties/Delegates/Constructors/ThreadMethods/HelpMethods/DelegateMethods/Eventhandler.
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
@@ -229,11 +234,14 @@ namespace Apfelmus
         #endregion
 
         #region ThreadMethods
+        // Hintergrund-Worker, die den Core im Refresh-Intervall zyklisch abfragen (Downloads,
+        // Uploads, Server, Informationen, uebergebene ajfsp-Links usw.). HTTP laeuft bewusst hier
+        // und NICHT im UI-Thread; die Ergebnisse werden per Dispatcher in die Bindings gespielt.
+        // Threads stoppen kooperativ (kein Thread.Abort, siehe ARCHITECTURE.md).
         /// <summary>
-        /// 
+        /// Thread-Schleife: holt im Refresh-Intervall die aktuellen Uploads vom Core und laesst das
+        /// Upload-DataGrid per Dispatcher aktualisieren.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void _updateUploads_ThreadWorker()
         {
             UpdateUploadDataGrid updateUploadDataGrid = new UpdateUploadDataGrid(RefreshUploadDatagrid);
@@ -465,6 +473,10 @@ namespace Apfelmus
             }
         }
 
+        /// <summary>
+        /// Thread-Schleife: holt zyklisch die Partliste des gewaehlten Downloads und laesst den
+        /// Verfuegbarkeitsbalken per Dispatcher neu zeichnen.
+        /// </summary>
         private void _refreshDownloadPartList_ThreadWorker()
         {
             RefreshDownloadPartlist refreshDownloadPartlist = new RefreshDownloadPartlist(CreateDownloadPartlist);
@@ -489,6 +501,10 @@ namespace Apfelmus
             }
         }
 
+        /// <summary>
+        /// Thread-Schleife: holt zyklisch die Partliste des gewaehlten Nutzers und laesst den
+        /// zugehoerigen Verfuegbarkeitsbalken per Dispatcher neu zeichnen.
+        /// </summary>
         private void _refreshUserPartList_ThreadWorker()
         {
             RefreshUserPartList refreshUserPartlist = new RefreshUserPartList(CreateUserPartlist);
@@ -518,6 +534,8 @@ namespace Apfelmus
         #endregion
 
         #region HelpMethods
+        // Hilfsmethoden: Aufbereiten/Abfragen von Core-Daten, Link-Verarbeitung sowie das Zeichnen
+        // des Partlisten-Verfuegbarkeitsbalkens (RenderPartList).
 
         /// <summary>
         /// Hilfsmethode zum Wechsel auf das Downloadtab
@@ -694,6 +712,11 @@ namespace Apfelmus
             }
         }
 
+        /// <summary>
+        /// Baut die ersten beiden Ebenen des Freigabe-Verzeichnisbaums fuer den Share-Tab (Wurzeln
+        /// und deren direkte Unterordner aus directory.xml). Fehlende Pfade werden unter Beachtung
+        /// des Core-Separators zusammengesetzt; tiefere Ebenen laedt DirectoryChildren lazy.
+        /// </summary>
         private void GenerateFirstTreeItem()
         {
             using (WebConnect webConnect = new WebConnect(config.HostName, config.Port))
@@ -1034,6 +1057,9 @@ namespace Apfelmus
         #endregion
 
         #region DelegateMethods
+        // Methoden, die (meist per Dispatcher.Invoke aus den Thread-Workern) auf dem UI-Thread
+        // laufen und die Oberflaeche aktualisieren - z.B. Collections abgleichen, Auswahl/Fokus
+        // erhalten, Tabs aktualisieren.
 
         /// <summary>
         /// Delegatemethode zum erzeugen des Suchergebnisses
@@ -1093,6 +1119,7 @@ namespace Apfelmus
         // Die zugehoerige Refresh-/Create-Methode (reines UI-Update) wird danach per
         // Dispatcher.Invoke auf den UI-Thread marshallt. So blockiert Netzwerk-I/O nie die GUI.
 
+        /// <summary>Holt die aktuellen Uploads vom Core (modified.xml, Filter uploads) in appleJuice.Upload.</summary>
         private void FetchUploads()
         {
             try
@@ -1108,6 +1135,7 @@ namespace Apfelmus
             }
         }
 
+        /// <summary>Holt die aktuellen Downloads vom Core (modified.xml, Filter down) in appleJuice.Download.</summary>
         private void FetchDownloads()
         {
             try
@@ -1123,6 +1151,7 @@ namespace Apfelmus
             }
         }
 
+        /// <summary>Holt die aktuellen Nutzer/Quellen vom Core (modified.xml, Filter user) in appleJuice.User.</summary>
         private void FetchUsers()
         {
             try
@@ -1138,6 +1167,7 @@ namespace Apfelmus
             }
         }
 
+        /// <summary>Holt die Serverliste vom Core (modified.xml, Filter server) in appleJuice.Server.</summary>
         private void FetchServer()
         {
             try
@@ -1153,6 +1183,10 @@ namespace Apfelmus
             }
         }
 
+        /// <summary>
+        /// Holt die Partliste (Verfuegbarkeitssegmente + Dateigroesse) des aktuell gewaehlten Downloads
+        /// (downloadpartlist.xml). Ohne Auswahl passiert nichts.
+        /// </summary>
         private void FetchDownloadPartlist()
         {
             try
@@ -1176,6 +1210,10 @@ namespace Apfelmus
             }
         }
 
+        /// <summary>
+        /// Holt die Partliste (welche Bereiche die Quelle anbietet) des aktuell gewaehlten Nutzers
+        /// (userpartlist.xml). Ohne Auswahl passiert nichts.
+        /// </summary>
         private void FetchUserPartlist()
         {
             try
@@ -1199,6 +1237,10 @@ namespace Apfelmus
             }
         }
 
+        /// <summary>
+        /// UI-seitige Aktualisierung der Upload-Ansicht: baut die Listen der laufenden und der
+        /// wartenden Uploads neu auf (wird vom Upload-Thread per Dispatcher aufgerufen).
+        /// </summary>
         private void RefreshUploadDatagrid()
         {
             try
@@ -1653,6 +1695,9 @@ namespace Apfelmus
         #endregion
 
         #region Eventhandler
+        // WPF-Eventhandler der Bedienelemente (Button-Klicks, Kontextmenues, Tab-/Fenster-Events,
+        // Titelleisten-Buttons). Rufen ueberwiegend die Hilfs-/Delegate-Methoden bzw. Core-Kommandos
+        // (/function/*) auf.
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
