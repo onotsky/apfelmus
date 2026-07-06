@@ -557,15 +557,25 @@ namespace Apfelmus
         {
             string _item = string.Empty;
 
-            if (args.TryTake(out _item))
+            // Ohne Argument keinen (leeren) processlink-Aufruf absetzen.
+            if (!args.TryTake(out _item) || string.IsNullOrEmpty(_item))
+                return;
+
+            // Manche Aufrufer liefern den Link URL-kodiert (| als %7C) -> zurueckwandeln.
+            if (!_item.Contains('|'))
+                _item = _item.Replace("%7C", "|");
+
+            // ajfsp-Link: ajfsp://file|<name>|<hash>|<size>[|<quelle>]/
+            // Nur der Dateiname (Segment 1) muss URL-kodiert werden; ALLE uebrigen
+            // Segmente bleiben erhalten. Die fruehere Fassung mit festem "{0}|{1}|{2}|{3}"
+            // warf bei kuerzeren Links (z.B. Serverlinks ajfsp://server|host|port/) eine
+            // Exception (Link ging verloren) und schnitt bei Links mit Quelle die
+            // Quellenangabe ab.
+            string[] tempArgs = _item.Split('|');
+            if (tempArgs.Length > 1)
             {
-                if (!_item.Contains('|'))
-                    _item = _item.Replace("%7C", "|");
-
-                string[] tempArgs = _item.ToString().Split('|');
-
                 tempArgs[1] = WebUtility.UrlEncode(tempArgs[1]);
-                _item = string.Format("{0}|{1}|{2}|{3}", tempArgs);
+                _item = string.Join("|", tempArgs);
             }
 
             string processLink = "/function/processlink?link=" + _item + "&password=" + config.Password;
