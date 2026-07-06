@@ -18,6 +18,13 @@ using ApfelmusFramework.Classes.Allgemein;
 
 namespace ApfelmusFramework.Classes.Logic
 {
+    /// <summary>
+    /// Kapselt die gesamte HTTP-Kommunikation mit dem appleJuice-Core ueber rohe Socket-GET-Requests.
+    /// Zwei Aufruf-Familien: /xml/*.xml (abgefragter Zustand, via GetHttpResult als XML) und /function/*
+    /// (Kommandos; StartXMLFunction feuert ohne Antwort, GetFunctionResult liest den Klartext-Body).
+    /// Jede Anfrage traegt das Core-Passwort als MD5-Hex. IDisposable, da pro Poll-Zyklus viele
+    /// Instanzen entstehen und der Socket garantiert geschlossen werden muss (frueher Leak).
+    /// </summary>
     public class WebConnect : IDisposable
     {
         private string serverName;

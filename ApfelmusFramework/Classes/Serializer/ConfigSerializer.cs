@@ -10,6 +10,12 @@ namespace ApfelmusFramework.Classes.Serializer
     using System.IO;
     using System.Xml.Serialization;
 
+    /// <summary>
+    /// Liest/schreibt die <see cref="Config.Config"/> als %AppData%\Apfelmus\Config.xml (XmlSerializer).
+    /// Loeste den frueheren BinaryFormatter/Config.dat-Ansatz ab (in .NET 9+ entfernt); die Migration
+    /// alter Config.dat uebernimmt das separate Tool ConfigMigrator. Config wird bewusst voll als
+    /// Config.Config qualifiziert (Namespace-Kollision, siehe ARCHITECTURE.md).
+    /// </summary>
     public static class ConfigSerializer
     {
         private static string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Apfelmus");

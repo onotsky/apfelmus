@@ -4,10 +4,17 @@ using System.Windows;
 
 namespace ApfelmusFramework.Classes.Logic
 {
+    /// <summary>
+    /// Liefert die zur Sprache passende Sprach-Ressourcen (DE/EN/IT). Dient dazu, die im GUI ueber
+    /// {DynamicResource ...} gebundenen Texte je nach Kultur bzw. gespeicherter Auswahl zu setzen.
+    /// </summary>
     public static class LanguageDictionary
     {
         private static ResourceDictionary dict;
 
+        /// <summary>
+        /// Waehlt das Sprach-Dictionary anhand der aktuellen Thread-Kultur (Fallback: Deutsch).
+        /// </summary>
         public static ResourceDictionary GetLanguageDictionary()
         {
             dict = new ResourceDictionary();
@@ -30,6 +37,7 @@ namespace ApfelmusFramework.Classes.Logic
             return dict;
         }
 
+        /// <summary>Laedt das Sprach-Dictionary explizit von dem in der Config gespeicherten Pfad.</summary>
         public static ResourceDictionary GetLanguageDictionary(string path)
         {
             dict = new ResourceDictionary();
@@ -37,6 +45,7 @@ namespace ApfelmusFramework.Classes.Logic
             return dict;
         }
 
+        /// <summary>Liefert den Standard-Pfad des zur aktuellen Kultur passenden Sprach-Dictionaries.</summary>
         public static string GetURI()
         {
             switch (Thread.CurrentThread.CurrentCulture.ToString())

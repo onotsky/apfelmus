@@ -12,7 +12,9 @@ namespace ApfelmusFramework.Classes.Logic
 {
     
     /// <summary>
-    /// Zum umwandlen des Passwortes
+    /// Erzeugt den MD5-Hex-Digest des Klartext-Passworts. Die Core-Schnittstelle verlangt in JEDER
+    /// Anfrage genau diesen MD5-Hex-Wert als password-Parameter - das ist eine Wire-Protokoll-Vorgabe
+    /// des externen Cores (nicht "verbessern", sonst schlaegt der Login fehl; siehe ARCHITECTURE.md).
     /// </summary>
     public static class CreateMd5Hash
     {
