@@ -25,12 +25,14 @@ namespace Apfelmus
     using System.Linq;
     using System.Net;
     using System.Reflection;
+    using System.Runtime.InteropServices;
     using System.Text.RegularExpressions;
     using System.Threading;
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Data;
     using System.Windows.Input;
+    using System.Windows.Interop;
     using System.Windows.Media;
     using System.Windows.Media.Imaging;
     using System.Windows.Shell;
@@ -2861,6 +2863,104 @@ namespace Apfelmus
                 SystemCommands.MaximizeWindow(this);
             }
         }
+
+        #region Maximieren auf Arbeitsflaeche begrenzen (WindowStyle=None-Bug)
+
+        // Bei WindowStyle="None" + WindowChrome dimensioniert Windows ein maximiertes Fenster
+        // auf die VOLLE Monitorgroesse -> der untere Rand (App-Statusleiste) verschwindet hinter
+        // der Windows-Taskbar. Der WM_GETMINMAXINFO-Hook begrenzt die Maximalgroesse/-position
+        // auf die Arbeitsflaeche (rcWork, also Monitor ohne Taskbar). Standardloesung fuer
+        // randlose WPF-Fenster.
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnSourceInitialized(e);
+
+            IntPtr handle = new WindowInteropHelper(this).Handle;
+            HwndSource.FromHwnd(handle)?.AddHook(WindowProc);
+        }
+
+        private static IntPtr WindowProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            const int WM_GETMINMAXINFO = 0x0024;
+
+            if (msg == WM_GETMINMAXINFO)
+            {
+                WmGetMinMaxInfo(hwnd, lParam);
+                handled = true;
+            }
+
+            return IntPtr.Zero;
+        }
+
+        private static void WmGetMinMaxInfo(IntPtr hwnd, IntPtr lParam)
+        {
+            MINMAXINFO mmi = (MINMAXINFO)Marshal.PtrToStructure(lParam, typeof(MINMAXINFO));
+
+            const int MONITOR_DEFAULTTONEAREST = 0x00000002;
+            IntPtr monitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+
+            if (monitor != IntPtr.Zero)
+            {
+                MONITORINFO monitorInfo = new MONITORINFO();
+                monitorInfo.cbSize = Marshal.SizeOf(typeof(MONITORINFO));
+                GetMonitorInfo(monitor, ref monitorInfo);
+
+                RECT rcWork = monitorInfo.rcWork;
+                RECT rcMonitor = monitorInfo.rcMonitor;
+
+                // Position/Groesse relativ zum Monitor (nicht zum virtuellen Desktop).
+                mmi.ptMaxPosition.X = rcWork.left - rcMonitor.left;
+                mmi.ptMaxPosition.Y = rcWork.top - rcMonitor.top;
+                mmi.ptMaxSize.X = rcWork.right - rcWork.left;
+                mmi.ptMaxSize.Y = rcWork.bottom - rcWork.top;
+            }
+
+            Marshal.StructureToPtr(mmi, lParam, true);
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct POINT
+        {
+            public int X;
+            public int Y;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct MINMAXINFO
+        {
+            public POINT ptReserved;
+            public POINT ptMaxSize;
+            public POINT ptMaxPosition;
+            public POINT ptMinTrackSize;
+            public POINT ptMaxTrackSize;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct RECT
+        {
+            public int left;
+            public int top;
+            public int right;
+            public int bottom;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct MONITORINFO
+        {
+            public int cbSize;
+            public RECT rcMonitor;
+            public RECT rcWork;
+            public uint dwFlags;
+        }
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr MonitorFromWindow(IntPtr hwnd, int dwFlags);
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool GetMonitorInfo(IntPtr hMonitor, ref MONITORINFO lpmi);
+
+        #endregion
 
         private void TitleBarClose_Click(object sender, RoutedEventArgs e)
         {
