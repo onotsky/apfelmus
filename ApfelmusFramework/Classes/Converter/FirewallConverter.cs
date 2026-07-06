@@ -10,6 +10,10 @@ using System.Windows.Data;
 namespace ApfelmusFramework.Classes.Converter
 {
 
+    /// <summary>
+    /// Waehlt anhand des Firewall-Status (true = hinter Firewall/nicht erreichbar) das passende
+    /// Firewall-Symbol (on/off) und liefert dessen Pack-URI-Pfad. Nur Hin-Richtung.
+    /// </summary>
     public class FirewallConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

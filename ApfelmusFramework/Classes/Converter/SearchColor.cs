@@ -5,6 +5,10 @@ using System.Windows.Media;
 
 namespace ApfelmusFramework.Classes.Converter
 {
+    /// <summary>
+    /// Faerbt eine Suche nach ihrem Status: 1 = laeuft/ok (gruen), 2 = beendet/Fehler (rot),
+    /// sonst kein Brush. Rueckgabe ist ein themebasierter Brush. Nur Hin-Richtung.
+    /// </summary>
     public class SearchColor : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

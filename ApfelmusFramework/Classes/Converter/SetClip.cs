@@ -3,6 +3,10 @@ using System.Windows.Data;
 
 namespace ApfelmusFramework.Classes.Converter
 {
+    /// <summary>
+    /// Setzt einen nicht-leeren Wert zur Anzeige in Klammern ("(Wert)"), sonst Leerstring -
+    /// z.B. fuer optionale Zusatzangaben hinter einem Namen. Nur Hin-Richtung.
+    /// </summary>
     public class SetClip : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

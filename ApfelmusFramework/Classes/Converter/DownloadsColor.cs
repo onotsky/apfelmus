@@ -5,6 +5,10 @@ using System.Windows.Media;
 
 namespace ApfelmusFramework.Classes.Converter
 {
+    /// <summary>
+    /// Bildet einen Download-Statuscode des Cores auf einen themebasierten Status-Brush ab
+    /// (1 = Fehler, 14 = ok/laeuft, 17 = Warnung, 18 = Info; sonst kein Brush). Nur Hin-Richtung.
+    /// </summary>
     public class DownloadsColor : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

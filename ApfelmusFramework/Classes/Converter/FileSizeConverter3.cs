@@ -10,6 +10,10 @@ using System.Windows.Data;
 namespace ApfelmusFramework.Classes.Converter
 {
 
+    /// <summary>
+    /// Bidirektionaler Umrechner Bytes &lt;-&gt; KB (einmal /1024 bzw. *1024) - z.B. um ein in Bytes
+    /// gespeichertes Limit im Einstellungsdialog in KB zu editieren und wieder zurueckzuschreiben.
+    /// </summary>
     public class FileSizeConverter3 : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

@@ -6,6 +6,10 @@ using ApfelmusFramework.Classes.Logic;
 
 namespace ApfelmusFramework.Classes.Converter
 {
+    /// <summary>
+    /// Uebersetzt den Verbindungs-/Userstatuscode eines Nutzers in einen lokalisierten Text
+    /// (Sprachschluessel "userstatusN") anhand der in der Config gewaehlten Sprache. Nur Hin-Richtung.
+    /// </summary>
     public class UserStatus : IValueConverter
     {
         ResourceDictionary dict;

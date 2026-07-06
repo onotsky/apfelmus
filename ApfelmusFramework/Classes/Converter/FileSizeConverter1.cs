@@ -9,7 +9,12 @@ using System.Windows.Data;
 
 namespace ApfelmusFramework.Classes.Converter
 {
-    
+    /// <summary>
+    /// Formatiert eine Byte-Anzahl als menschenlesbare Groesse (bytes/KB/MB/GB/TB/PB/EB),
+    /// indem sie so oft durch 1024 geteilt wird, bis sie unter die naechste Einheitsgrenze
+    /// faellt. Bei 0 wird ein Leerstring geliefert (Tabellenspalten bleiben leer). Negative
+    /// Werte werden analog behandelt (z.B. Restgroessen). Nur Hin-Richtung.
+    /// </summary>
     public class FileSizeConverter1 : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

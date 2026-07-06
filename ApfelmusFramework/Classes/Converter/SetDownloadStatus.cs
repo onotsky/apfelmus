@@ -13,6 +13,12 @@ using ApfelmusFramework.Classes.Serializer;
 namespace ApfelmusFramework.Classes.Converter
 {
 
+    /// <summary>
+    /// Baut den anzeigbaren Download-Statustext aus mehreren gebundenen Werten: values[0] ist der
+    /// Statuscode des Cores, der auf einen lokalisierten Text (Sprachschluessel "downloadstatusN")
+    /// abgebildet wird; die weiteren Werte (z.B. Quellen, Prozent) werden je nach Status in den
+    /// Text eingesetzt. Sprache kommt aus der aktuellen Config. Nur Hin-Richtung.
+    /// </summary>
     public class SetDownloadStatus : IMultiValueConverter
     {
         ResourceDictionary dict;

@@ -3,6 +3,10 @@ using System.Windows.Data;
 
 namespace ApfelmusFramework.Classes.Converter
 {
+    /// <summary>
+    /// Stellt einen PowerDownload-Wert als Verhaeltnis "1:x" dar, wobei x = (Wert + 10) / 10
+    /// (Anzahl paralleler Quellen pro fertiger Datei). Nur Hin-Richtung.
+    /// </summary>
     public class PowerDownload : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

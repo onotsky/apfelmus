@@ -11,6 +11,10 @@ namespace ApfelmusFramework.Classes.Converter
     using ApfelmusFramework.Classes.Logic;
     using ApfelmusFramework.Classes.Serializer;
 
+    /// <summary>
+    /// Uebersetzt den Upload-Statuscode in einen lokalisierten Text (1 =&gt; "uploadstatus1",
+    /// sonst "uploadstatus2") anhand der in der Config gewaehlten Sprache. Nur Hin-Richtung.
+    /// </summary>
     public class SetUploadStatus : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

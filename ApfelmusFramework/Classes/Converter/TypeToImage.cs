@@ -5,6 +5,12 @@ using System.Windows.Media;
 
 namespace ApfelmusFramework.Classes.Converter
 {
+    /// <summary>
+    /// Zeichnet fuer einen Verzeichnis-/Laufwerkstyp (1 = Monitor/lokal, 2 = Festplatte, 3 = Diskette,
+    /// 4 = Ordner, 5 = Monitor mit Taskleiste) ein handgezeichnetes WPF-Vektor-Icon als DrawingImage.
+    /// Bewusst Vektorgrafik (statt Bitmap), damit die Symbole scharf skalieren; Brush/Pen werden
+    /// eingefroren (Freeze) fuer bessere Performance. Nur Hin-Richtung.
+    /// </summary>
     public class TypeToImage : IValueConverter
     {
         private static readonly Brush IconBrush = CreateFrozenBrush();

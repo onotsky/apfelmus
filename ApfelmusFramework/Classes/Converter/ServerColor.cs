@@ -5,6 +5,10 @@ using System.Windows.Media;
 
 namespace ApfelmusFramework.Classes.Converter
 {
+    /// <summary>
+    /// Hebt den aktuell verbundenen Server in der Serverliste hervor: true = verbunden liefert
+    /// einen gruenen Brush, sonst keinen. Nur Hin-Richtung.
+    /// </summary>
     public class ServerColor : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

@@ -10,6 +10,10 @@ using System.Windows.Data;
 namespace ApfelmusFramework.Classes.Converter
 {
 
+    /// <summary>
+    /// Formatiert einen Geschwindigkeitswert als B/s bzw. Kb/s (nur diese zwei Einheiten);
+    /// 0 ergibt Leerstring. Nur Hin-Richtung.
+    /// </summary>
     public class FileSizeConverter4 : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

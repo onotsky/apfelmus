@@ -7,6 +7,13 @@ using System.Windows.Data;
 
 namespace ApfelmusFramework.Classes.Converter
 {
+    /// <summary>
+    /// Liefert das zum Dateityp passende Windows-Shell-Icon (16x16) fuer einen Dateinamen.
+    /// Da das Icon aus der Datei-Endung abgeleitet wird, wird kurzzeitig eine leere Temp-Datei
+    /// mit gleicher Endung angelegt, ihr Icon extrahiert und die Datei wieder geloescht.
+    /// Bewusst ein echtes Bitmap (kein theme-getoentes Vektor-Icon), da es das reale
+    /// OS-Dateisymbol zeigt. Nur Hin-Richtung.
+    /// </summary>
     public class FilenameToImage : IValueConverter
     {
         private System.Windows.Media.ImageSource icon;

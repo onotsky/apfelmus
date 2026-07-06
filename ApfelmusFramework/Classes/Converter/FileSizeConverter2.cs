@@ -10,6 +10,11 @@ using System.Windows.Data;
 namespace ApfelmusFramework.Classes.Converter
 {
  
+    /// <summary>
+    /// Wie FileSizeConverter1, jedoch ab MB beginnend und auf zwei Nachkommastellen gerundet
+    /// (fuer groessere Werte wie Gesamt-Transfervolumen). Behandelt "." als Dezimaltrenner.
+    /// Nur Hin-Richtung.
+    /// </summary>
     public class FileSizeConverter2 : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

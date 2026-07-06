@@ -11,6 +11,10 @@ using System.Windows.Data;
 namespace ApfelmusFramework.Classes.Converter
 {
 
+    /// <summary>
+    /// Multi-Value-Converter, der aus einer gebundenen Breite und Hoehe ein Rect (0,0,Breite,Hoehe)
+    /// bildet - z.B. zum Zuschneiden (Clip) eines Elements auf seine aktuelle Groesse. Nur Hin-Richtung.
+    /// </summary>
     public class RectConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
