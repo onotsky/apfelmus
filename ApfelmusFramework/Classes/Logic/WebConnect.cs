@@ -141,6 +141,50 @@ namespace ApfelmusFramework.Classes.Logic
             return string.Empty;
         }
 
+        /// <summary>
+        /// Fuehrt einen /function/*-Aufruf aus und liefert den reinen Antwort-Body des Cores
+        /// zurueck (HTTP-Header entfernt, KEINE XML-Extraktion). Im Gegensatz zu
+        /// StartXMLFunction wird die Antwort ueberhaupt gelesen; im Gegensatz zu GetHttpResult
+        /// wird sie nicht als XML interpretiert - die /function-Antworten (z.B. "ok",
+        /// "already downloaded") sind kein wohlgeformtes XML und wuerden dort verworfen.
+        /// </summary>
+        public string GetFunctionResult(string anfrage)
+        {
+            try
+            {
+                string request = string.Format("GET {0} HTTP/1.1\r\nHost: {1}\r\nConnection: Close\r\n\r\n", anfrage, serverName);
+                byte[] bytesSent = Encoding.ASCII.GetBytes(request);
+                byte[] bytesReceived = new byte[0x200];
+                StringBuilder response = new StringBuilder();
+                int count;
+
+                using (Socket s = GetSocket(serverName, serverPort))
+                {
+                    if (s == null)
+                        return null;
+
+                    s.Send(bytesSent, SocketFlags.None);
+
+                    do
+                    {
+                        count = s.Receive(bytesReceived, bytesReceived.Length, 0);
+                        response.Append(Encoding.ASCII.GetString(bytesReceived, 0, count));
+                    }
+                    while (count > 0);
+                }
+
+                string full = response.ToString();
+                int idx = full.IndexOf("\r\n\r\n");
+                return idx >= 0 ? full.Substring(idx + 4).Trim() : full.Trim();
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Fehler beim Ausfuehren der Function", ex);
+            }
+
+            return string.Empty;
+        }
+
         private Socket GetSocket(string hostName, int port)
         {
             Socket socket2 = null;

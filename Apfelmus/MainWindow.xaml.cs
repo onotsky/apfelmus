@@ -533,21 +533,76 @@ namespace Apfelmus
         /// </summary>
         private void ProcessLink()
         {
-            var link = tbxDownload.Text;
+            string link = tbxDownload.Text;
 
+            // Manche Aufrufer liefern den Link URL-kodiert (| als %7C) -> zurueckwandeln.
+            // (Frueher wurde das Ergebnis von Replace verworfen -> Bug.)
             if (!link.Contains('|'))
-                link.Replace("%7C", "|");
+                link = link.Replace("%7C", "|");
 
-            string[] tempArgs = link.ToString().Split('|');
+            string displayLink = link;
 
-            tempArgs[1] = WebUtility.UrlEncode(tempArgs[1]);
-            link = string.Format("{0}|{1}|{2}|{3}", tempArgs);
+            // Nur der Dateiname (Segment 1) muss URL-kodiert werden; ALLE uebrigen Segmente
+            // bleiben erhalten. Die alte Fassung mit festem "{0}|{1}|{2}|{3}" warf bei kurzen
+            // Links (z.B. Serverlinks) eine Exception und schnitt Quellenangaben ab.
+            string[] tempArgs = link.Split('|');
+            if (tempArgs.Length > 1)
+            {
+                tempArgs[1] = WebUtility.UrlEncode(tempArgs[1]);
+                link = string.Join("|", tempArgs);
+            }
 
             string processLink = "/function/processlink?link=" + link + "&password=" + config.Password;
-            using (WebConnect webConnect = new WebConnect(config.HostName, config.Port))
+            string host = config.HostName;
+            int port = config.Port;
+
+            // HTTP raus aus dem UI-Thread; anschliessend die Core-Antwort auswerten und -
+            // wie die offizielle Java-GUI - bei Bedarf eine Meldung zeigen (z.B. bereits geladen).
+            ThreadPool.QueueUserWorkItem(_ =>
             {
-                webConnect.StartXMLFunction(processLink);
-            }
+                string result;
+                using (WebConnect webConnect = new WebConnect(host, port))
+                {
+                    result = webConnect.GetFunctionResult(processLink);
+                }
+                ShowProcessLinkResult(result, displayLink);
+            });
+        }
+
+        /// <summary>
+        /// Wertet die Core-Antwort eines processlink-Aufrufs aus und zeigt - analog zur
+        /// offiziellen Java-GUI - eine Meldung, wenn die Datei bereits geladen wurde, der
+        /// Link ungueltig war oder ein Fehler auftrat. Bei Erfolg (Antwort beginnt mit "ok")
+        /// erscheint keine Meldung.
+        /// </summary>
+        private void ShowProcessLinkResult(string result, string displayLink)
+        {
+            if (string.IsNullOrEmpty(result))
+                return;
+
+            string trimmed = result.Trim();
+            if (trimmed.StartsWith("ok"))
+                return;
+
+            string messageKey;
+            if (trimmed.Contains("already downloaded"))
+                messageKey = "alreadyloaded";
+            else if (trimmed.Contains("incorrect link"))
+                messageKey = "invalidlink";
+            else if (trimmed.Contains("failure"))
+                messageKey = "linkfailure";
+            else
+                return;
+
+            Dispatcher.Invoke(() =>
+            {
+                string message = (Resources[messageKey] as string) ?? messageKey;
+                message = message.Replace("%s", displayLink);
+                string title = (Resources["linkinfotitle"] as string) ?? "appleJuice";
+
+                MessageWindow msg = new MessageWindow(message, title) { Owner = this };
+                msg.ShowDialog();
+            });
         }
 
         /// <summary>

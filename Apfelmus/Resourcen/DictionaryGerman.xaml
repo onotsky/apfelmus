@@ -41,6 +41,10 @@
     <system:String x:Key="passtab">Passwort</system:String>
     <system:String x:Key="newpass">Neues Passwort:</system:String>
     <system:String x:Key="ajlink">Ajfsp-Link mit GUI Verknüpfen:</system:String>
+    <system:String x:Key="linkinfotitle">AJ-Link</system:String>
+    <system:String x:Key="alreadyloaded">Diese Datei wird bereits geladen:&#10;%s</system:String>
+    <system:String x:Key="invalidlink">Ungültiger Link:&#10;%s</system:String>
+    <system:String x:Key="linkfailure">Der Link konnte nicht verarbeitet werden.</system:String>
     <system:String x:Key="refresh">Refreshrate der GUI in ms:</system:String>
     <system:String x:Key="admin">Bitte die Gui als Administrator starten, um den Wert in die Registry zu schreiben!</system:String>
     <system:String x:Key="change">Änderungen übernehmen</system:String>
