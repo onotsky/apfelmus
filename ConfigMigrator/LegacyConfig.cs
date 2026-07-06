@@ -8,12 +8,14 @@ namespace ConfigMigrator
     using System;
     using System.Runtime.Serialization;
 
-    // Spiegelt exakt die frueher per BinaryFormatter serialisierte
-    // ApfelmusFramework.Classes.Config.Config-Klasse (gleiche private Feldnamen, da
-    // BinaryFormatter Felder ueber FormatterServices namentlich zuordnet, nicht ueber
-    // Properties). Die echte Config-Klasse ist inzwischen nicht mehr [Serializable] und
-    // nutzt XmlSerializer - dieser Nachbau existiert nur, damit alte Config.dat-Dateien
-    // ueberhaupt noch gelesen werden koennen.
+    /// <summary>
+    /// Spiegelt exakt die frueher per BinaryFormatter serialisierte
+    /// ApfelmusFramework.Classes.Config.Config-Klasse (gleiche private Feldnamen, da
+    /// BinaryFormatter Felder ueber FormatterServices namentlich zuordnet, nicht ueber
+    /// Properties). Die echte Config-Klasse ist inzwischen nicht mehr [Serializable] und
+    /// nutzt XmlSerializer - dieser Nachbau existiert nur, damit alte Config.dat-Dateien
+    /// ueberhaupt noch gelesen werden koennen.
+    /// </summary>
     [Serializable]
     public class LegacyConfig
     {

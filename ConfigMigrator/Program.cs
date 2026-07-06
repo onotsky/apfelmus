@@ -11,12 +11,20 @@ namespace ConfigMigrator
     using ApfelmusFramework.Classes.Config;
     using ApfelmusFramework.Classes.Serializer;
 
-    // Einmaliges Kommandozeilen-Tool: migriert die alte, per BinaryFormatter serialisierte
-    // Config.dat auf das neue, per XmlSerializer geschriebene Config.xml-Format
-    // (siehe ConfigSerializer in ApfelmusFramework). Nach einem erfolgreichen Lauf braucht
-    // Apfelmus selbst BinaryFormatter nicht mehr.
+    /// <summary>
+    /// Einmaliges Kommandozeilen-Tool: migriert die alte, per BinaryFormatter serialisierte
+    /// Config.dat auf das neue, per XmlSerializer geschriebene Config.xml-Format
+    /// (siehe ConfigSerializer in ApfelmusFramework). Nach einem erfolgreichen Lauf braucht
+    /// Apfelmus selbst BinaryFormatter nicht mehr - die unsichere Abhaengigkeit bleibt auf dieses
+    /// separate Projekt beschraenkt.
+    /// </summary>
     public static class Program
     {
+        /// <summary>
+        /// Liest Config.dat (mit LegacyConfigBinder), uebertraegt die Werte in die aktuelle Config
+        /// und schreibt sie als Config.xml; fragt vor dem Ueberschreiben nach und sichert die alte
+        /// Datei als .bak. Rueckgabe: 0 = ok/nichts zu tun, 1 = Abbruch/Fehler.
+        /// </summary>
         public static int Main(string[] args)
         {
             string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Apfelmus");
