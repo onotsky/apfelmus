@@ -3,6 +3,11 @@ using System.ComponentModel;
 
 namespace ApfelmusFramework.Classes.Help
 {
+    /// <summary>
+    /// Bindbare Live-Kennzahlen einer Suche fuer die Oberflaeche (offene/gesamte Teilsuchen,
+    /// gefundene Dateien, befragte Nutzer, laeuft-Status). INotifyPropertyChanged aktualisiert die
+    /// Anzeige bei jedem Refresh.
+    /// </summary>
     public class SearchInfo : INotifyPropertyChanged
     {
         private int sumSearches;

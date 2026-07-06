@@ -6,6 +6,12 @@ using ApfelmusFramework.Classes.Directory;
 
 namespace ApfelmusFramework.Classes.Help
 {
+    /// <summary>
+    /// Baumknoten-Wrapper fuer die Freigabe-Verzeichnisbaum-Ansicht (TreeView). Die Kinder werden
+    /// erst beim Aufklappen geladen (lazy), indem <see cref="Childrens"/> per HTTP directory.xml des
+    /// aktuellen Pfades abfragt - das haelt den Baum bei tiefen Strukturen schlank.
+    /// Hinweis: Config wird bewusst voll als Config.Config qualifiziert (Namespace-Kollision, siehe ARCHITECTURE.md).
+    /// </summary>
     public class DirectoryChildren
     {
 
@@ -21,6 +27,11 @@ namespace ApfelmusFramework.Classes.Help
             set;
         }
 
+        /// <summary>
+        /// Laedt die Unterverzeichnisse dieses Knotens on-demand vom Core (directory.xml), sortiert
+        /// sie nach Namen und ergaenzt fehlende Pfade unter Beachtung des Core-Separators
+        /// (Windows "\\" vs. Linux "/"). Wird von der TreeView beim Aufklappen ausgewertet.
+        /// </summary>
         public ObservableCollection<DirectoryChildren> Childrens
         {
             get

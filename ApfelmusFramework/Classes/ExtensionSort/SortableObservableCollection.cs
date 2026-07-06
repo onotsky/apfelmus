@@ -5,8 +5,16 @@ using System.Linq;
 
 namespace ApfelmusFramework.Classes.ExtensionSort
 {
+    /// <summary>
+    /// Erweiterungsmethode zum In-Place-Sortieren einer ObservableCollection.
+    /// </summary>
     public static class SortExtension
     {
+        /// <summary>
+        /// Sortiert die Collection stabil aufsteigend nach dem per <paramref name="selector"/>
+        /// gewaehlten Schluessel - bewusst per Move() (Bubblesort) statt Neuaufbau, damit die
+        /// Collection-Instanz erhalten bleibt und Bindings/DataGrid-Auswahl nicht verloren gehen.
+        /// </summary>
         public static void Sort<TSource, TValue>(this ObservableCollection<TSource> source, Func<TSource, TValue> selector)
         {
             for (int i = source.Count - 1; i >= 0; i--)

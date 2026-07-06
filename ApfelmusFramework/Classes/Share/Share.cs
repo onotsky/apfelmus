@@ -13,6 +13,11 @@ namespace ApfelmusFramework.Classes.Share
     using System.Text;
     using System.Xml.Serialization;
 
+    /// <summary>
+    /// Eine einzelne freigegebene Datei (share.xml): Name, Groesse, Pruefsumme, Prioritaet sowie
+    /// Statistik (Anfragen, Suchtreffer, zuletzt angefragt). Wird im "Mein Share"-Tab gelistet.
+    /// INotifyPropertyChanged haelt die Bindings aktuell.
+    /// </summary>
     public class Share : INotifyPropertyChanged
     {
         private int id;

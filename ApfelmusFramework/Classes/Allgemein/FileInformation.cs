@@ -12,6 +12,10 @@ namespace ApfelmusFramework.Classes.Allgemein
     using System.Text;
     using System.Xml.Serialization;
 
+    /// <summary>
+    /// Dateigroesse eines Downloads aus der Partlisten-Antwort (downloadpartlist.xml). Bezugsgroesse
+    /// fuer die Umrechnung der Byte-Positionen der einzelnen Parts.
+    /// </summary>
     public class FileInformation
     {
         // long, weil der Core die Dateigroesse als 64-Bit-Wert liefert (Java: Long.parseLong).

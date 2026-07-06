@@ -10,6 +10,11 @@ using ApfelmusFramework.Classes.Allgemein;
 namespace ApfelmusFramework.Classes.Information
 {
     
+    /// <summary>
+    /// Allgemeine Core-Angaben aus information.xml: Core-Version, Betriebssystem und Dateisystem
+    /// (Separator). Release wird zusaetzlich zur Laufzeit mit der GUI-Version belegt und im
+    /// Uebersichts-Tab angezeigt.
+    /// </summary>
     public class GeneralInformation
     {
         [XmlElementAttribute(ElementName = "version")]

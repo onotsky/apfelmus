@@ -9,6 +9,10 @@ using System.Xml.Serialization;
 
 namespace ApfelmusFramework.Classes.Directory
 {
+    /// <summary>
+    /// Ein Verzeichnisknoten der freigegebenen Ordnerstruktur (directory.xml): Name, Pfad, Typ und
+    /// die rekursiv verschachtelten Unterverzeichnisse. Bildet den Baum im "Mein Share"-Bereich.
+    /// </summary>
     public class Dir
     {
         #region Properties

@@ -8,6 +8,11 @@ namespace ApfelmusFramework.Classes.Config
 {
 
 
+    /// <summary>
+    /// Persistente Client-Einstellungen (Verbindung, Sprache, Theme, Anzeige), die per
+    /// ConfigSerializer als %AppData%\Apfelmus\Config.xml gespeichert werden. Password enthaelt den
+    /// bereits als MD5-Hex abgelegten Wert (Anforderung der Core-Schnittstelle), nicht den Klartext.
+    /// </summary>
     public class Config
     {
         private string hostname;

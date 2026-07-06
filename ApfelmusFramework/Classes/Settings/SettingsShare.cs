@@ -12,6 +12,10 @@ namespace ApfelmusFramework.Classes.Settings
     using System.Text;
     using System.Xml.Serialization;
 
+    /// <summary>
+    /// Sammlung der in den Core-Einstellungen freigegebenen Verzeichnisse (Liste von
+    /// <see cref="SettingsDirectory"/>).
+    /// </summary>
     public class SettingsShare
     {
         [XmlElementAttribute(ElementName = "directory")]

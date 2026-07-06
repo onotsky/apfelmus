@@ -2,6 +2,10 @@
 
 namespace ApfelmusFramework.Classes.Help
 {
+    /// <summary>
+    /// Generische In-Place-Quicksort-Implementierung fuer IComparable-Werte. Kopiert das Eingabe-
+    /// Array im Konstruktor und sortiert es aufsteigend ueber <see cref="Sort"/>.
+    /// </summary>
     public class QuickSort<T> where T:IComparable
     {
         T[] input;

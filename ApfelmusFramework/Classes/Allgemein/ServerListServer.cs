@@ -10,6 +10,10 @@ using System.Xml.Serialization;
 
 namespace ApfelmusFramework.Classes.Allgemein
 {
+    /// <summary>
+    /// Ein Server-Eintrag aus einer extern gepflegten Serverliste (Name, Verbindungslink, zuletzt
+    /// gesehen) - nicht zu verwechseln mit Modified.Server (Laufzeitzustand eines verbundenen Servers).
+    /// </summary>
     [XmlRoot(ElementName = "server")]
     public class _Server
     {
@@ -21,6 +25,11 @@ namespace ApfelmusFramework.Classes.Allgemein
         public string Name { get; set; }
     }
 
+    /// <summary>
+    /// Herunterladbare Serverliste. DeserializeToObj laedt die XML per HTTP von einer URL (statt aus
+    /// einem uebergebenen String) und deserialisiert sie zu einer Liste von <see cref="_Server"/>,
+    /// um die Serverliste zu aktualisieren/zu befuellen.
+    /// </summary>
     [XmlRoot(ElementName = "serverlist")]
     public class Serverlist : Interfaces.IXmlSerializer
     {

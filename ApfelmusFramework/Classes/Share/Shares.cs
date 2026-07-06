@@ -13,6 +13,9 @@ namespace ApfelmusFramework.Classes.Share
     using System.Text;
     using System.Xml.Serialization;
 
+    /// <summary>
+    /// Container fuer die Liste der freigegebenen Dateien (Sammlung von <see cref="Share"/> aus share.xml).
+    /// </summary>
     public class Shares
     {
         [XmlElementAttribute(ElementName = "share")]

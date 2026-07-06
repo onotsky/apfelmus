@@ -12,6 +12,11 @@ namespace ApfelmusFramework.Classes.Allgemein
     using System.Text;
     using System.Xml.Serialization;
 
+    /// <summary>
+    /// Ein Abschnitt der Partliste eines Downloads: Start-Byte-Position (FromPosition) und Typ
+    /// (Verfuegbarkeit/Quellenzahl-Kategorie), aus denen RenderPartList den Verfuegbarkeitsbalken
+    /// zeichnet.
+    /// </summary>
     public class Part
     {
         // long, weil der Core die Byte-Position als 64-Bit-Wert liefert (Java: getFromPosition()).

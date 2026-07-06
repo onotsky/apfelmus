@@ -24,6 +24,12 @@ namespace ApfelmusFramework.Classes.Allgemein
     
     
 
+    /// <summary>
+    /// Zentrales Wurzel-DTO der Core-Antwort (&lt;applejuice&gt;...). Buendelt die Teilbereiche
+    /// (Downloads, Uploads, Server, User, Informationen, Session, Verzeichnisse, Share) in einem
+    /// Objekt und ist zugleich der IXmlSerializer-Einstieg zum (De-)Serialisieren dieser XML.
+    /// Das aktive AppleJuice; die gleichnamige Datei unter Classes/Logic ist toter, ausgeschlossener Code.
+    /// </summary>
     [XmlRootAttribute("applejuice")]
     public class AppleJuice : IXmlSerializer
     {

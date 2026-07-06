@@ -12,6 +12,10 @@ namespace ApfelmusFramework.Classes.Settings
     using System.Text;
     using System.Xml.Serialization;
 
+    /// <summary>
+    /// Ein freigegebenes Verzeichnis aus den Core-Einstellungen (settings.xml): Pfad/Name und der
+    /// Freigabemodus (sharemode).
+    /// </summary>
     public class SettingsDirectory
     {
         [XmlAttribute(AttributeName = "name")]
