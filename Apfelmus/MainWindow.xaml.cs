@@ -137,7 +137,6 @@ namespace Apfelmus
         #region Delegates
         private delegate void UpdateUploadDataGrid();
         private delegate void ActivateButtons();
-        private delegate void UpdateSearchCollection(ObservableCollection<SearchEntry> searchEntry, int id);
         private delegate void UpdateAppleJuiceObj();
         private delegate void UpdateInformations();
         private delegate void UpdateDownloadDataGrid();
@@ -327,21 +326,37 @@ namespace Apfelmus
             ObservableCollection<SearchEntry> searchEntrys = (ObservableCollection<SearchEntry>)args[0];
             int id = (int)args[1];
 
-            ActivateButtons aButtons = new ActivateButtons(_activateButtons);
-            UpdateSearchCollection uSearch = new UpdateSearchCollection(_startSearch);
-            object[] param = new object[] { searchEntrys, id };
+            string host = config.HostName;
+            int port = config.Port;
 
             while (!IsSearchStopped(id))
             {
                 try
                 {
-                    Search current = appleJuice.Search.AsEnumerable().FirstOrDefault(a => a.id.Equals(id));
-                    if (current == null || !current.Running)
+                    // HTTP bewusst hier auf dem Hintergrund-Thread (frueher via Dispatcher.Invoke auf
+                    // dem UI-Thread): bei mehreren parallelen Suchen blockierten die vielen
+                    // Suchabfragen sonst den UI-Thread und die Oberflaeche (z.B. Tab-Wechsel) ruckelte.
+                    AppleJuice searchResult;
+                    Shares shares;
+                    Settings freshSettings;
+                    using (WebConnect webConnect = new WebConnect(host, port))
+                    {
+                        searchResult = (AppleJuice)appleJuice.DeserializeToObj(webConnect.GetHttpResult(getSearch, config.UseCompression));
+                        shares = (appleJuice.DeserializeToObj(webConnect.GetHttpResult(getShare, config.UseCompression)) as AppleJuice)?.Shares;
+                        freshSettings = settings.DeserializeToObj(webConnect.GetHttpResult(getSettings, config.UseCompression)) as Settings;
+                    }
+
+                    // Nur noch die leichtgewichtige UI-Aktualisierung (kein HTTP) auf den UI-Thread.
+                    Dispatcher.Invoke(new Action(() => ApplySearchPoll(searchEntrys, id, searchResult, shares, freshSettings)));
+
+                    // Nur bei BESTAETIGTEM Ende beenden (Suche vorhanden, aber nicht mehr laufend).
+                    // Ein transienter Leer-/Fehl-Poll (current == null) beendet die Suche NICHT -
+                    // Tab-Schliessen bzw. der Stop-Button beenden sie ohnehin ueber StopSearch(id).
+                    Search current = searchResult?.Search?.AsEnumerable().FirstOrDefault(a => a.id.Equals(id));
+                    if (current != null && !current.Running)
                     {
                         break;
                     }
-
-                    Dispatcher.Invoke(uSearch, param);
                 }
                 catch (Exception ex)
                 {
@@ -354,7 +369,7 @@ namespace Apfelmus
             }
 
             SearchThreadEnded(id);
-            Dispatcher.Invoke(aButtons, null);
+            Dispatcher.Invoke(new ActivateButtons(_activateButtons));
         }
 
         /// <summary>
@@ -1113,25 +1128,29 @@ namespace Apfelmus
         /// </summary>
         /// <param name="searchEntrys">Vorhandene Sucheinträge</param>
         /// <param name="id">Id der Suche</param>
-        private void _startSearch(ObservableCollection<SearchEntry> searchEntrys, int id)
+        private void ApplySearchPoll(ObservableCollection<SearchEntry> searchEntrys, int id, AppleJuice searchResult, Shares shares, Settings freshSettings)
         {
             try
             {
-                using (WebConnect webConnect = new WebConnect(config.HostName, config.Port))
+                if (searchResult == null)
                 {
-                    // Suchergebnis nur EINMAL holen (frueher zweimal dieselbe URL).
-                    AppleJuice searchResult = (AppleJuice)appleJuice.DeserializeToObj(webConnect.GetHttpResult(getSearch, config.UseCompression));
-                    appleJuice.Search = searchResult.Search;
-                    appleJuice.SearchEntry = searchResult.SearchEntry;
-
-                    // Shares + Settings einmal pro Poll holen. Frueher lag das im
-                    // tempSearch_CollectionChanged-Handler und lief damit pro hinzugefuegtem
-                    // Treffer -> O(n) HTTP-Calls auf dem UI-Thread -> Programm fror beim Klick ein.
-                    appleJuice.Shares = (appleJuice.DeserializeToObj(webConnect.GetHttpResult(getShare, config.UseCompression)) as AppleJuice).Shares;
-                    settings = settings.DeserializeToObj(webConnect.GetHttpResult(getSettings, config.UseCompression)) as Settings;
+                    return;
                 }
 
-                Search _getSearch = appleJuice.Search.AsEnumerable().FirstOrDefault(a => a.id.Equals(id));
+                // Die im Hintergrund geholten Daten uebernehmen (Shares/Settings fuers Einfaerben der
+                // Treffer in tempSearch_CollectionChanged).
+                appleJuice.Search = searchResult.Search;
+                appleJuice.SearchEntry = searchResult.SearchEntry;
+                if (shares != null)
+                {
+                    appleJuice.Shares = shares;
+                }
+                if (freshSettings != null)
+                {
+                    settings = freshSettings;
+                }
+
+                Search _getSearch = appleJuice.Search?.AsEnumerable().FirstOrDefault(a => a.id.Equals(id));
                 if (_getSearch == null)
                 {
                     return;
@@ -1154,17 +1173,20 @@ namespace Apfelmus
                 // Nach der eigenen Such-Id filtern (Parameter id), NICHT ueber das Feld cTabItem.Tag:
                 // bei parallelen Suchen zeigt cTabItem auf den zuletzt erzeugten Tab und wuerde die
                 // Treffer sonst allen laufenden Suchen in den falschen Tab schreiben.
-                foreach (SearchEntry sEnt in appleJuice.SearchEntry)
+                if (appleJuice.SearchEntry != null)
                 {
-                    if (searchEntrys.Where(a => a.Id.Equals(sEnt.Id)).Count() == 0 && sEnt.SearchId.Equals(id))
+                    foreach (SearchEntry sEnt in appleJuice.SearchEntry)
                     {
-                        searchEntrys.Add(sEnt);
+                        if (searchEntrys.Where(a => a.Id.Equals(sEnt.Id)).Count() == 0 && sEnt.SearchId.Equals(id))
+                        {
+                            searchEntrys.Add(sEnt);
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
-                logger.Error("Fehler beim durchführen der Suche", ex);
+                logger.Error("Fehler beim Anzeigen der Suchergebnisse", ex);
             }
         }
 
@@ -3578,7 +3600,7 @@ namespace Apfelmus
 
         private void tempSearch_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            // Shares/Settings holt bereits _startSearch einmal pro Poll. Hier NUR die neu
+            // Shares/Settings holt bereits der Such-Poll (ApplySearchPoll) einmal pro Poll. Hier NUR die neu
             // hinzugekommenen Eintraege einfaerben - ohne HTTP und ohne Schleife ueber die
             // gesamte (waehrend der Suche wachsende) Ergebnisliste. Genau diese beiden Dinge
             // pro Add haben das Programm beim Klick ins DataGrid einfrieren lassen.

@@ -614,17 +614,38 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ProgressBar}">
-                    <Grid>
+                    <!-- ClipToBounds, damit der laufende Indeterminate-Block am Rand sauber abgeschnitten wird. -->
+                    <Grid ClipToBounds="True">
                         <Border Background="{TemplateBinding Background}" CornerRadius="4" />
+                        <!-- Bestimmter Fortschritt: WPF setzt die Breite von PART_Indicator anhand von Value. -->
                         <Border x:Name="PART_Track" CornerRadius="4">
                             <Decorator x:Name="PART_Indicator" HorizontalAlignment="Left">
                                 <Border Background="{TemplateBinding Foreground}" CornerRadius="4" />
                             </Decorator>
                         </Border>
+                        <!-- Unbestimmter Fortschritt (IsIndeterminate): eigener, laufender Block statt statischer Balken. -->
+                        <Border x:Name="IndeterminateGlow" Width="60" HorizontalAlignment="Left" CornerRadius="4"
+                                Background="{TemplateBinding Foreground}" Visibility="Collapsed">
+                            <Border.RenderTransform>
+                                <TranslateTransform x:Name="GlowTransform" X="0" />
+                            </Border.RenderTransform>
+                        </Border>
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsIndeterminate" Value="True">
-                            <Setter TargetName="PART_Indicator" Property="Width" Value="60" />
+                            <Setter TargetName="PART_Indicator" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="IndeterminateGlow" Property="Visibility" Value="Visible" />
+                            <Trigger.EnterActions>
+                                <BeginStoryboard Name="IndeterminateStoryboard">
+                                    <Storyboard RepeatBehavior="Forever">
+                                        <DoubleAnimation Storyboard.TargetName="GlowTransform" Storyboard.TargetProperty="X"
+                                                         From="-60" To="240" Duration="0:0:1.2" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <StopStoryboard BeginStoryboardName="IndeterminateStoryboard" />
+                            </Trigger.ExitActions>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
