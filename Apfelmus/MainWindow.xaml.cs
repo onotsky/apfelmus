@@ -1806,9 +1806,105 @@ namespace Apfelmus
                     sPanelShareFolders.Children.Add(sPanel);
                 }
             }
+                // Gespeichertes Spaltenlayout (Reihenfolge + Breite) von Download- und Upload-Tabelle
+                // wiederherstellen, damit es wie in der zuletzt gestarteten Version aussieht.
+                RestoreColumnLayout(dGridDownloads, Properties.Settings.Default.DownloadColumnLayout);
+                RestoreColumnLayout(dGridUploads, Properties.Settings.Default.UploadColumnLayout);
+            }
             catch (Exception ex)
             {
                 logger.Error("Fehler nach geladenem Fenster!", ex);
+            }
+        }
+
+        /// <summary>
+        /// Serialisiert Reihenfolge (DisplayIndex) und aktuelle Breite je Spalte eines DataGrids in
+        /// einen String "displayIndex:breite|..." (in Definitionsreihenfolge der Spalten).
+        /// </summary>
+        private static string SerializeColumnLayout(DataGrid grid)
+        {
+            if (grid == null)
+            {
+                return string.Empty;
+            }
+
+            List<string> parts = new List<string>();
+            foreach (DataGridColumn column in grid.Columns)
+            {
+                double width = column.ActualWidth > 0 ? column.ActualWidth : column.Width.DisplayValue;
+                parts.Add(string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0}:{1}", column.DisplayIndex, width));
+            }
+
+            return string.Join("|", parts);
+        }
+
+        /// <summary>
+        /// Stellt ein zuvor mit <see cref="SerializeColumnLayout"/> gespeichertes Spaltenlayout wieder
+        /// her (erst die Breiten als feste Pixelbreite, dann die Reihenfolge in aufsteigender
+        /// DisplayIndex-Reihenfolge, um Kollisionen zu vermeiden). Passt die Spaltenzahl nicht mehr
+        /// (z.B. neue Version mit anderen Spalten), wird das gespeicherte Layout ignoriert.
+        /// </summary>
+        private void RestoreColumnLayout(DataGrid grid, string layout)
+        {
+            try
+            {
+                if (grid == null || string.IsNullOrEmpty(layout))
+                {
+                    return;
+                }
+
+                string[] entries = layout.Split('|');
+                if (entries.Length != grid.Columns.Count)
+                {
+                    return;
+                }
+
+                List<KeyValuePair<DataGridColumn, int>> order = new List<KeyValuePair<DataGridColumn, int>>();
+                for (int i = 0; i < entries.Length; i++)
+                {
+                    string[] p = entries[i].Split(':');
+                    if (p.Length != 2)
+                    {
+                        return;
+                    }
+
+                    if (double.TryParse(p[1], System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double width) && width > 0)
+                    {
+                        grid.Columns[i].Width = new DataGridLength(width);
+                    }
+
+                    if (int.TryParse(p[0], System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out int displayIndex))
+                    {
+                        order.Add(new KeyValuePair<DataGridColumn, int>(grid.Columns[i], displayIndex));
+                    }
+                }
+
+                foreach (KeyValuePair<DataGridColumn, int> kvp in order.OrderBy(a => a.Value))
+                {
+                    if (kvp.Value >= 0 && kvp.Value < grid.Columns.Count)
+                    {
+                        kvp.Key.DisplayIndex = kvp.Value;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Fehler beim Wiederherstellen des Spaltenlayouts!", ex);
+            }
+        }
+
+        /// <summary>Speichert das Spaltenlayout von Download- und Upload-Tabelle in den Settings.</summary>
+        private void SaveColumnLayout()
+        {
+            try
+            {
+                Properties.Settings.Default.DownloadColumnLayout = SerializeColumnLayout(dGridDownloads);
+                Properties.Settings.Default.UploadColumnLayout = SerializeColumnLayout(dGridUploads);
+                Properties.Settings.Default.Save();
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Fehler beim Speichern des Spaltenlayouts!", ex);
             }
         }
 
@@ -3147,6 +3243,9 @@ namespace Apfelmus
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
+            // Spaltenlayout (Reihenfolge + Breite) von Download-/Upload-Tabelle sichern.
+            SaveColumnLayout();
+
             if (appleJuice.Search != null && appleJuice.Search.Count > 0)
             {
                 foreach (Search tempSearch in appleJuice.Search)
