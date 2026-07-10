@@ -9,7 +9,9 @@ set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
 PROJ="$HERE/Apfelmus.Avalonia.csproj"
-VER="5.3.0"
+# Version zentral aus Directory.Build.props ziehen (nicht mehr hartkodiert -> nie veraltet).
+VER="$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' "$HERE/../Directory.Build.props" | head -1)"
+VER="${VER:-0.0.0}"
 RID="osx-arm64"
 OUT="$HERE/bin/macos-app"
 APP="$OUT/Apfelmus.app"
