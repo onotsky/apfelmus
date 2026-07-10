@@ -41,6 +41,7 @@ namespace Apfelmus.Avalonia.ViewModels
             Servers = new ObservableCollection<Server>();
             SearchTabs = new ObservableCollection<SearchTabViewModel>();
             Shares = new ObservableCollection<ShareItem>();
+            FilteredShares = new ObservableCollection<ShareItem>();
             ShareTree = new ObservableCollection<DirNodeViewModel>();
 
             PowerValues = new ObservableCollection<int> { 0, 1, 2, 3, 4, 5 };
@@ -51,6 +52,7 @@ namespace Apfelmus.Avalonia.ViewModels
             _guiVersion = Assembly.GetExecutingAssembly().GetName().Version is { } v ? $"{v.Major}.{v.Minor}.{v.Build}" : "-";
             _refreshRate = config.RefreshRate > 0 ? config.RefreshRate : 1500;
             _releaseInfoHost = string.IsNullOrWhiteSpace(config.ReleaseInfoHost) ? ReleaseInfo.DefaultHost : config.ReleaseInfoHost;
+            _showLoginNextStart = !config.HideLoginWindow;
 
             // AJLink / Menue
             TransferAjLinkCommand = new RelayCommand(TransferAjLinkAsync, () => !string.IsNullOrWhiteSpace(AjLinkText));
@@ -171,6 +173,9 @@ namespace Apfelmus.Avalonia.ViewModels
 
         public ObservableCollection<DirNodeViewModel> ShareTree { get; }
 
+        /// <summary>Freigegebene Dateien, gefiltert auf den im Baum gewaehlten Ordner (explorer-artig, wie WPF).</summary>
+        public ObservableCollection<ShareItem> FilteredShares { get; }
+
         private DirNodeViewModel? _selectedShareNode;
         public DirNodeViewModel? SelectedShareNode
         {
@@ -182,6 +187,21 @@ namespace Apfelmus.Avalonia.ViewModels
                     ShareFolderCommand.RaiseCanExecuteChanged();
                     ShareFolderNoSubCommand.RaiseCanExecuteChanged();
                     UnshareFolderCommand.RaiseCanExecuteChanged();
+                    ApplyShareFilter();
+                }
+            }
+        }
+
+        private void ApplyShareFilter()
+        {
+            string? path = SelectedShareNode?.Path;
+            FilteredShares.Clear();
+            foreach (var s in Shares)
+            {
+                if (string.IsNullOrEmpty(path)
+                    || (s.FileName != null && s.FileName.StartsWith(path, System.StringComparison.OrdinalIgnoreCase)))
+                {
+                    FilteredShares.Add(s);
                 }
             }
         }
@@ -227,6 +247,7 @@ namespace Apfelmus.Avalonia.ViewModels
         private int _selectedPowerValue, _selectedPriority;
         private int _refreshRate;
         private string _releaseInfoHost, _settingsStatus = string.Empty;
+        private bool _showLoginNextStart;
 
         public Download? SelectedDownload
         {
@@ -254,6 +275,7 @@ namespace Apfelmus.Avalonia.ViewModels
         public int SelectedPriority { get => _selectedPriority; set => SetProperty(ref _selectedPriority, value); }
         public int RefreshRate { get => _refreshRate; set => SetProperty(ref _refreshRate, value); }
         public string ReleaseInfoHost { get => _releaseInfoHost; set => SetProperty(ref _releaseInfoHost, value); }
+        public bool ShowLoginNextStart { get => _showLoginNextStart; set => SetProperty(ref _showLoginNextStart, value); }
         public string SettingsStatus { get => _settingsStatus; private set => SetProperty(ref _settingsStatus, value); }
 
         // ---- Core-Einstellungen (settings.xml) ----
@@ -310,8 +332,8 @@ namespace Apfelmus.Avalonia.ViewModels
                 OpenConnections = d.OpenConnections; UploadQueue = d.MaxUploadPositions;
             }
 
-            await RefreshDownloadsAsync();
             await RefreshUsersAsync();
+            await RefreshDownloadsAsync();
             await RefreshSharesAsync();
             await RefreshUploadsAsync();
             await RefreshServersAsync();
@@ -323,15 +345,46 @@ namespace Apfelmus.Avalonia.ViewModels
         private async Task RefreshDownloadsAsync()
         {
             var r = await _client.GetModifiedAsync("down");
-            if (r?.Download != null)
-                MergeById(Downloads, r.Download, x => x.Id, (t, s) =>
-                {
-                    t.FileName = s.FileName; t.Size = s.Size; t.Status = s.Status; t.Speed = s.Speed;
-                    t.ActiveUsers = s.ActiveUsers; t.AllUsers = s.AllUsers; t.Percentages = s.Percentages;
-                    t.DownloadedFilesize = s.DownloadedFilesize; t.DownloadRest = s.DownloadRest;
-                    t.TimeToEnd = s.TimeToEnd; t.PowerDownload = s.PowerDownload;
-                });
+            if (r?.Download == null) return;
+
+            // Der Core liefert aktive Quellen/Speed/Fortschritt NICHT im Download-XML - sie werden
+            // (wie im WPF-Client) aus der User-Liste berechnet: aktive Quelle = Status 7.
+            foreach (var d in r.Download) ComputeDownloadDerived(d);
+
+            MergeById(Downloads, r.Download, x => x.Id, (t, s) =>
+            {
+                t.FileName = s.FileName; t.Size = s.Size; t.Status = s.Status; t.Speed = s.Speed;
+                t.ActiveUsers = s.ActiveUsers; t.AllUsers = s.AllUsers; t.DownloadUsers = s.DownloadUsers;
+                t.Percentages = s.Percentages; t.DownloadedFilesize = s.DownloadedFilesize;
+                t.DownloadRest = s.DownloadRest; t.CheckIfIsOver = s.CheckIfIsOver;
+                t.TimeToEnd = s.TimeToEnd; t.PowerDownload = s.PowerDownload;
+            });
         }
+
+        private void ComputeDownloadDerived(Download d)
+        {
+            var us = _allUsers.Where(u => u.DownloadId == d.Id).ToList();
+            d.ActiveUsers = us.Count(u => u.Status == 7);
+            d.DownloadUsers = us.Count(u => u.Status == 5 || u.Status == 7);
+            d.AllUsers = us.Count;
+            d.Speed = us.Where(u => u.Status == 7).Sum(u => u.Speed);
+
+            long size = ParseLong(d.Size);
+            long ready = ParseLong(d.Ready);
+            // d.Status-Getter hebt 0->2, wenn aktive Quellen vorhanden sind (siehe DTO).
+            if (d.Status == 14)
+            {
+                d.DownloadedFilesize = d.Size; d.CheckIfIsOver = d.Size; d.DownloadRest = "0"; d.Percentages = "100 %";
+            }
+            else
+            {
+                d.DownloadedFilesize = d.Ready; d.CheckIfIsOver = d.Ready;
+                d.DownloadRest = (size - ready).ToString();
+                d.Percentages = size > 0 ? Math.Round(ready / (double)size * 100.0, 2) + " %" : "0 %";
+            }
+        }
+
+        private static long ParseLong(string? s) => long.TryParse(s, out var v) ? v : 0;
 
         private async Task RefreshUsersAsync()
         {
@@ -411,6 +464,7 @@ namespace Apfelmus.Avalonia.ViewModels
             {
                 Shares.Clear();
                 foreach (var s in r.Shares.Share) Shares.Add(s);
+                ApplyShareFilter();
             }
         }
 
@@ -513,6 +567,7 @@ namespace Apfelmus.Avalonia.ViewModels
             {
                 _config.RefreshRate = RefreshRate > 0 ? RefreshRate : 1500;
                 _config.ReleaseInfoHost = string.IsNullOrWhiteSpace(ReleaseInfoHost) ? ReleaseInfo.DefaultHost : ReleaseInfoHost.Trim();
+                _config.HideLoginWindow = !ShowLoginNextStart;
                 ConfigSerializer.SerializeToFile(_config);
                 _timer.Interval = TimeSpan.FromMilliseconds(_config.RefreshRate);
                 SettingsStatus = "Gespeichert.";

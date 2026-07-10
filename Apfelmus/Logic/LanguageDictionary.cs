@@ -1,64 +1,58 @@
 ﻿using System;
+using System.IO;
 using System.Threading;
 using System.Windows;
 
 namespace ApfelmusFramework.Classes.Logic
 {
     /// <summary>
-    /// Liefert die zur Sprache passende Sprach-Ressourcen (DE/EN/IT). Dient dazu, die im GUI ueber
-    /// {DynamicResource ...} gebundenen Texte je nach Kultur bzw. gespeicherter Auswahl zu setzen.
+    /// Liefert das zur Sprache passende Sprach-ResourceDictionary (DE/EN/IT). Die Dictionaries liegen
+    /// als Page-Ressourcen im Apfelmus-Hauptprojekt (Resourcen\Dictionary*.xaml) und werden ueber
+    /// ABSOLUTE pack-URIs geladen. Wichtig: fruehere relative URIs ("..\Resourcen\...") funktionierten
+    /// nur, solange diese Klasse im ApfelmusFramework-Assembly lag; nach dem Verschieben ins
+    /// Apfelmus-Assembly muss der absolute pack-URI verwendet werden (sonst bleiben alle
+    /// {DynamicResource}-Texte leer).
     /// </summary>
     public static class LanguageDictionary
     {
-        private static ResourceDictionary dict;
+        private const string Base = "pack://application:,,,/Resourcen/";
 
-        /// <summary>
-        /// Waehlt das Sprach-Dictionary anhand der aktuellen Thread-Kultur (Fallback: Deutsch).
-        /// </summary>
         public static ResourceDictionary GetLanguageDictionary()
         {
-            dict = new ResourceDictionary();
-            switch (Thread.CurrentThread.CurrentCulture.ToString())
-            {
-                case "de-DE":
-                    dict.Source = new Uri("..\\Resourcen\\DictionaryGerman.xaml", UriKind.Relative);
-                    break;
-                case "en-US":
-                    dict.Source = new Uri("..\\Resourcen\\DictionaryEnglish.xaml", UriKind.Relative);
-                    break;
-                case "it-IT":
-                    dict.Source = new Uri("..\\Resourcen\\DictionaryItalian.xaml", UriKind.Relative);
-                    break;
-                default:
-                    dict.Source = new Uri("..\\Resourcen\\DictionaryGerman.xaml", UriKind.Relative);
-                    break;
-            }
-
-            return dict;
+            return Load(Base + CultureFile());
         }
 
-        /// <summary>Laedt das Sprach-Dictionary explizit von dem in der Config gespeicherten Pfad.</summary>
+        /// <summary>Laedt das Dictionary anhand eines gespeicherten Pfads/URIs (auch alte "..\Resourcen\"-Werte).</summary>
         public static ResourceDictionary GetLanguageDictionary(string path)
         {
-            dict = new ResourceDictionary();
-            dict.Source = new Uri(path, UriKind.Relative);
-            return dict;
+            string file = Path.GetFileName((path ?? string.Empty).Replace('\\', '/'));
+            if (string.IsNullOrEmpty(file))
+                file = CultureFile();
+            return Load(Base + file);
         }
 
-        /// <summary>Liefert den Standard-Pfad des zur aktuellen Kultur passenden Sprach-Dictionaries.</summary>
+        /// <summary>Absoluter pack-URI des zur aktuellen Kultur passenden Sprach-Dictionaries.</summary>
         public static string GetURI()
+        {
+            return Base + CultureFile();
+        }
+
+        private static string CultureFile()
         {
             switch (Thread.CurrentThread.CurrentCulture.ToString())
             {
-                case "de-DE":
-                    return "..\\Resourcen\\DictionaryGerman.xaml";
                 case "en-US":
-                    return "..\\Resourcen\\DictionaryEnglish.xaml";
+                    return "DictionaryEnglish.xaml";
                 case "it-IT":
-                    return "..\\Resourcen\\DictionaryItalian.xaml";
+                    return "DictionaryItalian.xaml";
                 default:
-                    return "..\\Resourcen\\DictionaryGerman.xaml";
+                    return "DictionaryGerman.xaml";
             }
+        }
+
+        private static ResourceDictionary Load(string uri)
+        {
+            return new ResourceDictionary { Source = new Uri(uri, UriKind.Absolute) };
         }
     }
 }

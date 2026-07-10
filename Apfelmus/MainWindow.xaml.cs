@@ -3416,8 +3416,8 @@ namespace Apfelmus
         {
             Resources.MergedDictionaries.RemoveAt(0);
             dict = new ResourceDictionary();
-            config.LanguageFile = "..\\Resourcen\\DictionaryGerman.xaml";
-            dict.Source = new Uri(config.LanguageFile, UriKind.Relative);
+            config.LanguageFile = "pack://application:,,,/Resourcen/DictionaryGerman.xaml";
+            dict.Source = new Uri(config.LanguageFile, UriKind.Absolute);
             Resources.MergedDictionaries.Add(dict);
             ConfigSerializer.SerializeToFile(config);
         }
@@ -3426,8 +3426,8 @@ namespace Apfelmus
         {
             Resources.MergedDictionaries.RemoveAt(0);
             dict = new ResourceDictionary();
-            config.LanguageFile = "..\\Resourcen\\DictionaryEnglish.xaml";
-            dict.Source = new Uri(config.LanguageFile, UriKind.Relative);
+            config.LanguageFile = "pack://application:,,,/Resourcen/DictionaryEnglish.xaml";
+            dict.Source = new Uri(config.LanguageFile, UriKind.Absolute);
             Resources.MergedDictionaries.Add(dict);
             ConfigSerializer.SerializeToFile(config);
         }
@@ -3436,8 +3436,8 @@ namespace Apfelmus
         {
             Resources.MergedDictionaries.RemoveAt(0);
             dict = new ResourceDictionary();
-            config.LanguageFile = "..\\Resourcen\\DictionaryItalian.xaml";
-            dict.Source = new Uri(config.LanguageFile, UriKind.Relative);
+            config.LanguageFile = "pack://application:,,,/Resourcen/DictionaryItalian.xaml";
+            dict.Source = new Uri(config.LanguageFile, UriKind.Absolute);
             Resources.MergedDictionaries.Add(dict);
             ConfigSerializer.SerializeToFile(config);
         }

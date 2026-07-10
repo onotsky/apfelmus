@@ -7,32 +7,35 @@
         Width="320" SizeToContent="Height"
         CanResize="False"
         WindowStartupLocation="CenterScreen"
-        Background="{StaticResource WindowBackgroundBrush}">
+        Icon="avares://Apfelmus.Avalonia/Assets/Images/Apple-icon.png"
+        Background="{DynamicResource WindowBackgroundBrush}">
 
     <StackPanel Margin="24" Spacing="10">
         <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,0,0,8">
             <Image Source="avares://Apfelmus.Avalonia/Assets/Images/Apple-icon.png" Width="32" Height="32" />
             <TextBlock Text="Apfelmus" FontSize="22" FontWeight="SemiBold"
-                       VerticalAlignment="Center" Foreground="{StaticResource TextPrimaryBrush}" />
+                       VerticalAlignment="Center" Foreground="{DynamicResource TextPrimaryBrush}" />
         </StackPanel>
 
-        <TextBlock Text="Host" Foreground="{StaticResource TextSecondaryBrush}" />
+        <TextBlock Text="Host" Foreground="{DynamicResource TextSecondaryBrush}" />
         <TextBox Text="{Binding Host, Mode=TwoWay}" Watermark="localhost" />
 
-        <TextBlock Text="Port" Foreground="{StaticResource TextSecondaryBrush}" />
+        <TextBlock Text="Port" Foreground="{DynamicResource TextSecondaryBrush}" />
         <TextBox Text="{Binding Port, Mode=TwoWay}" Watermark="9851" />
 
-        <TextBlock Text="Passwort" Foreground="{StaticResource TextSecondaryBrush}" />
+        <TextBlock Text="Passwort" Foreground="{DynamicResource TextSecondaryBrush}" />
         <TextBox Text="{Binding Password, Mode=TwoWay}" PasswordChar="•" />
 
         <CheckBox Content="Kompression verwenden" IsChecked="{Binding UseCompression, Mode=TwoWay}"
-                  Foreground="{StaticResource TextPrimaryBrush}" />
+                  Foreground="{DynamicResource TextPrimaryBrush}" />
+        <CheckBox Content="Login-Fenster künftig überspringen" IsChecked="{Binding HideLoginWindow, Mode=TwoWay}"
+                  Foreground="{DynamicResource TextPrimaryBrush}" />
 
         <Button Content="Verbinden" Command="{Binding LoginCommand}"
                 HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-                Background="{StaticResource AccentBrush}" Foreground="White" Margin="0,6,0,0" />
+                Background="{DynamicResource AccentBrush}" Foreground="White" Margin="0,6,0,0" />
 
-        <TextBlock Text="{Binding StatusMessage}" Foreground="{StaticResource TextSecondaryBrush}"
+        <TextBlock Text="{Binding StatusMessage}" Foreground="{DynamicResource TextSecondaryBrush}"
                    TextWrapping="Wrap" />
     </StackPanel>
 </Window>

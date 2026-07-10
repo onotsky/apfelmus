@@ -19,6 +19,7 @@ namespace Apfelmus.Avalonia.ViewModels
         private string _port = "9851";
         private string _password = string.Empty;
         private bool _useCompression = true;
+        private bool _hideLoginWindow;
         private string _statusMessage = string.Empty;
         private bool _isBusy;
 
@@ -54,6 +55,13 @@ namespace Apfelmus.Avalonia.ViewModels
             set => SetProperty(ref _useCompression, value);
         }
 
+        /// <summary>Login-Fenster kuenftig ueberspringen (direkt starten), sobald das Passwort gespeichert ist.</summary>
+        public bool HideLoginWindow
+        {
+            get => _hideLoginWindow;
+            set => SetProperty(ref _hideLoginWindow, value);
+        }
+
         public string StatusMessage
         {
             get => _statusMessage;
@@ -84,6 +92,7 @@ namespace Apfelmus.Avalonia.ViewModels
                     _host = string.IsNullOrEmpty(existing.HostName) ? _host : existing.HostName;
                     _port = existing.Port > 0 ? existing.Port.ToString() : _port;
                     _useCompression = existing.UseCompression;
+                    _hideLoginWindow = existing.HideLoginWindow;
                 }
             }
             catch (Exception)
@@ -109,6 +118,7 @@ namespace Apfelmus.Avalonia.ViewModels
                 Port = port,
                 Password = CreateMd5Hash.GetMD5Hash(Password),
                 UseCompression = UseCompression,
+                HideLoginWindow = HideLoginWindow,
                 RefreshRate = 1500,
                 Theme = ThemeNames.Dark,
             };

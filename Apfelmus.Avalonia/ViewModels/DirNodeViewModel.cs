@@ -9,29 +9,39 @@ namespace Apfelmus.Avalonia.ViewModels
     /// <summary>
     /// Knoten des Freigabe-Verzeichnisbaums. Kinder werden erst beim Aufklappen vom Core geladen
     /// (lazy, directory.xml) - analog zur WPF-DirectoryChildren-Logik. Ein Platzhalter-Kind sorgt
-    /// dafuer, dass zunaechst jeder Knoten aufklappbar erscheint.
+    /// dafuer, dass zunaechst jeder Knoten aufklappbar erscheint; beim Aufklappen wird es durch die
+    /// echten Unterordner ersetzt.
     /// </summary>
     public sealed class DirNodeViewModel : ViewModelBase
     {
-        private readonly CoreClient _client;
+        private readonly CoreClient? _client;
+        private readonly bool _isPlaceholder;
         private bool _loaded;
         private bool _isExpanded;
 
+        /// <summary>Echter Verzeichnisknoten (bekommt einen Platzhalter, um aufklappbar zu sein).</summary>
         public DirNodeViewModel(Dir dir, CoreClient client)
         {
             _client = client;
             Name = dir.Name ?? string.Empty;
             Path = dir.Path ?? string.Empty;
             Type = dir.Type;
-            Children = new ObservableCollection<DirNodeViewModel> { Placeholder };
+            Children = new ObservableCollection<DirNodeViewModel> { new DirNodeViewModel() };
+        }
+
+        /// <summary>Platzhalter-Knoten (KEINE Kinder - verhindert die Endlos-Rekursion).</summary>
+        private DirNodeViewModel()
+        {
+            _isPlaceholder = true;
+            Name = "…";
+            Path = string.Empty;
+            Children = new ObservableCollection<DirNodeViewModel>();
         }
 
         public string Name { get; }
         public string Path { get; }
         public int Type { get; }
         public ObservableCollection<DirNodeViewModel> Children { get; }
-
-        private static DirNodeViewModel Placeholder => new(new Dir { Name = "…", Path = string.Empty }, null!);
 
         public bool IsExpanded
         {
@@ -47,7 +57,7 @@ namespace Apfelmus.Avalonia.ViewModels
 
         private async Task LoadChildrenAsync()
         {
-            if (_loaded || _client == null) return;
+            if (_loaded || _isPlaceholder || _client == null) return;
             _loaded = true;
 
             var aj = await _client.GetDirectoryAsync(Path);

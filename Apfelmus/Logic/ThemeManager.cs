@@ -7,10 +7,10 @@ namespace ApfelmusFramework.Classes.Logic
 {
     /// <summary>
     /// Verwaltet das aktive Farbschema (Dunkel/Hell) der Anwendung. Die Theme-Resourcedictionaries
-    /// liegen als lose XAML-Dateien im Apfelmus-Hauptprojekt (Resourcen\Theme.*.xaml). Der relative
-    /// URI (".." + Resourcen\...) normalisiert unabhaengig vom aufrufenden Assembly auf
-    /// pack://application:,,,/Resourcen/... im Anwendungsassembly - daher bleibt die Aufloesung
-    /// korrekt, seit diese Klasse aus ApfelmusFramework hierher (Apfelmus) verschoben wurde.
+    /// liegen als Page-Ressourcen im Apfelmus-Hauptprojekt (Resourcen\Theme.*.xaml) und werden ueber
+    /// ABSOLUTE pack-URIs geladen (pack://application:,,,/Resourcen/Theme.*.xaml). Fruehere relative
+    /// URIs ("..\Resourcen\...") funktionierten nur, solange diese Klasse im ApfelmusFramework-Assembly
+    /// lag - nach dem Verschieben ins Apfelmus-Assembly ist der absolute pack-URI noetig.
     /// </summary>
     public static class ThemeManager
     {
@@ -23,7 +23,8 @@ namespace ApfelmusFramework.Classes.Logic
 
             ResourceDictionary newDictionary = new ResourceDictionary
             {
-                Source = new Uri("..\\Resourcen\\Theme." + name + ".xaml", UriKind.Relative)
+                // Absoluter pack-URI (nicht relativ), seit diese Klasse im Apfelmus-Assembly liegt.
+                Source = new Uri("pack://application:,,,/Resourcen/Theme." + name + ".xaml", UriKind.Absolute)
             };
 
             ResourceDictionary existing = Application.Current.Resources.MergedDictionaries

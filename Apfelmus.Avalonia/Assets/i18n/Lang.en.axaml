@@ -102,6 +102,7 @@
     <sys:String x:Key="set_infourl">Info URL (%s = file link)</sys:String>
     <sys:String x:Key="set_design">Theme</sys:String>
     <sys:String x:Key="set_guisave">Save GUI</sys:String>
+    <sys:String x:Key="set_showlogin">Show login window on next start</sys:String>
     <sys:String x:Key="set_core">Core settings</sys:String>
     <sys:String x:Key="set_nick">Nickname</sys:String>
     <sys:String x:Key="set_tempdir">Temp directory</sys:String>

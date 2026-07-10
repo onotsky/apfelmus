@@ -6,18 +6,24 @@
 
     <Application.Resources>
         <ResourceDictionary>
-            <!-- Charcoal + Gruen Palette (analog zum WPF-Client). -->
-            <Color x:Key="WindowBackgroundColor">#1E2226</Color>
-            <Color x:Key="SurfaceColor">#272C31</Color>
-            <Color x:Key="AccentColor">#4CAF7D</Color>
-            <Color x:Key="TextPrimaryColor">#ECEFF1</Color>
-            <Color x:Key="TextSecondaryColor">#8FA0AB</Color>
-
-            <SolidColorBrush x:Key="WindowBackgroundBrush" Color="{StaticResource WindowBackgroundColor}" />
-            <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource SurfaceColor}" />
-            <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}" />
-            <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimaryColor}" />
-            <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondaryColor}" />
+            <!-- Theme-abhaengige Farben: bei RequestedThemeVariant-Wechsel greifen die passenden
+                 Brushes (nur via {DynamicResource} referenziert, damit sie live umschalten). -->
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#1E2226" />
+                    <SolidColorBrush x:Key="SurfaceBrush" Color="#272C31" />
+                    <SolidColorBrush x:Key="AccentBrush" Color="#4CAF7D" />
+                    <SolidColorBrush x:Key="TextPrimaryBrush" Color="#ECEFF1" />
+                    <SolidColorBrush x:Key="TextSecondaryBrush" Color="#8FA0AB" />
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#F4F6F8" />
+                    <SolidColorBrush x:Key="SurfaceBrush" Color="#E3E7EB" />
+                    <SolidColorBrush x:Key="AccentBrush" Color="#2E8B57" />
+                    <SolidColorBrush x:Key="TextPrimaryBrush" Color="#1E2226" />
+                    <SolidColorBrush x:Key="TextSecondaryBrush" Color="#556069" />
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
 
             <!-- Avalonia-Converter (Portierungen der WPF-IValueConverter). -->
             <conv:FirewallConverter x:Key="FirewallConverter" />
@@ -40,7 +46,7 @@
 
         <!-- Kartenlayout fuer den Start-Tab (Ersatz fuer WPF-GroupBox) -->
         <Style Selector="Border.card">
-            <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
+            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
             <Setter Property="CornerRadius" Value="6" />
             <Setter Property="Padding" Value="12" />
             <Setter Property="Margin" Value="10" />
@@ -48,14 +54,14 @@
         <Style Selector="TextBlock.cardheader">
             <Setter Property="FontSize" Value="15" />
             <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
             <Setter Property="Margin" Value="0,0,0,6" />
         </Style>
         <Style Selector="TextBlock.lbl">
-            <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
         </Style>
         <Style Selector="TextBlock.val">
-            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
         </Style>
 
         <!-- Fensterkontroll-Buttons der eigenen Titelleiste -->
@@ -65,7 +71,7 @@
             <Setter Property="Padding" Value="0" />
             <Setter Property="CornerRadius" Value="0" />
             <Setter Property="Background" Value="Transparent" />
-            <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
             <Setter Property="HorizontalContentAlignment" Value="Center" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
         </Style>

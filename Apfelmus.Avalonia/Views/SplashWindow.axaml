@@ -1,0 +1,20 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Apfelmus.Avalonia.Views.SplashWindow"
+        Width="420" Height="240"
+        SystemDecorations="None" CanResize="False" ShowInTaskbar="False"
+        WindowStartupLocation="CenterScreen"
+        Icon="avares://Apfelmus.Avalonia/Assets/Images/Apple-icon.png"
+        Background="{DynamicResource WindowBackgroundBrush}">
+    <Border BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1">
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
+            <Image Source="avares://Apfelmus.Avalonia/Assets/Images/Apple-icon.png" Width="88" Height="88" />
+            <TextBlock Text="Apfelmus" FontSize="28" FontWeight="SemiBold" HorizontalAlignment="Center"
+                       Foreground="{DynamicResource TextPrimaryBrush}" />
+            <TextBlock Text="appleJuice Client" FontSize="13" HorizontalAlignment="Center"
+                       Foreground="{DynamicResource TextSecondaryBrush}" />
+            <ProgressBar IsIndeterminate="True" Width="240" Height="6" Margin="0,10,0,0"
+                         Foreground="{DynamicResource AccentBrush}" />
+        </StackPanel>
+    </Border>
+</Window>

@@ -22,20 +22,42 @@ namespace Apfelmus.Avalonia
                 // den Wechsel vom Login- zum Hauptfenster.
                 desktop.ShutdownMode = ShutdownMode.OnLastWindowClose;
 
-                var loginVm = new LoginViewModel();
-                var login = new LoginWindow { DataContext = loginVm };
-
-                loginVm.LoginSucceeded += config =>
+                // Zeigt den Splashscreen und oeffnet danach das Hauptfenster (Splash kommt NACH dem Login).
+                void ShowSplashThenMain(ApfelmusFramework.Classes.Config.Config config)
                 {
-                    var main = new MainWindow
+                    var splash = new SplashWindow();
+                    splash.Show();
+                    global::Avalonia.Threading.DispatcherTimer.RunOnce(() =>
                     {
-                        DataContext = new MainWindowViewModel(config)
-                    };
-                    main.Show();
-                    login.Close();
-                };
+                        var main = new MainWindow { DataContext = new MainWindowViewModel(config) };
+                        main.Show();
+                        splash.Close();
+                    }, System.TimeSpan.FromSeconds(1.6));
+                }
 
-                desktop.MainWindow = login;
+                // Gespeicherte Config laden - bei "Login ausblenden" + vorhandenem Passwort direkt starten.
+                ApfelmusFramework.Classes.Config.Config? saved = null;
+                try { saved = ApfelmusFramework.Classes.Serializer.ConfigSerializer.DeserializeFromFile(); }
+                catch { /* keine/erste Config */ }
+                bool skipLogin = saved != null && saved.HideLoginWindow && !string.IsNullOrEmpty(saved.Password);
+
+                if (skipLogin)
+                {
+                    // Kein Login-Fenster: direkt Splash -> Hauptfenster.
+                    ShowSplashThenMain(saved!);
+                }
+                else
+                {
+                    var loginVm = new LoginViewModel();
+                    var login = new LoginWindow { DataContext = loginVm };
+                    loginVm.LoginSucceeded += config =>
+                    {
+                        // Erst Splash zeigen, dann Login schliessen (immer >= 1 Fenster offen).
+                        ShowSplashThenMain(config);
+                        login.Close();
+                    };
+                    desktop.MainWindow = login; // wird beim Start automatisch angezeigt
+                }
             }
 
             base.OnFrameworkInitializationCompleted();
