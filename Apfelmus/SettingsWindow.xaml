@@ -289,6 +289,7 @@
                         <RowDefinition Height="40"/>
                         <RowDefinition Height="40"/>
                         <RowDefinition Height="40"/>
+                        <RowDefinition Height="40"/>
                     </Grid.RowDefinitions>
                     <StackPanel Grid.Row="0" Orientation="Horizontal">
                         <Grid>
@@ -330,6 +331,16 @@
                                 <ComboBoxItem>40</ComboBoxItem>
                                 <ComboBoxItem>60</ComboBoxItem>
                             </ComboBox>
+                        </Grid>
+                    </StackPanel>
+                    <StackPanel Grid.Row="3" Orientation="Horizontal" FlowDirection="LeftToRight">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="250"/>
+                                <ColumnDefinition Width="300"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0" Content="{DynamicResource releaseinfourl}" VerticalAlignment="Center"/>
+                            <TextBox Grid.Column="1" Name="tBoxReleaseInfoHost" Width="290" VerticalAlignment="Center" HorizontalAlignment="Left"/>
                         </Grid>
                     </StackPanel>
                 </Grid>
