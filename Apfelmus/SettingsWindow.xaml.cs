@@ -72,6 +72,12 @@ namespace Apfelmus
                     RefreshRateValue = config.RefreshRate;
 
                 SelectPartlistSize();
+
+                // Info-URL vorbelegen: gespeicherter Wert, sonst der Default (damit der Nutzer den
+                // aktuell wirksamen Wert sieht und weiss, dass %s der Datei-Link ist).
+                tBoxReleaseInfoHost.Text = string.IsNullOrWhiteSpace(config.ReleaseInfoHost)
+                    ? ReleaseInfo.DefaultHost
+                    : config.ReleaseInfoHost;
             }
             catch (Exception ex)
             {
@@ -93,6 +99,7 @@ namespace Apfelmus
                     ChangeRefreshRate();
 
                 ChangePartlistSize();
+                ChangeReleaseInfoHost();
             }
             catch (Exception ex)
             {
@@ -267,6 +274,7 @@ namespace Apfelmus
                     ChangeRefreshRate();
 
                 ChangePartlistSize();
+                ChangeReleaseInfoHost();
             }
             catch (Exception ex)
             {
@@ -282,6 +290,24 @@ namespace Apfelmus
         {
             config.RefreshRate = RefreshRateValue;
             ConfigSerializer.SerializeToFile(config);
+        }
+
+        /// <summary>
+        /// Uebernimmt die Info-URL (Kontextmenue "Suche nach mehr Informationen") in die Config.
+        /// Leeres Feld -> Default (ReleaseInfo.DefaultHost) wird geschrieben, damit der Eintrag in
+        /// der Config.xml sichtbar und dort editierbar ist.
+        /// </summary>
+        private void ChangeReleaseInfoHost()
+        {
+            string value = tBoxReleaseInfoHost.Text?.Trim();
+            if (string.IsNullOrWhiteSpace(value))
+                value = ReleaseInfo.DefaultHost;
+
+            if (config.ReleaseInfoHost != value)
+            {
+                config.ReleaseInfoHost = value;
+                ConfigSerializer.SerializeToFile(config);
+            }
         }
 
         /// <summary>
