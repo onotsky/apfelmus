@@ -3367,14 +3367,40 @@ namespace Apfelmus
             }
         }
 
+        /// <summary>
+        /// Stoppt eine laufende Suche per /function/cancelsearch, laesst aber Tab und bisherige
+        /// Ergebnisse stehen. Bevorzugt wird nur die Suche des aktuell gewaehlten Such-Tabs gestoppt;
+        /// ist kein Such-Tab gewaehlt, werden alle laufenden Suchen beendet. Der zugehoerige
+        /// Such-Thread beendet sich kooperativ ueber StopSearch(id).
+        /// </summary>
         private void btnStopSearch_Click(object sender, RoutedEventArgs e)
         {
-            using (WebConnect webConnect = new WebConnect(config.HostName, config.Port))
+            try
             {
-                foreach (Search s in appleJuice.Search)
+                CloseableTab.CloseableTabItem selectedTab = tControlSearches.SelectedItem as CloseableTab.CloseableTabItem;
+
+                using (WebConnect webConnect = new WebConnect(config.HostName, config.Port))
                 {
-                    webConnect.StartXMLFunction("/function/cancelsearch?id=" + s.id + "&password=" + config.Password);
+                    if (selectedTab != null && int.TryParse(selectedTab.Tag?.ToString(), out int selectedId))
+                    {
+                        webConnect.StartXMLFunction("/function/cancelsearch?id=" + selectedId + "&password=" + config.Password);
+                        StopSearch(selectedId);
+                    }
+                    else
+                    {
+                        foreach (Search s in appleJuice.Search)
+                        {
+                            webConnect.StartXMLFunction("/function/cancelsearch?id=" + s.id + "&password=" + config.Password);
+                            StopSearch(s.id);
+                        }
+                    }
                 }
+
+                _activateButtons();
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Fehler beim Stoppen der Suche!", ex);
             }
         }
 
