@@ -36,9 +36,10 @@ namespace Apfelmus.Avalonia.ViewModels
 
             Downloads = new ObservableCollection<Download>();
             DownloadSources = new ObservableCollection<User>();
-            Uploads = new ObservableCollection<Upload>();
+            ActiveUploads = new ObservableCollection<Upload>();
+            QueuedUploads = new ObservableCollection<Upload>();
             Servers = new ObservableCollection<Server>();
-            SearchResults = new ObservableCollection<SearchEntry>();
+            SearchTabs = new ObservableCollection<SearchTabViewModel>();
             Shares = new ObservableCollection<ShareItem>();
             ShareTree = new ObservableCollection<DirNodeViewModel>();
 
@@ -73,6 +74,8 @@ namespace Apfelmus.Avalonia.ViewModels
             SetDownloadPriorityCommand = new RelayCommand(async () => await WithDownload(id => _client.SetDownloadPriorityAsync(id, SelectedPriority)), () => SelectedDownload != null);
             ReleaseInfoDownloadCommand = new RelayCommand(() => { if (SelectedDownload != null) OpenReleaseInfo(SelectedDownload.FileName, SelectedDownload.Hash, SelectedDownload.Size); return Task.CompletedTask; }, () => SelectedDownload != null);
             CopyDownloadLinkCommand = new RelayCommand(() => { if (SelectedDownload != null) RaiseCopy(BuildAjfsp(SelectedDownload.FileName, SelectedDownload.Hash, SelectedDownload.Size)); return Task.CompletedTask; }, () => SelectedDownload != null);
+            CopyDownloadSourceCommand = new RelayCommand(() => { if (SelectedDownload != null) RaiseCopy(BuildSourceLink(SelectedDownload.FileName, SelectedDownload.Hash, SelectedDownload.Size)); return Task.CompletedTask; }, () => SelectedDownload != null);
+            RenameCommand = new RelayCommand(() => { if (SelectedDownload != null) RenameRequested?.Invoke(SelectedDownload); return Task.CompletedTask; }, () => SelectedDownload != null);
 
             // Server
             ConnectServerCommand = new RelayCommand(async () => { if (SelectedServer != null) await _client.ConnectServerAsync(SelectedServer.Id); }, () => SelectedServer != null);
@@ -81,10 +84,11 @@ namespace Apfelmus.Avalonia.ViewModels
 
             // Suche
             StartSearchCommand = new RelayCommand(StartSearchAsync, () => !string.IsNullOrWhiteSpace(SearchText));
-            StopSearchCommand = new RelayCommand(StopSearchAsync, () => SearchRunning);
-            DownloadSearchResultCommand = new RelayCommand(async () => { if (SelectedSearchResult != null) await _client.StartDownloadAsync(SelectedSearchResult.FileName?.Name ?? string.Empty, SelectedSearchResult.Checksum, SelectedSearchResult.Size.ToString()); }, () => SelectedSearchResult != null);
-            ReleaseInfoSearchCommand = new RelayCommand(() => { if (SelectedSearchResult != null) OpenReleaseInfo(SelectedSearchResult.FileName?.Name, SelectedSearchResult.Checksum, SelectedSearchResult.Size.ToString()); return Task.CompletedTask; }, () => SelectedSearchResult != null);
-            CopySearchLinkCommand = new RelayCommand(() => { if (SelectedSearchResult != null) RaiseCopy(BuildAjfsp(SelectedSearchResult.FileName?.Name, SelectedSearchResult.Checksum, SelectedSearchResult.Size.ToString())); return Task.CompletedTask; }, () => SelectedSearchResult != null);
+            StopSearchCommand = new RelayCommand(StopSearchAsync, () => SelectedSearchTab is { Running: true });
+            CloseSearchTabCommand = new RelayCommand(CloseSearchTabAsync, () => SelectedSearchTab != null);
+            DownloadSearchResultCommand = new RelayCommand(async () => { var r = SelectedSearchTab?.SelectedResult; if (r != null) await _client.StartDownloadAsync(r.FileName?.Name ?? string.Empty, r.Checksum, r.Size.ToString()); });
+            ReleaseInfoSearchCommand = new RelayCommand(() => { var r = SelectedSearchTab?.SelectedResult; if (r != null) OpenReleaseInfo(r.FileName?.Name, r.Checksum, r.Size.ToString()); return Task.CompletedTask; });
+            CopySearchLinkCommand = new RelayCommand(() => { var r = SelectedSearchTab?.SelectedResult; if (r != null) RaiseCopy(BuildAjfsp(r.FileName?.Name, r.Checksum, r.Size.ToString())); return Task.CompletedTask; });
 
             // Share
             SetSharePriorityCommand = new RelayCommand(async () => { if (SelectedShare != null) { await _client.SetDownloadPriorityAsync(SelectedShare.Id, SelectedPriority); } }, () => SelectedShare != null);
@@ -114,9 +118,10 @@ namespace Apfelmus.Avalonia.ViewModels
         // ---- Collections ----
         public ObservableCollection<Download> Downloads { get; }
         public ObservableCollection<User> DownloadSources { get; }
-        public ObservableCollection<Upload> Uploads { get; }
+        public ObservableCollection<Upload> ActiveUploads { get; }
+        public ObservableCollection<Upload> QueuedUploads { get; }
         public ObservableCollection<Server> Servers { get; }
-        public ObservableCollection<SearchEntry> SearchResults { get; }
+        public ObservableCollection<SearchTabViewModel> SearchTabs { get; }
         public ObservableCollection<ShareItem> Shares { get; }
         public ObservableCollection<int> PowerValues { get; }
         public ObservableCollection<int> PriorityValues { get; }
@@ -141,11 +146,17 @@ namespace Apfelmus.Avalonia.ViewModels
         public RelayCommand SetDownloadPriorityCommand { get; }
         public RelayCommand ReleaseInfoDownloadCommand { get; }
         public RelayCommand CopyDownloadLinkCommand { get; }
+        public RelayCommand CopyDownloadSourceCommand { get; }
+        public RelayCommand RenameCommand { get; }
+
+        /// <summary>Wird von der View abonniert, um den Umbenennen-Dialog anzuzeigen.</summary>
+        public event Action<Download>? RenameRequested;
         public RelayCommand ConnectServerCommand { get; }
         public RelayCommand RemoveServerCommand { get; }
         public RelayCommand AddOfficialServersCommand { get; }
         public RelayCommand StartSearchCommand { get; }
         public RelayCommand StopSearchCommand { get; }
+        public RelayCommand CloseSearchTabCommand { get; }
         public RelayCommand DownloadSearchResultCommand { get; }
         public RelayCommand ReleaseInfoSearchCommand { get; }
         public RelayCommand CopySearchLinkCommand { get; }
@@ -209,13 +220,11 @@ namespace Apfelmus.Avalonia.ViewModels
         // ---- Auswahl / Eingaben ----
         private Download? _selectedDownload;
         private Server? _selectedServer;
-        private SearchEntry? _selectedSearchResult;
+        private SearchTabViewModel? _selectedSearchTab;
         private ShareItem? _selectedShare;
         private string _searchText = string.Empty;
         private string _ajLinkText = string.Empty;
         private int _selectedPowerValue, _selectedPriority;
-        private int _foundFiles, _sumSearches, _currentSearchId = -1;
-        private bool _searchRunning;
         private int _refreshRate;
         private string _releaseInfoHost, _settingsStatus = string.Empty;
 
@@ -229,10 +238,10 @@ namespace Apfelmus.Avalonia.ViewModels
             get => _selectedServer;
             set { if (SetProperty(ref _selectedServer, value)) { ConnectServerCommand.RaiseCanExecuteChanged(); RemoveServerCommand.RaiseCanExecuteChanged(); } }
         }
-        public SearchEntry? SelectedSearchResult
+        public SearchTabViewModel? SelectedSearchTab
         {
-            get => _selectedSearchResult;
-            set { if (SetProperty(ref _selectedSearchResult, value)) { DownloadSearchResultCommand.RaiseCanExecuteChanged(); ReleaseInfoSearchCommand.RaiseCanExecuteChanged(); CopySearchLinkCommand.RaiseCanExecuteChanged(); } }
+            get => _selectedSearchTab;
+            set { if (SetProperty(ref _selectedSearchTab, value)) { StopSearchCommand.RaiseCanExecuteChanged(); CloseSearchTabCommand.RaiseCanExecuteChanged(); } }
         }
         public ShareItem? SelectedShare
         {
@@ -243,9 +252,6 @@ namespace Apfelmus.Avalonia.ViewModels
         public string AjLinkText { get => _ajLinkText; set { if (SetProperty(ref _ajLinkText, value)) TransferAjLinkCommand.RaiseCanExecuteChanged(); } }
         public int SelectedPowerValue { get => _selectedPowerValue; set => SetProperty(ref _selectedPowerValue, value); }
         public int SelectedPriority { get => _selectedPriority; set => SetProperty(ref _selectedPriority, value); }
-        public int FoundFiles { get => _foundFiles; private set => SetProperty(ref _foundFiles, value); }
-        public int SumSearches { get => _sumSearches; private set => SetProperty(ref _sumSearches, value); }
-        public bool SearchRunning { get => _searchRunning; private set { if (SetProperty(ref _searchRunning, value)) StopSearchCommand.RaiseCanExecuteChanged(); } }
         public int RefreshRate { get => _refreshRate; set => SetProperty(ref _refreshRate, value); }
         public string ReleaseInfoHost { get => _releaseInfoHost; set => SetProperty(ref _releaseInfoHost, value); }
         public string SettingsStatus { get => _settingsStatus; private set => SetProperty(ref _settingsStatus, value); }
@@ -306,10 +312,10 @@ namespace Apfelmus.Avalonia.ViewModels
 
             await RefreshDownloadsAsync();
             await RefreshUsersAsync();
+            await RefreshSharesAsync();
             await RefreshUploadsAsync();
             await RefreshServersAsync();
-            await RefreshSharesAsync();
-            if (_currentSearchId >= 0) await RefreshSearchAsync();
+            await RefreshSearchAsync();
         }
 
         private int _connectedServerId;
@@ -364,10 +370,20 @@ namespace Apfelmus.Avalonia.ViewModels
         private async Task RefreshUploadsAsync()
         {
             var r = await _client.GetModifiedAsync("uploads");
-            if (r?.Upload != null)
+            if (r?.Upload == null) return;
+
+            ActiveUploads.Clear();
+            QueuedUploads.Clear();
+            foreach (var u in r.Upload)
             {
-                Uploads.Clear();
-                foreach (var u in r.Upload) Uploads.Add(u);
+                // Dateiname stammt nicht vom Core im Upload selbst, sondern aus der Freigabe (Shareid).
+                var share = Shares.FirstOrDefault(s => s.Id == u.Shareid);
+                if (share != null) u.FileName = share.ShortFileName;
+                if (u.UploadTo > u.UploadFrom)
+                    u.Percentages = Math.Round((double)(u.ActualUploadPosition - u.UploadFrom) / (u.UploadTo - u.UploadFrom) * 100.0, 2) + " %";
+
+                if (u.Status == 1) ActiveUploads.Add(u);
+                else QueuedUploads.Add(u);
             }
         }
 
@@ -400,16 +416,20 @@ namespace Apfelmus.Avalonia.ViewModels
 
         private async Task RefreshSearchAsync()
         {
+            if (SearchTabs.Count == 0) return;
             var r = await _client.GetModifiedAsync("search");
-            if (r?.Search != null)
+            if (r == null) return;
+
+            foreach (var tab in SearchTabs)
             {
-                var cur = r.Search.FirstOrDefault(s => s.id == _currentSearchId);
-                if (cur != null) { FoundFiles = cur.FoundFiles; SumSearches = cur.SumSearches; SearchRunning = cur.Running; }
+                var cur = r.Search?.FirstOrDefault(s => s.id == tab.Id);
+                if (cur != null) { tab.FoundFiles = cur.FoundFiles; tab.SumSearches = cur.SumSearches; tab.Running = cur.Running; }
+                if (r.SearchEntry != null)
+                    foreach (var e in r.SearchEntry)
+                        if (e.SearchId == tab.Id && !tab.Results.Any(x => x.Id == e.Id))
+                            tab.Results.Add(e);
             }
-            if (r?.SearchEntry != null)
-                foreach (var e in r.SearchEntry)
-                    if (e.SearchId == _currentSearchId && !SearchResults.Any(x => x.Id == e.Id))
-                        SearchResults.Add(e);
+            StopSearchCommand.RaiseCanExecuteChanged();
         }
 
         // ---- Commands impl ----
@@ -421,19 +441,40 @@ namespace Apfelmus.Avalonia.ViewModels
 
         private async Task StartSearchAsync()
         {
-            SearchResults.Clear();
-            FoundFiles = 0; SumSearches = 0; SearchRunning = true;
+            var tab = new SearchTabViewModel(SearchText) { Running = true };
+            SearchTabs.Add(tab);
+            SelectedSearchTab = tab;
+
             await _client.StartSearchAsync(SearchText);
-            // Aktuelle Such-Id ermitteln (laufende Suche).
+
+            // Neue Such-Id ermitteln: die neueste laufende Suche, die noch keinem Tab zugeordnet ist.
+            var known = SearchTabs.Where(t => t.Id != 0).Select(t => t.Id).ToHashSet();
             var r = await _client.GetModifiedAsync("search");
-            var running = r?.Search?.FirstOrDefault(s => s.Running);
-            _currentSearchId = running?.id ?? 0;
+            var running = r?.Search?
+                .Where(s => !known.Contains(s.id))
+                .OrderByDescending(s => s.id)
+                .FirstOrDefault();
+            if (running != null) tab.Id = running.id;
+
+            SearchText = string.Empty;
         }
 
         private async Task StopSearchAsync()
         {
-            if (_currentSearchId >= 0) await _client.StopSearchAsync(_currentSearchId);
-            SearchRunning = false;
+            var tab = SelectedSearchTab;
+            if (tab == null) return;
+            if (tab.Id != 0) await _client.StopSearchAsync(tab.Id);
+            tab.Running = false;
+            StopSearchCommand.RaiseCanExecuteChanged();
+        }
+
+        private async Task CloseSearchTabAsync()
+        {
+            var tab = SelectedSearchTab;
+            if (tab == null) return;
+            if (tab.Id != 0 && tab.Running) await _client.StopSearchAsync(tab.Id);
+            SearchTabs.Remove(tab);
+            SelectedSearchTab = SearchTabs.LastOrDefault();
         }
 
         private async Task WithDownload(Func<int, Task> action)
@@ -446,7 +487,24 @@ namespace Apfelmus.Avalonia.ViewModels
             ContinueCommand.RaiseCanExecuteChanged(); BreakCommand.RaiseCanExecuteChanged();
             CancelCommand.RaiseCanExecuteChanged(); ApplyPowerDownloadCommand.RaiseCanExecuteChanged();
             SetDownloadPriorityCommand.RaiseCanExecuteChanged(); ReleaseInfoDownloadCommand.RaiseCanExecuteChanged();
-            CopyDownloadLinkCommand.RaiseCanExecuteChanged();
+            CopyDownloadLinkCommand.RaiseCanExecuteChanged(); CopyDownloadSourceCommand.RaiseCanExecuteChanged();
+            RenameCommand.RaiseCanExecuteChanged();
+        }
+
+        /// <summary>Fuehrt das Umbenennen aus (vom Dialog der View aufgerufen).</summary>
+        public void ExecuteRename(int downloadId, string newName)
+        {
+            if (!string.IsNullOrWhiteSpace(newName))
+                _ = _client.RenameDownloadAsync(downloadId, newName.Trim());
+        }
+
+        private string BuildSourceLink(string? name, string? hash, string? size)
+        {
+            var srv = Servers.FirstOrDefault(s => s.IsConnected);
+            int corePort = _coreSettings?.Port ?? 0;
+            if (srv == null || string.IsNullOrEmpty(OwnIp) || OwnIp == "-")
+                return BuildAjfsp(name, hash, size);
+            return $"ajfsp://file|{name}|{hash}|{size}|{OwnIp}:{corePort}:{srv.Host}:{srv.Port}/";
         }
 
         private Task SaveSettings()

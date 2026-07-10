@@ -45,12 +45,17 @@ laufenden appleJuice-Core steht noch aus.
 - Share-Verzeichnisbaum + Freigabe-Verwaltung (Ordner freigeben/entfernen).
 - Datei-Typ-Icons als plattformneutrale Vektor-Kategorie-Icons.
 
-**Bewusst vereinfacht / nicht 1:1:**
-- Datei-Icons sind Kategorie-Vektor-Icons statt echter Windows-Shell-Icons
-  (letztere sind plattformgebunden und cross-platform nicht reproduzierbar).
-- Suche zeigt eine gemeinsame Ergebnisliste statt dynamischer Ergebnis-Tabs pro Suche.
-- Kein Download-Umbenennen-Dialog, kein „Quelle kopieren“ (nur „Link kopieren“),
-  kein Upload-Detail-Untergrid.
+**Ebenfalls umgesetzt:**
+- Suche mit dynamischen Ergebnis-Tabs pro Suchlauf (mehrere parallele Suchen,
+  Tab schließen = Suche abbrechen) – analog WPF `CloseableTabItem`.
+- Download umbenennen (Dialog → `/function/renamedownload`) und „Quelle kopieren“
+  (ajfsp-Link inkl. IP/Port/Server) zusätzlich zu „Link kopieren“.
+- Uploads getrennt in „Aktive Uploads“ und „Warteschlange“ (Dateiname aus der
+  Freigabe per Shareid aufgelöst, Fortschritt berechnet).
+
+**Bewusst nicht 1:1:**
+- Datei-Icons sind plattformneutrale Kategorie-Vektor-Icons statt echter
+  Windows-Shell-Icons (letztere sind cross-platform nicht reproduzierbar).
 
 ## Bauen & Starten
 

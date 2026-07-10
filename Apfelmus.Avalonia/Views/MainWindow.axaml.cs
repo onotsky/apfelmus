@@ -21,6 +21,18 @@ namespace Apfelmus.Avalonia.Views
                 // Kopier-Anfragen des ViewModels in die Zwischenablage legen (Clipboard haengt am TopLevel).
                 vm.CopyRequested -= OnCopyRequested;
                 vm.CopyRequested += OnCopyRequested;
+                vm.RenameRequested -= OnRenameRequested;
+                vm.RenameRequested += OnRenameRequested;
+            }
+        }
+
+        private async void OnRenameRequested(ApfelmusFramework.Classes.Modified.Download d)
+        {
+            var dlg = new RenameDialog(d.FileName ?? string.Empty);
+            var result = await dlg.ShowDialog<string?>(this);
+            if (result != null && DataContext is MainWindowViewModel vm)
+            {
+                vm.ExecuteRename(d.Id, result);
             }
         }
 

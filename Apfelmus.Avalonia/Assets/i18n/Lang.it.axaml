@@ -44,6 +44,11 @@
     <sys:String x:Key="d_clean">Rimuovi completati</sys:String>
     <sys:String x:Key="d_releaseinfo">URL info</sys:String>
     <sys:String x:Key="d_copylink">Copia link</sys:String>
+    <sys:String x:Key="d_copysource">Copia fonte</sys:String>
+    <sys:String x:Key="d_rename">Nuovo nome file</sys:String>
+    <sys:String x:Key="d_renamebtn">Rinomina</sys:String>
+    <sys:String x:Key="u_active">Upload attivi</sys:String>
+    <sys:String x:Key="u_queue">Coda</sys:String>
     <sys:String x:Key="d_power">Power</sys:String>
     <sys:String x:Key="d_apply">Applica</sys:String>
     <sys:String x:Key="d_priority">Priorità</sys:String>
@@ -78,6 +83,7 @@
     <sys:String x:Key="s_placeholder">Termine di ricerca...</sys:String>
     <sys:String x:Key="s_hits">Risultati:</sys:String>
     <sys:String x:Key="s_sources">Fonti:</sys:String>
+    <sys:String x:Key="s_close">Chiudi scheda</sys:String>
 
     <sys:String x:Key="sv_connect">Connetti</sys:String>
     <sys:String x:Key="sv_remove">Rimuovi</sys:String>

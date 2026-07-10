@@ -144,6 +144,9 @@ namespace Apfelmus.Avalonia.Services
         public Task CleanDownloadListAsync()
             => Fire("/function/cleandownloadlist?password=" + _config.Password);
 
+        public Task RenameDownloadAsync(int id, string newName)
+            => Fire("/function/renamedownload?id=" + id + "&name=" + (newName ?? string.Empty).Replace(" ", "%20") + "&password=" + _config.Password);
+
         public Task SetDownloadPriorityAsync(int id, int priority)
             => Fire("/function/setpriority?id=" + id + "&priority=" + priority + "&password=" + _config.Password);
 

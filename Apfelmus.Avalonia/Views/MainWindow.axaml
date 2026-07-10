@@ -143,6 +143,8 @@
                         <Button Content="{DynamicResource d_clean}" Command="{Binding CleanFinishedCommand}" />
                         <Button Content="{DynamicResource d_releaseinfo}" Command="{Binding ReleaseInfoDownloadCommand}" />
                         <Button Content="{DynamicResource d_copylink}" Command="{Binding CopyDownloadLinkCommand}" />
+                        <Button Content="{DynamicResource d_copysource}" Command="{Binding CopyDownloadSourceCommand}" />
+                        <Button Content="{DynamicResource d_renamebtn}" Command="{Binding RenameCommand}" />
                         <Border Width="1" Background="{StaticResource TextSecondaryBrush}" Margin="4,0" />
                         <TextBlock Text="{DynamicResource d_power}" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" />
                         <ComboBox x:CompileBindings="False" Width="70" ItemsSource="{Binding PowerValues}" SelectedItem="{Binding SelectedPowerValue}" />
@@ -221,26 +223,52 @@
 
             <!-- ===================== UPLOADS ===================== -->
             <TabItem Header="{DynamicResource t_uploads}">
-                <DataGrid x:CompileBindings="False" Margin="4" ItemsSource="{Binding Uploads}" IsReadOnly="True"
-                          GridLinesVisibility="Horizontal" CanUserResizeColumns="True">
-                    <DataGrid.Columns>
-                        <DataGridTemplateColumn Header="{DynamicResource col_file}" Width="*">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
-                                                <Image Width="16" Height="16" Source="{Binding FileName, Converter={StaticResource FileIconConverter}}" />
-                                                <TextBlock Text="{Binding FileName}" VerticalAlignment="Center" />
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                        <DataGridTextColumn Header="{DynamicResource col_nick}" Binding="{Binding Nick}" Width="140" />
-                        <DataGridTextColumn Header="{DynamicResource col_speed}" Binding="{Binding Speed, Converter={StaticResource FileSizeConverter}}" Width="90" />
-                        <DataGridTextColumn Header="{DynamicResource col_percent}" Binding="{Binding Percentages}" Width="70" />
-                        <DataGridTextColumn Header="{DynamicResource col_prio}" Binding="{Binding Priority}" Width="80" />
-                        <DataGridTextColumn Header="{DynamicResource col_version}" Binding="{Binding Version}" Width="140" />
-                    </DataGrid.Columns>
-                </DataGrid>
+                <Grid RowDefinitions="Auto,*,4,Auto,*" Margin="4">
+                    <TextBlock Grid.Row="0" Text="{DynamicResource u_active}" Classes="lbl" Margin="2" />
+                    <DataGrid Grid.Row="1" x:CompileBindings="False" ItemsSource="{Binding ActiveUploads}" IsReadOnly="True"
+                              GridLinesVisibility="Horizontal" CanUserResizeColumns="True">
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn Header="{DynamicResource col_file}" Width="*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
+                                            <Image Width="16" Height="16" Source="{Binding FileName, Converter={StaticResource FileIconConverter}}" />
+                                            <TextBlock Text="{Binding FileName}" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="{DynamicResource col_nick}" Binding="{Binding Nick}" Width="140" />
+                            <DataGridTextColumn Header="{DynamicResource col_speed}" Binding="{Binding Speed, Converter={StaticResource FileSizeConverter}}" Width="90" />
+                            <DataGridTextColumn Header="{DynamicResource col_percent}" Binding="{Binding Percentages}" Width="70" />
+                            <DataGridTextColumn Header="{DynamicResource col_prio}" Binding="{Binding Priority}" Width="80" />
+                            <DataGridTextColumn Header="{DynamicResource col_version}" Binding="{Binding Version}" Width="140" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <GridSplitter Grid.Row="2" ResizeDirection="Rows" HorizontalAlignment="Stretch" Background="{StaticResource SurfaceBrush}" />
+
+                    <TextBlock Grid.Row="3" Text="{DynamicResource u_queue}" Classes="lbl" Margin="2" />
+                    <DataGrid Grid.Row="4" x:CompileBindings="False" ItemsSource="{Binding QueuedUploads}" IsReadOnly="True"
+                              GridLinesVisibility="Horizontal" CanUserResizeColumns="True">
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn Header="{DynamicResource col_file}" Width="*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
+                                            <Image Width="16" Height="16" Source="{Binding FileName, Converter={StaticResource FileIconConverter}}" />
+                                            <TextBlock Text="{Binding FileName}" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="{DynamicResource col_nick}" Binding="{Binding Nick}" Width="140" />
+                            <DataGridTextColumn Header="{DynamicResource col_prio}" Binding="{Binding Priority}" Width="80" />
+                            <DataGridTextColumn Header="{DynamicResource col_lastseen}" Binding="{Binding LastConnection, Converter={StaticResource SecondsToDateConverter}}" Width="150" />
+                            <DataGridTextColumn Header="{DynamicResource col_version}" Binding="{Binding Version}" Width="140" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
             </TabItem>
 
             <!-- ===================== SUCHEN ===================== -->
@@ -250,31 +278,49 @@
                         <TextBox Width="300" Watermark="{DynamicResource s_placeholder}" Text="{Binding SearchText, Mode=TwoWay}" />
                         <Button Content="{DynamicResource s_search}" Command="{Binding StartSearchCommand}" />
                         <Button Content="{DynamicResource s_stop}" Command="{Binding StopSearchCommand}" />
+                        <Button Content="{DynamicResource s_close}" Command="{Binding CloseSearchTabCommand}" />
                         <Button Content="{DynamicResource s_download}" Command="{Binding DownloadSearchResultCommand}" />
                         <Button Content="{DynamicResource d_releaseinfo}" Command="{Binding ReleaseInfoSearchCommand}" />
                         <Button Content="{DynamicResource d_copylink}" Command="{Binding CopySearchLinkCommand}" />
-                        <TextBlock VerticalAlignment="Center" Margin="10,0,0,0" Foreground="{StaticResource TextSecondaryBrush}">
-                            <Run Text="Treffer: " /><Run Text="{Binding FoundFiles}" /><Run Text="  Quellen: " /><Run Text="{Binding SumSearches}" />
-                        </TextBlock>
                     </StackPanel>
-                    <DataGrid x:CompileBindings="False" ItemsSource="{Binding SearchResults}"
-                              SelectedItem="{Binding SelectedSearchResult}" IsReadOnly="True"
-                              GridLinesVisibility="Horizontal" CanUserResizeColumns="True">
-                        <DataGrid.Columns>
-                            <DataGridTemplateColumn Header="{DynamicResource col_file}" Width="*">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
-                                                <Image Width="16" Height="16" Source="{Binding FileName.Name, Converter={StaticResource FileIconConverter}}" />
-                                                <TextBlock Text="{Binding FileName.Name}" VerticalAlignment="Center" />
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                            <DataGridTextColumn Header="{DynamicResource col_size}" Binding="{Binding Size, Converter={StaticResource FileSizeConverter}}" Width="100" />
-                            <DataGridTextColumn Header="{DynamicResource col_checksum}" Binding="{Binding Checksum}" Width="260" />
-                        </DataGrid.Columns>
-                    </DataGrid>
+
+                    <!-- Ein Ergebnis-Tab pro Suche (analog WPF CloseableTabItem) -->
+                    <TabControl x:CompileBindings="False" ItemsSource="{Binding SearchTabs}" SelectedItem="{Binding SelectedSearchTab}">
+                        <TabControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Title}" />
+                            </DataTemplate>
+                        </TabControl.ItemTemplate>
+                        <TabControl.ContentTemplate>
+                            <DataTemplate>
+                                <DockPanel>
+                                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="8" Margin="2">
+                                        <TextBlock Text="{DynamicResource s_hits}" Foreground="{StaticResource TextSecondaryBrush}" />
+                                        <TextBlock Text="{Binding FoundFiles}" Foreground="{StaticResource TextPrimaryBrush}" />
+                                        <TextBlock Text="{DynamicResource s_sources}" Foreground="{StaticResource TextSecondaryBrush}" />
+                                        <TextBlock Text="{Binding SumSearches}" Foreground="{StaticResource TextPrimaryBrush}" />
+                                    </StackPanel>
+                                    <DataGrid ItemsSource="{Binding Results}" SelectedItem="{Binding SelectedResult}" IsReadOnly="True"
+                                              GridLinesVisibility="Horizontal" CanUserResizeColumns="True">
+                                        <DataGrid.Columns>
+                                            <DataGridTemplateColumn Header="{DynamicResource col_file}" Width="*">
+                                                <DataGridTemplateColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
+                                                            <Image Width="16" Height="16" Source="{Binding FileName.Name, Converter={StaticResource FileIconConverter}}" />
+                                                            <TextBlock Text="{Binding FileName.Name}" VerticalAlignment="Center" />
+                                                        </StackPanel>
+                                                    </DataTemplate>
+                                                </DataGridTemplateColumn.CellTemplate>
+                                            </DataGridTemplateColumn>
+                                            <DataGridTextColumn Header="{DynamicResource col_size}" Binding="{Binding Size, Converter={StaticResource FileSizeConverter}}" Width="100" />
+                                            <DataGridTextColumn Header="{DynamicResource col_checksum}" Binding="{Binding Checksum}" Width="260" />
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                </DockPanel>
+                            </DataTemplate>
+                        </TabControl.ContentTemplate>
+                    </TabControl>
                 </DockPanel>
             </TabItem>
 
