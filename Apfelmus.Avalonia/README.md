@@ -87,3 +87,21 @@ Assets/Images/        → Bildressourcen (avares://)
 
 Der gesamte Netzwerk-/Datenkern bleibt in `ApfelmusFramework` und wird unverändert
 mit dem WPF-Client geteilt.
+
+## ajfsp://-Protokoll-Verknüpfung
+
+- **Windows:** Checkbox „ajfsp-Links mit Apfelmus verknüpfen" im Einstellungen-Tab
+  (registriert `ajfsp` unter `HKCU\Software\Classes`, kein Admin nötig). Eingehende
+  Links kommen als Kommandozeilen-Argument und werden an den Core weitergereicht.
+- **macOS:** über das `.app`-Bundle. `build-macos-app.sh` erzeugt `Apfelmus.app`
+  (self-contained, osx-arm64) mit `Info.plist` inkl. `ajfsp`-URL-Scheme und einem
+  `.icns`-Icon (das gibt der App auch ein Dock-Icon). Registrierung durch macOS,
+  sobald das Bundle bekannt ist (nach `/Applications` kopieren bzw. `lsregister -f Apfelmus.app`).
+  Der Link kommt als Apple-Event und wird über Avalonias `IActivatableLifetime`
+  entgegengenommen und an den Core weitergereicht.
+
+```bash
+# macOS-App-Bundle bauen (statt/zusätzlich zum reinen Ordner-Zip):
+./Apfelmus.Avalonia/build-macos-app.sh
+# -> Apfelmus.Avalonia/bin/macos-app/Apfelmus.app (+ .zip)
+```

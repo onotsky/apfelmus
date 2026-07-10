@@ -554,6 +554,13 @@ namespace Apfelmus.Avalonia.ViewModels
             RenameCommand.RaiseCanExecuteChanged();
         }
 
+        /// <summary>Verarbeitet einen von aussen (Protokoll-Handler/Aktivierung) uebergebenen ajfsp-Link.</summary>
+        public void ProcessExternalLink(string link)
+        {
+            if (!string.IsNullOrWhiteSpace(link))
+                _ = _client.ProcessLinkAsync(Uri.EscapeDataString(link.Trim()));
+        }
+
         /// <summary>Fuehrt das Umbenennen aus (vom Dialog der View aufgerufen).</summary>
         public void ExecuteRename(int downloadId, string newName)
         {

@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -9,6 +11,9 @@ namespace Apfelmus.Avalonia
 {
     public partial class App : Application
     {
+        private MainWindowViewModel? _mainVm;
+        private string? _pendingLink;
+
         public override void Initialize()
         {
             AvaloniaXamlLoader.Load(this);
@@ -16,11 +21,20 @@ namespace Apfelmus.Avalonia
 
         public override void OnFrameworkInitializationCompleted()
         {
+            // macOS/URL-Scheme: eingehende ajfsp://-Links kommen als Aktivierung (Apple-Event),
+            // nicht als Kommandozeilen-Argument.
+            if (this.TryGetFeature(typeof(IActivatableLifetime)) is IActivatableLifetime activatable)
+            {
+                activatable.Activated += OnActivated;
+            }
+
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                // Beim Schliessen des zuletzt offenen Fensters beenden - so ueberlebt die App
-                // den Wechsel vom Login- zum Hauptfenster.
                 desktop.ShutdownMode = ShutdownMode.OnLastWindowClose;
+
+                // ajfsp-Link aus der Kommandozeile (Windows/Linux-Protokoll-Handler).
+                string? argvLink = desktop.Args?.FirstOrDefault(
+                    a => a.StartsWith("ajfsp://", StringComparison.OrdinalIgnoreCase));
 
                 // Zeigt den Splashscreen und oeffnet danach das Hauptfenster (Splash kommt NACH dem Login).
                 void ShowSplashThenMain(ApfelmusFramework.Classes.Config.Config config)
@@ -29,7 +43,10 @@ namespace Apfelmus.Avalonia
                     splash.Show();
                     global::Avalonia.Threading.DispatcherTimer.RunOnce(() =>
                     {
-                        var main = new MainWindow { DataContext = new MainWindowViewModel(config) };
+                        var vm = new MainWindowViewModel(config, _pendingLink ?? argvLink);
+                        _pendingLink = null;
+                        _mainVm = vm;
+                        var main = new MainWindow { DataContext = vm };
                         main.Show();
                         splash.Close();
                     }, System.TimeSpan.FromSeconds(1.6));
@@ -43,7 +60,6 @@ namespace Apfelmus.Avalonia
 
                 if (skipLogin)
                 {
-                    // Kein Login-Fenster: direkt Splash -> Hauptfenster.
                     ShowSplashThenMain(saved!);
                 }
                 else
@@ -52,7 +68,6 @@ namespace Apfelmus.Avalonia
                     var login = new LoginWindow { DataContext = loginVm };
                     loginVm.LoginSucceeded += config =>
                     {
-                        // Erst Splash zeigen, dann Login schliessen (immer >= 1 Fenster offen).
                         ShowSplashThenMain(config);
                         login.Close();
                     };
@@ -61,6 +76,23 @@ namespace Apfelmus.Avalonia
             }
 
             base.OnFrameworkInitializationCompleted();
+        }
+
+        private void OnActivated(object? sender, ActivatedEventArgs e)
+        {
+            if (e is ProtocolActivatedEventArgs p && p.Kind == ActivationKind.OpenUri && p.Uri != null)
+            {
+                string link = p.Uri.ToString();
+                if (_mainVm != null)
+                {
+                    _mainVm.ProcessExternalLink(link);
+                }
+                else
+                {
+                    // Aktivierung vor dem Erstellen des Hauptfensters -> merken und beim Start verarbeiten.
+                    _pendingLink = link;
+                }
+            }
         }
     }
 }
