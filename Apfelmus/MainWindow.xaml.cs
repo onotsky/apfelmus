@@ -66,11 +66,14 @@ namespace Apfelmus
         private Thread _listenArguments;
         private Thread _refreshServer;
         private Thread _checkConnectionToCore;
-        private Thread _searchThread;
-        // Kooperatives Stopp-Signal fuer den Such-Thread. Thread.Abort() gibt es unter .NET (Core)
-        // nicht mehr (wirft PlatformNotSupportedException) - der Thread muss selbst regelmaessig
-        // pruefen, ob er beendet werden soll.
-        private volatile bool _stopSearch;
+        // Mehrere Suchen koennen parallel laufen (je eigener Tab). Deshalb werden die Such-Threads
+        // und ihr kooperatives Stopp-Signal PRO Such-Id verwaltet (frueher: ein einzelner Thread +
+        // ein globales Flag -> es konnte nur eine Suche gleichzeitig laufen). Thread.Abort() gibt es
+        // unter .NET (Core) nicht mehr; der Thread prueft selbst, ob seine Id gestoppt wurde.
+        // Zugriff ausschliesslich unter _searchLock.
+        private readonly Dictionary<int, Thread> _searchThreads = new Dictionary<int, Thread>();
+        private readonly HashSet<int> _stoppedSearches = new HashSet<int>();
+        private readonly object _searchLock = new object();
         private volatile Thread _refreshDownloadPartList;
         private volatile Thread _refreshUserPartList;
         private DataGrid selectionDownloadGrid = new DataGrid();
@@ -229,7 +232,11 @@ namespace Apfelmus
         private void _activateButtons()
         {
             btnStartSearch.IsEnabled = true;
-            pBarSearchCount.IsIndeterminate = false;
+            // Fortschrittsanzeige nur ausschalten, wenn KEINE weitere Suche mehr laeuft.
+            if (RunningSearchCount() == 0)
+            {
+                pBarSearchCount.IsIndeterminate = false;
+            }
         }
         #endregion
 
@@ -263,29 +270,68 @@ namespace Apfelmus
             }
         }
 
+        /// <summary>Registriert den Thread einer neu gestarteten Suche und hebt ein evtl. altes Stopp-Signal fuer diese Id auf.</summary>
+        private void RegisterSearch(int id, Thread thread)
+        {
+            lock (_searchLock)
+            {
+                _stoppedSearches.Remove(id);
+                _searchThreads[id] = thread;
+            }
+        }
+
+        /// <summary>Signalisiert der Suche mit dieser Id, kooperativ zu stoppen (z.B. beim Schliessen ihres Tabs).</summary>
+        private void StopSearch(int id)
+        {
+            lock (_searchLock)
+            {
+                _stoppedSearches.Add(id);
+                _searchThreads.Remove(id);
+            }
+        }
+
+        private bool IsSearchStopped(int id)
+        {
+            lock (_searchLock)
+            {
+                return _stoppedSearches.Contains(id);
+            }
+        }
+
+        private void SearchThreadEnded(int id)
+        {
+            lock (_searchLock)
+            {
+                _searchThreads.Remove(id);
+            }
+        }
+
+        /// <summary>Anzahl aktuell laufender Suchen - fuer die globale Fortschrittsanzeige.</summary>
+        private int RunningSearchCount()
+        {
+            lock (_searchLock)
+            {
+                return _searchThreads.Count;
+            }
+        }
+
         /// <summary>
-        /// DoWorkevent zur AppleJuice Suche
+        /// Thread-Schleife EINER Suche. Erhaelt die Ergebnis-Collection ihres Tabs und ihre Such-Id
+        /// (als object[] { collection, id }); pollt, bis die Suche nicht mehr laeuft oder ihr Tab
+        /// geschlossen wurde (kooperativer Stopp ueber die Such-Id). Mehrere solcher Threads koennen
+        /// parallel laufen, jeder befuellt ausschliesslich die Collection seines eigenen Tabs.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void _search_ThreadWorker(object obj)
         {
+            object[] args = (object[])obj;
+            ObservableCollection<SearchEntry> searchEntrys = (ObservableCollection<SearchEntry>)args[0];
+            int id = (int)args[1];
+
             ActivateButtons aButtons = new ActivateButtons(_activateButtons);
-
-            // FirstOrDefault statt First: findet sich keine laufende Suche (Race beim Start),
-            // wird der Thread sauber beendet statt mit einer Exception zu sterben.
-            Search _getSearch = appleJuice.Search.AsEnumerable().FirstOrDefault(a => a.Running.Equals(true));
-            if (_getSearch == null)
-            {
-                Dispatcher.Invoke(aButtons, null);
-                return;
-            }
-
-            int id = _getSearch.id;
-            object[] param = new object[] { (ObservableCollection<SearchEntry>)obj, id };
             UpdateSearchCollection uSearch = new UpdateSearchCollection(_startSearch);
+            object[] param = new object[] { searchEntrys, id };
 
-            while (!_stopSearch)
+            while (!IsSearchStopped(id))
             {
                 try
                 {
@@ -307,6 +353,7 @@ namespace Apfelmus
                 }
             }
 
+            SearchThreadEnded(id);
             Dispatcher.Invoke(aButtons, null);
         }
 
@@ -1097,9 +1144,12 @@ namespace Apfelmus
                 searchInfo.SumSearches = _getSearch.SumSearches;
                 searchInfo.Users = appleJuice.NetworkInfo.Users;
 
+                // Nach der eigenen Such-Id filtern (Parameter id), NICHT ueber das Feld cTabItem.Tag:
+                // bei parallelen Suchen zeigt cTabItem auf den zuletzt erzeugten Tab und wuerde die
+                // Treffer sonst allen laufenden Suchen in den falschen Tab schreiben.
                 foreach (SearchEntry sEnt in appleJuice.SearchEntry)
                 {
-                    if (searchEntrys.Where(a => a.Id.Equals(sEnt.Id)).Count() == 0 && sEnt.SearchId.Equals(cTabItem.Tag))
+                    if (searchEntrys.Where(a => a.Id.Equals(sEnt.Id)).Count() == 0 && sEnt.SearchId.Equals(id))
                     {
                         searchEntrys.Add(sEnt);
                     }
@@ -2835,12 +2885,13 @@ namespace Apfelmus
                 }
             }
 
-            if (_searchThread != null && _searchThread.IsAlive && _searchThread.Name.Contains(tItem.Tag.ToString()))
+            // Nur die Suche DIESES Tabs kooperativ beenden (nicht mehr alle laufenden). Thread.Abort()
+            // gibt es unter .NET (Core) nicht mehr - der Thread prueft seine Id selbst.
+            if (tItem.Tag != null && int.TryParse(tItem.Tag.ToString(), out int closedSearchId))
             {
-                // Kooperativ beenden statt Thread.Abort() (existiert unter .NET Core nicht mehr).
-                _stopSearch = true;
-                _activateButtons();
+                StopSearch(closedSearchId);
             }
+            _activateButtons();
         }
 
         private void DownloadSearchResult_Click(object sender, RoutedEventArgs e)
@@ -3177,13 +3228,13 @@ namespace Apfelmus
                 cTabItem.Tag = _getSearch.id;
                 cTabItem.Focus();
 
-                _stopSearch = false;
-                _searchThread = new Thread(new ParameterizedThreadStart(_search_ThreadWorker))
+                Thread searchThread = new Thread(new ParameterizedThreadStart(_search_ThreadWorker))
                 {
                     Name = "SearchWorker" + _getSearch.id,
                     IsBackground = true
                 };
-                _searchThread.Start(tempSearch);
+                RegisterSearch(_getSearch.id, searchThread);
+                searchThread.Start(new object[] { tempSearch, _getSearch.id });
 
                 Binding bindImage = new Binding("FileName.Name")
                 {
@@ -3263,6 +3314,11 @@ namespace Apfelmus
                 tempSearch.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(tempSearch_CollectionChanged);
                 dGrid.ItemsSource = tempSearch;
                 cTabItem.Content = dGrid;
+
+                // Setup fertig -> Button sofort wieder freigeben, damit waehrend dieser Suche eine
+                // WEITERE Suche in einem neuen Tab gestartet werden kann (frueher blieb er bis zum
+                // Ende der Suche gesperrt).
+                btnStartSearch.IsEnabled = true;
             }
             catch (Exception ex)
             {
