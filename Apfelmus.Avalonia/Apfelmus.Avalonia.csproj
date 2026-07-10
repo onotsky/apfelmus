@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Cross-Platform-Umsetzung der Apfelmus-GUI mit Avalonia (Windows/macOS/Linux).
+    Nutzt bewusst dieselbe plattformneutrale Kernbibliothek ApfelmusFramework (net10.0)
+    wie der WPF-Client - nur die Praesentationsschicht (Views, ViewModels, Converter,
+    Themes) ist Avalonia-spezifisch neu.
+
+    Status: Grundgeruest / Work in progress. Login + Start-/Uebersichts-Tab sind gegen
+    den echten Core (WebConnect) verdrahtet; die uebrigen Tabs sind Platzhalter (siehe README.md).
+
+    Hinweis: Auf dieser Maschine ist kein .NET-SDK installiert - der Build wurde NICHT
+    verifiziert. Avalonia ist aber cross-platform baubar (dotnet build), sobald ein SDK vorliegt.
+  -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <RootNamespace>Apfelmus.Avalonia</RootNamespace>
+    <AssemblyName>Apfelmus.Avalonia</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.2.1" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.2.1" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.1" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.1" />
+    <!-- Nur fuer Debug-Diagnose (DevTools). -->
+    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.2.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ApfelmusFramework\ApfelmusFramework.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="Assets/**" />
+  </ItemGroup>
+
+</Project>

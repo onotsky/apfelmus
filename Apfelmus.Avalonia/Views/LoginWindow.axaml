@@ -1,0 +1,38 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:Apfelmus.Avalonia.ViewModels"
+        x:Class="Apfelmus.Avalonia.Views.LoginWindow"
+        x:DataType="vm:LoginViewModel"
+        Title="Apfelmus - Login"
+        Width="320" SizeToContent="Height"
+        CanResize="False"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource WindowBackgroundBrush}">
+
+    <StackPanel Margin="24" Spacing="10">
+        <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,0,0,8">
+            <Image Source="avares://Apfelmus.Avalonia/Assets/Images/Apple-icon.png" Width="32" Height="32" />
+            <TextBlock Text="Apfelmus" FontSize="22" FontWeight="SemiBold"
+                       VerticalAlignment="Center" Foreground="{StaticResource TextPrimaryBrush}" />
+        </StackPanel>
+
+        <TextBlock Text="Host" Foreground="{StaticResource TextSecondaryBrush}" />
+        <TextBox Text="{Binding Host, Mode=TwoWay}" Watermark="localhost" />
+
+        <TextBlock Text="Port" Foreground="{StaticResource TextSecondaryBrush}" />
+        <TextBox Text="{Binding Port, Mode=TwoWay}" Watermark="9851" />
+
+        <TextBlock Text="Passwort" Foreground="{StaticResource TextSecondaryBrush}" />
+        <TextBox Text="{Binding Password, Mode=TwoWay}" PasswordChar="•" />
+
+        <CheckBox Content="Kompression verwenden" IsChecked="{Binding UseCompression, Mode=TwoWay}"
+                  Foreground="{StaticResource TextPrimaryBrush}" />
+
+        <Button Content="Verbinden" Command="{Binding LoginCommand}"
+                HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                Background="{StaticResource AccentBrush}" Foreground="White" Margin="0,6,0,0" />
+
+        <TextBlock Text="{Binding StatusMessage}" Foreground="{StaticResource TextSecondaryBrush}"
+                   TextWrapping="Wrap" />
+    </StackPanel>
+</Window>

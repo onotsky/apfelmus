@@ -1,0 +1,109 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:Apfelmus.Avalonia.ViewModels"
+        xmlns:m="clr-namespace:ApfelmusFramework.Classes.Modified;assembly=ApfelmusFramework"
+        x:Class="Apfelmus.Avalonia.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="Apfelmus" Width="900" Height="600"
+        WindowStartupLocation="CenterScreen"
+        Icon="avares://Apfelmus.Avalonia/Assets/Images/Apple-icon.png"
+        Background="{StaticResource WindowBackgroundBrush}">
+
+    <DockPanel>
+        <!-- Kopfzeile -->
+        <Border DockPanel.Dock="Top" Background="{StaticResource SurfaceBrush}" Padding="12,8">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+                <Image Source="avares://Apfelmus.Avalonia/Assets/Images/Apple-icon.png" Width="20" Height="20" />
+                <TextBlock Text="Apfelmus" FontWeight="SemiBold" VerticalAlignment="Center"
+                           Foreground="{StaticResource TextPrimaryBrush}" />
+                <TextBlock Text="{Binding ConnectionStatus}" VerticalAlignment="Center"
+                           Margin="16,0,0,0" Foreground="{StaticResource AccentBrush}" />
+            </StackPanel>
+        </Border>
+
+        <TabControl Margin="8">
+            <!-- START / UEBERSICHT (vollstaendig gegen den Core verdrahtet) -->
+            <TabItem Header="Start">
+                <ScrollViewer>
+                    <StackPanel Margin="16" Spacing="12" MaxWidth="520" HorizontalAlignment="Left">
+                        <TextBlock Text="Netzwerk" FontSize="16" FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextPrimaryBrush}" />
+
+                        <Grid ColumnDefinitions="180,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" >
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Core-Version"
+                                       Foreground="{StaticResource TextSecondaryBrush}" />
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding CoreVersion}"
+                                       Foreground="{StaticResource TextPrimaryBrush}" />
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Nutzer im Netz"
+                                       Foreground="{StaticResource TextSecondaryBrush}" />
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Users}"
+                                       Foreground="{StaticResource TextPrimaryBrush}" />
+
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Dateien im Netz"
+                                       Foreground="{StaticResource TextSecondaryBrush}" />
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Files}"
+                                       Foreground="{StaticResource TextPrimaryBrush}" />
+
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Datenmenge"
+                                       Foreground="{StaticResource TextSecondaryBrush}" />
+                            <TextBlock Grid.Row="3" Grid.Column="1"
+                                       Text="{Binding FileSize, Converter={StaticResource FileSizeConverter}}"
+                                       Foreground="{StaticResource TextPrimaryBrush}" />
+
+                            <TextBlock Grid.Row="4" Grid.Column="0" Text="Eigene IP"
+                                       Foreground="{StaticResource TextSecondaryBrush}" />
+                            <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding OwnIp}"
+                                       Foreground="{StaticResource TextPrimaryBrush}" />
+
+                            <TextBlock Grid.Row="5" Grid.Column="0" Text="Firewall"
+                                       Foreground="{StaticResource TextSecondaryBrush}" />
+                            <StackPanel Grid.Row="5" Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                <Image Width="16" Height="16"
+                                       Source="{Binding Firewalled, Converter={StaticResource FirewallConverter}}" />
+                                <TextBlock Foreground="{StaticResource TextPrimaryBrush}"
+                                           Text="{Binding Firewalled, Converter={StaticResource BoolToFirewallTextConverter}}" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- DOWNLOADS (Liste gegen modified.xml?filter=down verdrahtet) -->
+            <TabItem Header="Downloads">
+                <ListBox ItemsSource="{Binding Downloads}" Margin="8">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="m:Download">
+                            <TextBlock Text="{Binding FileName}" Foreground="{StaticResource TextPrimaryBrush}" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </TabItem>
+
+            <!-- UPLOADS (Liste gegen modified.xml?filter=uploads verdrahtet) -->
+            <TabItem Header="Uploads">
+                <ListBox ItemsSource="{Binding Uploads}" Margin="8">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="m:Upload">
+                            <TextBlock Text="{Binding FileName}" Foreground="{StaticResource TextPrimaryBrush}" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </TabItem>
+
+            <!-- Platzhalter: noch zu portieren (siehe README) -->
+            <TabItem Header="Suchen">
+                <TextBlock Margin="16" Foreground="{StaticResource TextSecondaryBrush}"
+                           Text="Noch nicht portiert (Platzhalter)." />
+            </TabItem>
+            <TabItem Header="Mein Share">
+                <TextBlock Margin="16" Foreground="{StaticResource TextSecondaryBrush}"
+                           Text="Noch nicht portiert (Platzhalter)." />
+            </TabItem>
+            <TabItem Header="Server">
+                <TextBlock Margin="16" Foreground="{StaticResource TextSecondaryBrush}"
+                           Text="Noch nicht portiert (Platzhalter)." />
+            </TabItem>
+        </TabControl>
+    </DockPanel>
+</Window>

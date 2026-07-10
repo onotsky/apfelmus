@@ -1,0 +1,32 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="clr-namespace:Apfelmus.Avalonia.Converters"
+             x:Class="Apfelmus.Avalonia.App"
+             RequestedThemeVariant="Dark">
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <!-- Charcoal + Gruen Palette (analog zum WPF-Client). -->
+            <Color x:Key="WindowBackgroundColor">#1E2226</Color>
+            <Color x:Key="SurfaceColor">#272C31</Color>
+            <Color x:Key="AccentColor">#4CAF7D</Color>
+            <Color x:Key="TextPrimaryColor">#ECEFF1</Color>
+            <Color x:Key="TextSecondaryColor">#8FA0AB</Color>
+
+            <SolidColorBrush x:Key="WindowBackgroundBrush" Color="{StaticResource WindowBackgroundColor}" />
+            <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource SurfaceColor}" />
+            <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}" />
+            <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimaryColor}" />
+            <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondaryColor}" />
+
+            <!-- Avalonia-Converter (Portierungen der WPF-IValueConverter). -->
+            <conv:FirewallConverter x:Key="FirewallConverter" />
+            <conv:FileSizeConverter x:Key="FileSizeConverter" />
+            <conv:BoolToFirewallTextConverter x:Key="BoolToFirewallTextConverter" />
+        </ResourceDictionary>
+    </Application.Resources>
+
+    <Application.Styles>
+        <FluentTheme />
+    </Application.Styles>
+</Application>
