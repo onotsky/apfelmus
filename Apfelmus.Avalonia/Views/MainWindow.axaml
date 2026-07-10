@@ -1,10 +1,9 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:Apfelmus.Avalonia.ViewModels"
-        xmlns:m="clr-namespace:ApfelmusFramework.Classes.Modified;assembly=ApfelmusFramework"
         x:Class="Apfelmus.Avalonia.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Title="Apfelmus" Width="900" Height="600"
+        Title="Apfelmus" Width="960" Height="640"
         WindowStartupLocation="CenterScreen"
         Icon="avares://Apfelmus.Avalonia/Assets/Images/Apple-icon.png"
         Background="{StaticResource WindowBackgroundBrush}">
@@ -22,87 +21,150 @@
         </Border>
 
         <TabControl Margin="8">
-            <!-- START / UEBERSICHT (vollstaendig gegen den Core verdrahtet) -->
+            <!-- ============================ START / UEBERSICHT ============================ -->
             <TabItem Header="Start">
                 <ScrollViewer>
                     <StackPanel Margin="16" Spacing="12" MaxWidth="520" HorizontalAlignment="Left">
                         <TextBlock Text="Netzwerk" FontSize="16" FontWeight="SemiBold"
                                    Foreground="{StaticResource TextPrimaryBrush}" />
-
-                        <Grid ColumnDefinitions="180,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" >
-                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Core-Version"
-                                       Foreground="{StaticResource TextSecondaryBrush}" />
-                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding CoreVersion}"
-                                       Foreground="{StaticResource TextPrimaryBrush}" />
-
-                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Nutzer im Netz"
-                                       Foreground="{StaticResource TextSecondaryBrush}" />
-                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Users}"
-                                       Foreground="{StaticResource TextPrimaryBrush}" />
-
-                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Dateien im Netz"
-                                       Foreground="{StaticResource TextSecondaryBrush}" />
-                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Files}"
-                                       Foreground="{StaticResource TextPrimaryBrush}" />
-
-                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Datenmenge"
-                                       Foreground="{StaticResource TextSecondaryBrush}" />
-                            <TextBlock Grid.Row="3" Grid.Column="1"
-                                       Text="{Binding FileSize, Converter={StaticResource FileSizeConverter}}"
-                                       Foreground="{StaticResource TextPrimaryBrush}" />
-
-                            <TextBlock Grid.Row="4" Grid.Column="0" Text="Eigene IP"
-                                       Foreground="{StaticResource TextSecondaryBrush}" />
-                            <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding OwnIp}"
-                                       Foreground="{StaticResource TextPrimaryBrush}" />
-
-                            <TextBlock Grid.Row="5" Grid.Column="0" Text="Firewall"
-                                       Foreground="{StaticResource TextSecondaryBrush}" />
+                        <Grid ColumnDefinitions="180,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Core-Version" Foreground="{StaticResource TextSecondaryBrush}" />
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding CoreVersion}" Foreground="{StaticResource TextPrimaryBrush}" />
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Nutzer im Netz" Foreground="{StaticResource TextSecondaryBrush}" />
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Users}" Foreground="{StaticResource TextPrimaryBrush}" />
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Dateien im Netz" Foreground="{StaticResource TextSecondaryBrush}" />
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Files}" Foreground="{StaticResource TextPrimaryBrush}" />
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Datenmenge" Foreground="{StaticResource TextSecondaryBrush}" />
+                            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding FileSize, Converter={StaticResource FileSizeConverter}}" Foreground="{StaticResource TextPrimaryBrush}" />
+                            <TextBlock Grid.Row="4" Grid.Column="0" Text="Eigene IP" Foreground="{StaticResource TextSecondaryBrush}" />
+                            <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding OwnIp}" Foreground="{StaticResource TextPrimaryBrush}" />
+                            <TextBlock Grid.Row="5" Grid.Column="0" Text="Firewall" Foreground="{StaticResource TextSecondaryBrush}" />
                             <StackPanel Grid.Row="5" Grid.Column="1" Orientation="Horizontal" Spacing="8">
-                                <Image Width="16" Height="16"
-                                       Source="{Binding Firewalled, Converter={StaticResource FirewallConverter}}" />
-                                <TextBlock Foreground="{StaticResource TextPrimaryBrush}"
-                                           Text="{Binding Firewalled, Converter={StaticResource BoolToFirewallTextConverter}}" />
+                                <Image Width="16" Height="16" Source="{Binding Firewalled, Converter={StaticResource FirewallConverter}}" />
+                                <TextBlock Foreground="{StaticResource TextPrimaryBrush}" Text="{Binding Firewalled, Converter={StaticResource BoolToFirewallTextConverter}}" />
                             </StackPanel>
                         </Grid>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
 
-            <!-- DOWNLOADS (Liste gegen modified.xml?filter=down verdrahtet) -->
+            <!-- ============================ DOWNLOADS ============================ -->
             <TabItem Header="Downloads">
-                <ListBox ItemsSource="{Binding Downloads}" Margin="8">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate x:DataType="m:Download">
-                            <TextBlock Text="{Binding FileName}" Foreground="{StaticResource TextPrimaryBrush}" />
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+                <DockPanel Margin="4">
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" Margin="4">
+                        <Button Content="Info-URL" Command="{Binding ReleaseInfoDownloadCommand}" />
+                        <Button Content="Pause" Command="{Binding PauseDownloadCommand}" />
+                        <Button Content="Fortsetzen" Command="{Binding ResumeDownloadCommand}" />
+                        <Button Content="Abbrechen" Command="{Binding CancelDownloadCommand}" />
+                    </StackPanel>
+                    <DataGrid x:CompileBindings="False" ItemsSource="{Binding Downloads}"
+                              SelectedItem="{Binding SelectedDownload}"
+                              IsReadOnly="True" GridLinesVisibility="Horizontal" CanUserResizeColumns="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Datei" Binding="{Binding FileName}" Width="*" />
+                            <DataGridTextColumn Header="Größe" Binding="{Binding Size, Converter={StaticResource FileSizeConverter}}" Width="100" />
+                            <DataGridTextColumn Header="Status" Binding="{Binding Status, Converter={StaticResource DownloadStatusConverter}}" Width="120" />
+                            <DataGridTextColumn Header="Speed/s" Binding="{Binding Speed, Converter={StaticResource FileSizeConverter}}" Width="100" />
+                            <DataGridTextColumn Header="aktiv" Binding="{Binding ActiveUsers}" Width="60" />
+                            <DataGridTextColumn Header="gesamt" Binding="{Binding AllUsers}" Width="60" />
+                            <DataGridTextColumn Header="%" Binding="{Binding Percentages}" Width="70" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
             </TabItem>
 
-            <!-- UPLOADS (Liste gegen modified.xml?filter=uploads verdrahtet) -->
+            <!-- ============================ UPLOADS ============================ -->
             <TabItem Header="Uploads">
-                <ListBox ItemsSource="{Binding Uploads}" Margin="8">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate x:DataType="m:Upload">
-                            <TextBlock Text="{Binding FileName}" Foreground="{StaticResource TextPrimaryBrush}" />
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+                <DataGrid x:CompileBindings="False" Margin="4" ItemsSource="{Binding Uploads}"
+                          IsReadOnly="True" GridLinesVisibility="Horizontal" CanUserResizeColumns="True">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Datei" Binding="{Binding FileName}" Width="*" />
+                        <DataGridTextColumn Header="Nick" Binding="{Binding Nick}" Width="160" />
+                        <DataGridTextColumn Header="Speed/s" Binding="{Binding Speed, Converter={StaticResource FileSizeConverter}}" Width="100" />
+                        <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="80" />
+                    </DataGrid.Columns>
+                </DataGrid>
             </TabItem>
 
-            <!-- Platzhalter: noch zu portieren (siehe README) -->
+            <!-- ============================ SUCHEN ============================ -->
             <TabItem Header="Suchen">
-                <TextBlock Margin="16" Foreground="{StaticResource TextSecondaryBrush}"
-                           Text="Noch nicht portiert (Platzhalter)." />
+                <DockPanel Margin="4">
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" Margin="4">
+                        <TextBox Width="320" Watermark="Suchbegriff..." Text="{Binding SearchText, Mode=TwoWay}" />
+                        <Button Content="Suchen" Command="{Binding StartSearchCommand}" />
+                        <Button Content="Download" Command="{Binding DownloadSearchResultCommand}" />
+                        <Button Content="Info-URL" Command="{Binding ReleaseInfoSearchCommand}" />
+                    </StackPanel>
+                    <DataGrid x:CompileBindings="False" ItemsSource="{Binding SearchResults}"
+                              SelectedItem="{Binding SelectedSearchResult}"
+                              IsReadOnly="True" GridLinesVisibility="Horizontal" CanUserResizeColumns="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Datei" Binding="{Binding FileName.Name}" Width="*" />
+                            <DataGridTextColumn Header="Größe" Binding="{Binding Size, Converter={StaticResource FileSizeConverter}}" Width="100" />
+                            <DataGridTextColumn Header="Prüfsumme" Binding="{Binding Checksum}" Width="260" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
             </TabItem>
+
+            <!-- ============================ MEIN SHARE ============================ -->
             <TabItem Header="Mein Share">
-                <TextBlock Margin="16" Foreground="{StaticResource TextSecondaryBrush}"
-                           Text="Noch nicht portiert (Platzhalter)." />
+                <DataGrid x:CompileBindings="False" Margin="4" ItemsSource="{Binding Shares}"
+                          IsReadOnly="True" GridLinesVisibility="Horizontal" CanUserResizeColumns="True">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Datei" Binding="{Binding ShortFileName}" Width="*" />
+                        <DataGridTextColumn Header="Größe" Binding="{Binding Size, Converter={StaticResource FileSizeConverter}}" Width="100" />
+                        <DataGridTextColumn Header="Priorität" Binding="{Binding Priority}" Width="80" />
+                        <DataGridTextColumn Header="Anfragen" Binding="{Binding AskCount}" Width="90" />
+                        <DataGridTextColumn Header="Suchtreffer" Binding="{Binding SearchCount}" Width="100" />
+                    </DataGrid.Columns>
+                </DataGrid>
             </TabItem>
+
+            <!-- ============================ SERVER ============================ -->
             <TabItem Header="Server">
-                <TextBlock Margin="16" Foreground="{StaticResource TextSecondaryBrush}"
-                           Text="Noch nicht portiert (Platzhalter)." />
+                <DockPanel Margin="4">
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" Margin="4">
+                        <Button Content="Verbinden" Command="{Binding ConnectServerCommand}" />
+                    </StackPanel>
+                    <DataGrid x:CompileBindings="False" ItemsSource="{Binding Servers}"
+                              SelectedItem="{Binding SelectedServer}"
+                              IsReadOnly="True" GridLinesVisibility="Horizontal" CanUserResizeColumns="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*" />
+                            <DataGridTextColumn Header="Host" Binding="{Binding Host}" Width="220" />
+                            <DataGridTextColumn Header="Port" Binding="{Binding Port}" Width="80" />
+                            <DataGridTextColumn Header="Versuche" Binding="{Binding ConnectionTry}" Width="90" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+            </TabItem>
+
+            <!-- ============================ EINSTELLUNGEN ============================ -->
+            <TabItem Header="Einstellungen">
+                <StackPanel Margin="16" Spacing="12" MaxWidth="620" HorizontalAlignment="Left">
+                    <TextBlock Text="GUI" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
+
+                    <Grid ColumnDefinitions="200,*" RowDefinitions="Auto,Auto,Auto" >
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Refreshrate (ms)" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBox Grid.Row="0" Grid.Column="1" Width="120" HorizontalAlignment="Left" Text="{Binding RefreshRate, Mode=TwoWay}" />
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Info-URL (%s = Dateilink)" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,8,0,0" />
+                        <TextBox Grid.Row="1" Grid.Column="1" Margin="0,8,0,0" Text="{Binding ReleaseInfoHost, Mode=TwoWay}" />
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Design" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,8,0,0" />
+                        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0,8,0,0">
+                            <Button Content="Dunkel" Command="{Binding ApplyDarkThemeCommand}" />
+                            <Button Content="Hell" Command="{Binding ApplyLightThemeCommand}" />
+                        </StackPanel>
+                    </Grid>
+
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <Button Content="Speichern" Command="{Binding SaveSettingsCommand}"
+                                Background="{StaticResource AccentBrush}" Foreground="White" />
+                        <TextBlock Text="{Binding SettingsStatus}" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" />
+                    </StackPanel>
+                </StackPanel>
             </TabItem>
         </TabControl>
     </DockPanel>

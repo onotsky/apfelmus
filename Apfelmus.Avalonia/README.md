@@ -8,29 +8,37 @@ Kernbibliothek `ApfelmusFramework` (`net10.0`)** – nur die Präsentationsschic
 Diese Umsetzung entstand auf dem Git-Branch `avalonia`, aufgesetzt auf der
 Entkopplung des Frameworks (siehe Commit „Framework von WPF entkoppeln“ auf `main`).
 
-## Status: Grundgerüst / Work in progress
+## Status: funktionsfähig (gebaut & Startup getestet)
 
-**Fertig verdrahtet (gegen den echten Core über `WebConnect`):**
-- Login/Verbindung (`LoginViewModel`): Passwort → MD5 (`CreateMd5Hash`), Socket-Test
-  (`WebConnect.CheckSocket`), Speichern der `Config` als `Config.xml`
-  (`ConfigSerializer`) – exakt dieselbe Kernbibliothek wie beim WPF-Client.
-- Start-/Übersichts-Tab: zyklisches Polling von `information.xml`
-  (Core-Version, Nutzer/Dateien im Netz, Datenmenge, eigene IP, Firewall-Status).
-- Downloads-/Uploads-Tab: Liste aus `modified.xml?filter=down|uploads`
-  (als Nachweis der Wiederverwendung; noch ohne Spalten/Fortschritt).
+Gebaut mit .NET 10 (`dotnet build`, 0 Warnungen/0 Fehler) und per Startup-Smoke-Test
+gelaufen. Ein Test gegen einen echten laufenden appleJuice-Core steht noch aus.
 
-**Noch offen (Platzhalter-Tabs):**
-- Suche inkl. dynamischer Ergebnis-Tabs (WPF: `CloseableTabItem`).
-- „Mein Share“ (Verzeichnisbaum, Prioritäten).
-- Server-Liste inkl. Verbindungssteuerung.
-- Partlisten-Rendering (WPF: `RenderPartList`, `WriteableBitmap`) – für Avalonia
-  auf `WriteableBitmap`/`RenderTargetBitmap` neu umzusetzen.
-- Vollständige Theme-Umschaltung Dark/Light zur Laufzeit + Mehrsprachigkeit (DE/EN/IT).
-- Restliche `IValueConverter` (bisher portiert: Firewall, FileSize, Firewall-Text).
-- Custom Title Bar / rahmenloses Fenster (WPF: `WindowChrome`).
-- Datei-Icons pro Typ: der WPF-Client zieht das Windows-Shell-Icon
-  (`FilenameToImage`, Windows-only) – cross-platform braucht es ein mitgeliefertes
-  Icon-Set pro Endung.
+**Verdrahtet gegen den echten Core über `WebConnect` (gemeinsame Kernbibliothek):**
+- Login/Verbindung: Passwort → MD5 (`CreateMd5Hash`), Socket-Test
+  (`WebConnect.CheckSocket`), Speichern der `Config` als `Config.xml` (`ConfigSerializer`).
+- Start-/Übersicht: Polling von `information.xml` (Core-Version, Nutzer/Dateien,
+  Datenmenge, IP, Firewall-Status).
+- Downloads: DataGrid (Datei, Größe, Status, Speed, Quellen, %) + Aktionen
+  Info-URL / Pause / Fortsetzen / Abbrechen (`/function/*`), Merge-Update ohne
+  Auswahlverlust.
+- Uploads: DataGrid (Datei, Nick, Speed, Status).
+- Suche: Suchbegriff → `/function/search`, Ergebnisse aus `modified.xml?filter=search`,
+  Download starten (`/function/processlink` mit ajfsp-Link) und Info-URL öffnen.
+- Server: DataGrid (Name, Host, Port, Versuche) + Verbinden (`/function/serverlogin`).
+- Mein Share: DataGrid aus `share.xml` (Datei, Größe, Priorität, Anfragen, Suchtreffer).
+- Einstellungen: Refreshrate, Info-URL (`ReleaseInfoHost`, %s = Dateilink),
+  Design-Umschaltung Dunkel/Hell zur Laufzeit; alles über `ConfigSerializer` persistiert.
+- „Suche nach mehr Informationen“ nutzt direkt `ReleaseInfo.Open` aus dem Framework
+  (öffnet die konfigurierbare URL im Standardbrowser, plattformübergreifend).
+
+**Bewusst (noch) nicht portiert / vereinfacht:**
+- Partlisten-Balken (WPF: `RenderPartList`, `WriteableBitmap`) – noch nicht dargestellt.
+- Mehrsprachigkeit (DE/EN/IT): die Avalonia-UI ist aktuell deutschsprachig; die
+  Sprachumschaltung des WPF-Clients wurde nicht übernommen.
+- Custom Title Bar / rahmenloses Fenster (WPF: `WindowChrome`) – hier normale OS-Chrome.
+- Datei-Icons pro Typ (WPF: Windows-Shell-Icon via `FilenameToImage`, Windows-only) –
+  cross-platform bräuchte es ein mitgeliefertes Icon-Set pro Endung.
+- Erweiterte Download-Aktionen (Powerdownload-Gebote, Priorität, Zielverzeichnis).
 
 ## Bauen & Starten
 
@@ -41,10 +49,9 @@ dotnet restore
 dotnet run --project Apfelmus.Avalonia
 ```
 
-> Hinweis: Auf der Maschine, auf der dieses Grundgerüst erstellt wurde, war **kein
-> .NET-SDK installiert** – der Build wurde daher **nicht verifiziert**. Vor dem
-> ersten Lauf bitte `dotnet build` prüfen; ggf. Avalonia-Paketversionen (aktuell
-> `11.2.1`) an eine vorhandene/gewünschte Version anpassen.
+> Getestet mit .NET-SDK 10.0.301 (macOS/arm64): baut mit 0 Warnungen/0 Fehlern und
+> startet. Avalonia-Pakete sind auf `11.2.1` gepinnt; `Tmds.DBus.Protocol` ist auf
+> `0.21.3` hochgezogen (schließt Advisory GHSA-xrw6-gwf8-vvr9 des transitiven 0.20.0).
 
 Es muss – wie beim WPF-Client – ein separater appleJuice-**Core** laufen, gegen den
 sich die GUI verbindet (Standard: `localhost:9851`).

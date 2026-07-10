@@ -23,10 +23,12 @@
             <conv:FirewallConverter x:Key="FirewallConverter" />
             <conv:FileSizeConverter x:Key="FileSizeConverter" />
             <conv:BoolToFirewallTextConverter x:Key="BoolToFirewallTextConverter" />
+            <conv:DownloadStatusConverter x:Key="DownloadStatusConverter" />
         </ResourceDictionary>
     </Application.Resources>
 
     <Application.Styles>
         <FluentTheme />
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
     </Application.Styles>
 </Application>
