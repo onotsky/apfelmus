@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Avalonia;
+using Avalonia.Media.Imaging;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using Apfelmus.Avalonia.Services;
@@ -233,6 +234,10 @@ namespace Apfelmus.Avalonia.ViewModels
         public string NewPassword { get => _newPassword; set { if (SetProperty(ref _newPassword, value)) ChangePasswordCommand.RaiseCanExecuteChanged(); } }
         public string CoreSettingsStatus { get => _coreSettingsStatus; private set => SetProperty(ref _coreSettingsStatus, value); }
 
+        // ---- Partlisten-Verfuegbarkeitsbalken ----
+        private WriteableBitmap? _partlistImage;
+        public WriteableBitmap? PartlistImage { get => _partlistImage; private set => SetProperty(ref _partlistImage, value); }
+
         // ---- Polling ----
         private async Task PollAsync()
         {
@@ -297,9 +302,25 @@ namespace Apfelmus.Avalonia.ViewModels
         private void UpdateDownloadSources()
         {
             DownloadSources.Clear();
-            if (SelectedDownload == null) return;
+            if (SelectedDownload == null) { PartlistImage = null; return; }
             foreach (var u in _allUsers.Where(u => u.DownloadId == SelectedDownload.Id))
                 DownloadSources.Add(u);
+            _ = BuildPartlistAsync();
+        }
+
+        /// <summary>Holt die Partliste des gewaehlten Downloads und rendert den Verfuegbarkeitsbalken.</summary>
+        private async Task BuildPartlistAsync()
+        {
+            var sel = SelectedDownload;
+            if (sel == null) { PartlistImage = null; return; }
+
+            var pl = await _client.GetDownloadPartlistAsync(sel.Id);
+            // Auswahl koennte sich waehrend des Ladens geaendert haben.
+            if (SelectedDownload != sel) return;
+            if (pl?.FileInformation == null || pl.Parts == null) { PartlistImage = null; return; }
+
+            var sources = DownloadSources.Where(u => u.Status == 2 || u.ActualDownloadPosition > u.DownloadFrom).ToList();
+            PartlistImage = PartlistRenderer.Render(pl.FileInformation.Filesize, pl.Parts, sources, 240, 4);
         }
 
         private async Task RefreshUploadsAsync()

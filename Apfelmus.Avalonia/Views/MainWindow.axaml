@@ -130,7 +130,7 @@
                         <Button Content="Setzen" Command="{Binding SetDownloadPriorityCommand}" />
                     </StackPanel>
 
-                    <Grid RowDefinitions="*,4,180">
+                    <Grid RowDefinitions="*,4,160,74">
                         <DataGrid Grid.Row="0" x:CompileBindings="False" ItemsSource="{Binding Downloads}"
                                   SelectedItem="{Binding SelectedDownload}" IsReadOnly="True"
                                   GridLinesVisibility="Horizontal" CanUserResizeColumns="True">
@@ -161,6 +161,23 @@
                                     <DataGridTextColumn Header="Power" Binding="{Binding PowerDownload, Converter={StaticResource PowerDownloadConverter}}" Width="70" />
                                 </DataGrid.Columns>
                             </DataGrid>
+                        </DockPanel>
+
+                        <!-- Partlisten-Verfuegbarkeitsbalken des gewaehlten Downloads -->
+                        <DockPanel Grid.Row="3" Margin="2,4,2,2">
+                            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="12" Margin="0,0,0,3">
+                                <TextBlock Text="Partliste" Classes="lbl" VerticalAlignment="Center" />
+                                <StackPanel Orientation="Horizontal" Spacing="3" VerticalAlignment="Center">
+                                    <Rectangle Width="10" Height="10" Fill="Red" /><TextBlock Text="nicht verfügbar" Classes="lbl" />
+                                    <Rectangle Width="10" Height="10" Fill="#4C6BFF" Margin="8,0,0,0" /><TextBlock Text="verfügbar" Classes="lbl" />
+                                    <Rectangle Width="10" Height="10" Fill="Orange" Margin="8,0,0,0" /><TextBlock Text="geladen" Classes="lbl" />
+                                    <Rectangle Width="10" Height="10" Fill="Yellow" Margin="8,0,0,0" /><TextBlock Text="aktiv" Classes="lbl" />
+                                    <Rectangle Width="10" Height="10" Fill="Green" Margin="8,0,0,0" /><TextBlock Text="fertig" Classes="lbl" />
+                                </StackPanel>
+                            </StackPanel>
+                            <Border BorderBrush="{StaticResource TextSecondaryBrush}" BorderThickness="1">
+                                <Image Source="{Binding PartlistImage}" Stretch="Fill" />
+                            </Border>
                         </DockPanel>
                     </Grid>
                 </DockPanel>

@@ -46,6 +46,10 @@ namespace Apfelmus.Avalonia.Services
         public Task<AppleJuice?> GetShareAsync()
             => QueryAsync(string.Format("/xml/share.xml?timestamp=0&password={0}&mode=zip", _config.Password));
 
+        /// <summary>downloadpartlist.xml: Verfuegbarkeitssegmente (Parts) + Dateigroesse eines Downloads.</summary>
+        public Task<AppleJuice?> GetDownloadPartlistAsync(int downloadId)
+            => QueryAsync(string.Format("/xml/downloadpartlist.xml?id={0}&password={1}&mode=zip", downloadId, _config.Password));
+
         /// <summary>Liest die Core-Einstellungen (settings.xml).</summary>
         public Task<ApfelmusFramework.Classes.Settings.Settings?> GetSettingsAsync()
         {
