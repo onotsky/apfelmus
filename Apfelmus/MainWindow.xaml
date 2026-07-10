@@ -308,6 +308,8 @@
                                 <MenuItem Name="mItemShareLinks" Header="{DynamicResource copylinks}" Click="ShareLinks_Click" />
                                 <MenuItem Name="mitemShareSource" Header="{DynamicResource copysource}" Click="ShareSource_Click" />
                                 <MenuItem Name="mitemShareSources" Header="{DynamicResource copysources}" Click="ShareSources_Click" />
+                                <Separator />
+                                <MenuItem Name="mItemReleaseInfoShare" Header="{DynamicResource releaseinfo}" Click="ReleaseInfoShare_Click" />
                             </ContextMenu>
                         </DataGrid.ContextMenu>
                         <DataGrid.Columns>
@@ -415,6 +417,8 @@
                                 <MenuItem Name="mItemDownload" Header="{DynamicResource link}" Click="DownloadSearchResult_Click" />
                                 <MenuItem Name="mItemSearchLink" Header="{DynamicResource copylink}" Click="SearchLink_Click" />
                                 <MenuItem Name="mItemSearchSource" Header="{DynamicResource copysource}" Click="SearchSource_Click" />
+                                <Separator />
+                                <MenuItem Name="mItemReleaseInfoSearch" Header="{DynamicResource releaseinfo}" Click="ReleaseInfoSearch_Click" />
                             </ContextMenu>
                         </TabControl.ContextMenu>
 
@@ -462,6 +466,8 @@
                                     <MenuItem Name="mItemClean" Header="{DynamicResource finished}" Click="Finished_Click" />
                                     <MenuItem Name="mItemLink" Header="{DynamicResource copylink}" Click="Link_Click" />
                                     <MenuItem Name="mItemSource" Header="{DynamicResource copysource}" Click="Source_Click" />
+                                    <Separator />
+                                    <MenuItem Name="mItemReleaseInfoDownload" Header="{DynamicResource releaseinfo}" Click="ReleaseInfoDownload_Click" />
                                 </ContextMenu>
                             </DataGrid.ContextMenu>
                             <DataGrid.Resources>
@@ -690,6 +696,11 @@
                     </Grid.RowDefinitions>
                     <DataGrid Grid.Row="0" MinHeight="100" Height="Auto" MinWidth="870" Width="Auto" VirtualizingPanel.VirtualizationMode="Recycling"  AutoGenerateColumns="False" Name="dGridUploads" SelectionMode="Single" SelectionUnit="FullRow" GridLinesVisibility="None" CanUserAddRows="False" CanUserDeleteRows="False" >
                         <!--<DataGrid Grid.Row="0" MinHeight="100" Height="Auto" MinWidth="870" Width="Auto" AutoGenerateColumns="False" Name="dGridUploads" SelectionMode="Single" SelectionUnit="FullRow" GridLinesVisibility="None" CanUserAddRows="False" CanUserDeleteRows="False" >-->
+                        <DataGrid.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Name="mItemReleaseInfoUpload" Header="{DynamicResource releaseinfo}" Click="ReleaseInfoUpload_Click" />
+                            </ContextMenu>
+                        </DataGrid.ContextMenu>
                         <DataGrid.Resources>
                             <conv:FileSizeConverter1 x:Key="FileSizeConverter1" />
                             <conv:FileSizeConverter4 x:Key="FileSizeConverter4" />

@@ -2838,6 +2838,88 @@ namespace Apfelmus
             }
         }
 
+        /// <summary>
+        /// Oeffnet fuer den gewaehlten Download die "Suche nach mehr Informationen"-Seite im Browser:
+        /// baut den ajfsp-Link und uebergibt ihn an den konfigurierten Host (Default apple-deluxe.co).
+        /// Analog zur offiziellen Java-GUI; die Infos werden extern angezeigt, nicht inline.
+        /// </summary>
+        private void ReleaseInfoDownload_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Download tmpDownload = dGridDownloads.SelectedItem as Download;
+                if (tmpDownload != null)
+                {
+                    ReleaseInfo.Open(config.ReleaseInfoHost, tmpDownload.FileName, tmpDownload.Hash, tmpDownload.Size);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Fehler beim Oeffnen der Release-Infos (Download)!", ex);
+            }
+        }
+
+        /// <summary>Wie ReleaseInfoDownload_Click, fuer den gewaehlten Treffer im aktiven Such-Tab.</summary>
+        private void ReleaseInfoSearch_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (tControlSearches.SelectedItem is CloseableTab.CloseableTabItem tab
+                    && tab.Content is DataGrid grid
+                    && grid.SelectedItem is SearchEntry sEnt)
+                {
+                    ReleaseInfo.Open(config.ReleaseInfoHost, sEnt.FileName.Name, sEnt.Checksum, sEnt.Size.ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Fehler beim Oeffnen der Release-Infos (Suche)!", ex);
+            }
+        }
+
+        /// <summary>Wie ReleaseInfoDownload_Click, fuer die gewaehlte Datei im "Mein Share"-Tab.</summary>
+        private void ReleaseInfoShare_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Share share = dGridShares.SelectedItem as Share;
+                if (share != null)
+                {
+                    ReleaseInfo.Open(config.ReleaseInfoHost, share.ShortFileName, share.CheckSum, share.Size.ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Fehler beim Oeffnen der Release-Infos (Share)!", ex);
+            }
+        }
+
+        /// <summary>
+        /// Wie ReleaseInfoDownload_Click, fuer den gewaehlten Upload. Ein Upload traegt nur die
+        /// ShareId, daher werden Dateiname/Hash/Groesse ueber die zugehoerige Share-Datei aufgeloest.
+        /// </summary>
+        private void ReleaseInfoUpload_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Upload upload = dGridUploads.SelectedItem as Upload;
+                if (upload == null)
+                {
+                    return;
+                }
+
+                Share share = appleJuice.Shares?.Share?.FirstOrDefault(a => a.Id.Equals(upload.Shareid));
+                if (share != null)
+                {
+                    ReleaseInfo.Open(config.ReleaseInfoHost, share.ShortFileName, share.CheckSum, share.Size.ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Fehler beim Oeffnen der Release-Infos (Upload)!", ex);
+            }
+        }
+
         private void SearchSource_Click(object sender, RoutedEventArgs e)
         {
             try

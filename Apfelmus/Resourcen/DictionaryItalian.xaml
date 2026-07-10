@@ -96,6 +96,7 @@
     <system:String x:Key="foundfiles">File trovati:</system:String>
     <system:String x:Key="sumsearches">I clienti acquisiti:</system:String>
     <system:String x:Key="stopsearch">Smettere di cercare</system:String>
+    <system:String x:Key="releaseinfo">Cerca ulteriori informazioni</system:String>
     <system:String x:Key="clearsearch">Cancella ricerca</system:String>
     <system:String x:Key="filename_search">Nome del file</system:String>
     <system:String x:Key="filesize_search">Dimensione</system:String>

@@ -96,6 +96,16 @@ namespace ApfelmusFramework.Classes.Config
             set { theme = value; }
         }
 
+        private string releaseInfoHost;
+
+        // Host fuer "Suche nach mehr Informationen" (Kontextmenue). %s wird durch den ajfsp-Link
+        // ersetzt. Leer/nicht gesetzt (alte Config) -> ReleaseInfo.DefaultHost (apple-deluxe.co).
+        public string ReleaseInfoHost
+        {
+            get { return releaseInfoHost; }
+            set { releaseInfoHost = value; }
+        }
+
         private int partlistRowHeight;
 
         // Hoehe (in Pixel) einer Zeile im Partlisten-Balken. Groesser = weniger, dafuer dickere
