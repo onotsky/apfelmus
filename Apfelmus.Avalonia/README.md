@@ -8,37 +8,43 @@ Kernbibliothek `ApfelmusFramework` (`net10.0`)** – nur die Präsentationsschic
 Diese Umsetzung entstand auf dem Git-Branch `avalonia`, aufgesetzt auf der
 Entkopplung des Frameworks (siehe Commit „Framework von WPF entkoppeln“ auf `main`).
 
-## Status: funktionsfähig (gebaut & Startup getestet)
+## Status: weitgehende Funktionsparität zum WPF-Client
 
-Gebaut mit .NET 10 (`dotnet build`, 0 Warnungen/0 Fehler) und per Startup-Smoke-Test
-gelaufen. Ein Test gegen einen echten laufenden appleJuice-Core steht noch aus.
+Gebaut mit .NET 10 (`dotnet build`, 0 Warnungen/0 Fehler); Startup und Laden des
+Hauptfensters (inkl. aller Tabs) per Smoke-Test geprüft. Ein Test gegen einen echten
+laufenden appleJuice-Core steht noch aus.
 
 **Verdrahtet gegen den echten Core über `WebConnect` (gemeinsame Kernbibliothek):**
-- Login/Verbindung: Passwort → MD5 (`CreateMd5Hash`), Socket-Test
-  (`WebConnect.CheckSocket`), Speichern der `Config` als `Config.xml` (`ConfigSerializer`).
-- Start-/Übersicht: Polling von `information.xml` (Core-Version, Nutzer/Dateien,
-  Datenmenge, IP, Firewall-Status).
-- Downloads: DataGrid (Datei, Größe, Status, Speed, Quellen, %) + Aktionen
-  Info-URL / Pause / Fortsetzen / Abbrechen (`/function/*`), Merge-Update ohne
-  Auswahlverlust.
-- Uploads: DataGrid (Datei, Nick, Speed, Status).
-- Suche: Suchbegriff → `/function/search`, Ergebnisse aus `modified.xml?filter=search`,
-  Download starten (`/function/processlink` mit ajfsp-Link) und Info-URL öffnen.
-- Server: DataGrid (Name, Host, Port, Versuche) + Verbinden (`/function/serverlogin`).
-- Mein Share: DataGrid aus `share.xml` (Datei, Größe, Priorität, Anfragen, Suchtreffer).
-- Einstellungen: Refreshrate, Info-URL (`ReleaseInfoHost`, %s = Dateilink),
-  Design-Umschaltung Dunkel/Hell zur Laufzeit; alles über `ConfigSerializer` persistiert.
-- „Suche nach mehr Informationen“ nutzt direkt `ReleaseInfo.Open` aus dem Framework
-  (öffnet die konfigurierbare URL im Standardbrowser, plattformübergreifend).
+- **Menüleiste:** Design (Dunkel/Hell) und Core → „Core beenden“ (`/function/exitcore`).
+- **AJLink-Transfer** (Kopfzeile): Link einfügen → `/function/processlink`.
+- **Login/Verbindung:** Passwort → MD5, Socket-Test, `Config.xml` (`ConfigSerializer`).
+- **Start/Übersicht:** Client (GUI-/Core-Version), Netzwerk (Nutzer, Dateien,
+  Gesamtgröße, Verbindungen, Upload-Queue, Firewall-Icon, IP), Server (Name,
+  verbunden-seit, Willkommensnachricht) – aus `information.xml` + `modified.xml?filter=informations`.
+- **Statusleiste:** Credits, Up-/Download-Speed, Session-Traffic (in/out).
+- **Downloads:** DataGrid (Datei, Status-Text, Größe, geladen, Speed, Restzeit, %,
+  Rest, Power) + Quellen-Unterliste des gewählten Downloads (`filter=user`) +
+  Aktionen Fortsetzen/Pause/Abbrechen/Fertige-entfernen/Powerdownload/Priorität/
+  Info-URL/Link-kopieren.
+- **Uploads:** DataGrid (Datei, Nick, Speed, %, Priorität, Version).
+- **Suche:** Start/Stopp (`/function/search`, `/function/cancelsearch`), Treffer-/
+  Quellen-Zähler, Ergebnisliste (`filter=search`), Download (`processlink`),
+  Info-URL, Link-kopieren.
+- **Server:** DataGrid (Name, Host, Port, zuletzt gesehen, Versuche) + Verbinden
+  (`serverlogin`), Entfernen (`removeserver`), offizielle Serverliste holen.
+- **Mein Share:** DataGrid (`share.xml`) + Priorität setzen/zurück, Link-kopieren, Info-URL.
+- **Einstellungen:** Refreshrate, Info-URL (`ReleaseInfoHost`), Theme; via `ConfigSerializer` persistiert.
+- „Suche nach mehr Informationen“ über `ReleaseInfo.Open` (Framework, plattformübergreifend).
 
-**Bewusst (noch) nicht portiert / vereinfacht:**
-- Partlisten-Balken (WPF: `RenderPartList`, `WriteableBitmap`) – noch nicht dargestellt.
-- Mehrsprachigkeit (DE/EN/IT): die Avalonia-UI ist aktuell deutschsprachig; die
-  Sprachumschaltung des WPF-Clients wurde nicht übernommen.
-- Custom Title Bar / rahmenloses Fenster (WPF: `WindowChrome`) – hier normale OS-Chrome.
-- Datei-Icons pro Typ (WPF: Windows-Shell-Icon via `FilenameToImage`, Windows-only) –
-  cross-platform bräuchte es ein mitgeliefertes Icon-Set pro Endung.
-- Erweiterte Download-Aktionen (Powerdownload-Gebote, Priorität, Zielverzeichnis).
+**Noch offen / bewusst vereinfacht gegenüber dem WPF-Client:**
+- Partlisten-Balken (WPF `RenderPartList`/`WriteableBitmap`) – nicht dargestellt.
+- Mehrsprachigkeit (DE/EN/IT) – Avalonia-UI aktuell deutschsprachig.
+- Rahmenlose Custom-Titelleiste (WPF `WindowChrome`) – hier normale OS-Chrome.
+- Datei-Typ-Icons (WPF Windows-Shell-Icons, Windows-only) – keine Per-Datei-Icons.
+- Verzeichnisbaum/Freigabe-Verwaltung im Share-Tab (Ordner freigeben, Baum-Browsing).
+- Voller Core-Einstellungsdialog (Verzeichnisse, Ports, Nick, Limits, Slots,
+  Passwortänderung, Protokoll-Handler) – hier nur lokale GUI-Optionen.
+- Download-Umbenennen-Dialog, „Quelle kopieren“, Zeilenfärbung nach Status.
 
 ## Bauen & Starten
 

@@ -24,11 +24,35 @@
             <conv:FileSizeConverter x:Key="FileSizeConverter" />
             <conv:BoolToFirewallTextConverter x:Key="BoolToFirewallTextConverter" />
             <conv:DownloadStatusConverter x:Key="DownloadStatusConverter" />
+            <conv:TimeConverter x:Key="TimeConverter" />
+            <conv:SecondsToDateConverter x:Key="SecondsToDateConverter" />
+            <conv:PowerDownloadConverter x:Key="PowerDownloadConverter" />
+            <conv:UserStatusConverter x:Key="UserStatusConverter" />
         </ResourceDictionary>
     </Application.Resources>
 
     <Application.Styles>
         <FluentTheme />
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
+
+        <!-- Kartenlayout fuer den Start-Tab (Ersatz fuer WPF-GroupBox) -->
+        <Style Selector="Border.card">
+            <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Padding" Value="12" />
+            <Setter Property="Margin" Value="10" />
+        </Style>
+        <Style Selector="TextBlock.cardheader">
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+            <Setter Property="Margin" Value="0,0,0,6" />
+        </Style>
+        <Style Selector="TextBlock.lbl">
+            <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+        </Style>
+        <Style Selector="TextBlock.val">
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        </Style>
     </Application.Styles>
 </Application>

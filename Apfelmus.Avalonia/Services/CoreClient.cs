@@ -10,7 +10,7 @@ namespace Apfelmus.Avalonia.Services
     /// Duenne, asynchrone Huelle um die plattformneutrale <see cref="WebConnect"/>-Kommunikation
     /// des ApfelmusFramework. Baut die /xml/*-Abfragen und /function/*-Kommandos (identisch zum
     /// WPF-Client) und liefert das deserialisierte <see cref="AppleJuice"/>-Wurzelobjekt.
-    /// Bewusst UI-frameworkunabhaengig - lauft auf jeder Plattform.
+    /// Bewusst UI-frameworkunabhaengig - laeuft auf jeder Plattform.
     /// </summary>
     public sealed class CoreClient
     {
@@ -23,7 +23,6 @@ namespace Apfelmus.Avalonia.Services
 
         public Config Config => _config;
 
-        /// <summary>Prueft, ob der Core erreichbar ist (Socket-Test).</summary>
         public Task<bool> CheckConnectionAsync()
         {
             return Task.Run(() =>
@@ -33,63 +32,86 @@ namespace Apfelmus.Avalonia.Services
             });
         }
 
-        /// <summary>Holt information.xml (Netzwerk-/Allgemeininfos) und deserialisiert es.</summary>
+        /// <summary>information.xml: Netzwerk- und Allgemeininfos (Start-Tab, Core-Version).</summary>
         public Task<AppleJuice?> GetInformationAsync()
-        {
-            string query = string.Format(
-                "/xml/information.xml?timestamp=0&password={0}&mode=zip", _config.Password);
-            return QueryAsync(query);
-        }
+            => QueryAsync(string.Format("/xml/information.xml?timestamp=0&password={0}&mode=zip", _config.Password));
 
-        /// <summary>Holt einen modified.xml-Teilbereich (z.B. filter=informations, down, uploads, server, search).</summary>
+        /// <summary>modified.xml?filter=informations: Client-Kennzahlen (Credits, Speeds, Session, Verbindungen) + NetworkInfo.</summary>
+        public Task<AppleJuice?> GetInformationsAsync()
+            => GetModifiedAsync("informations");
+
         public Task<AppleJuice?> GetModifiedAsync(string filter)
-        {
-            string query = string.Format(
-                "/xml/modified.xml?timestamp=0&filter={0}&password={1}&mode=zip", filter, _config.Password);
-            return QueryAsync(query);
-        }
+            => QueryAsync(string.Format("/xml/modified.xml?timestamp=0&filter={0}&password={1}&mode=zip", filter, _config.Password));
 
-        /// <summary>Holt share.xml (freigegebene Dateien).</summary>
         public Task<AppleJuice?> GetShareAsync()
-        {
-            string query = string.Format("/xml/share.xml?timestamp=0&password={0}&mode=zip", _config.Password);
-            return QueryAsync(query);
-        }
+            => QueryAsync(string.Format("/xml/share.xml?timestamp=0&password={0}&mode=zip", _config.Password));
 
-        /// <summary>Startet eine Suche (Kommando ohne Antwort). Ergebnisse via GetModifiedAsync("search").</summary>
+        // ---- Kommandos (/function/*) -----------------------------------------------------------
+
         public Task StartSearchAsync(string searchText)
-        {
-            string encoded = Uri.EscapeDataString(searchText ?? string.Empty);
-            return FireFunctionAsync("/function/search?search=" + encoded + "&password=" + _config.Password);
-        }
+            => Fire("/function/search?search=" + Uri.EscapeDataString(searchText ?? string.Empty) + "&password=" + _config.Password);
 
-        /// <summary>Bricht einen Download ab.</summary>
+        public Task StopSearchAsync(int searchId)
+            => Fire("/function/cancelsearch?id=" + searchId + "&password=" + _config.Password);
+
         public Task CancelDownloadAsync(int id)
-            => FireFunctionAsync("/function/canceldownload?id=" + id + "&password=" + _config.Password);
+            => Fire("/function/canceldownload?id=" + id + "&password=" + _config.Password);
 
-        /// <summary>Pausiert einen Download.</summary>
         public Task PauseDownloadAsync(int id)
-            => FireFunctionAsync("/function/pausedownload?id=" + id + "&password=" + _config.Password);
+            => Fire("/function/pausedownload?id=" + id + "&password=" + _config.Password);
 
-        /// <summary>Setzt einen pausierten Download fort.</summary>
         public Task ResumeDownloadAsync(int id)
-            => FireFunctionAsync("/function/resumedownload?id=" + id + "&password=" + _config.Password);
+            => Fire("/function/resumedownload?id=" + id + "&password=" + _config.Password);
 
-        /// <summary>Verbindet mit einem Server der Liste.</summary>
+        public Task CleanDownloadListAsync()
+            => Fire("/function/cleandownloadlist?password=" + _config.Password);
+
+        public Task SetDownloadPriorityAsync(int id, int priority)
+            => Fire("/function/setpriority?id=" + id + "&priority=" + priority + "&password=" + _config.Password);
+
+        public Task SetPowerDownloadAsync(int id, int value)
+            => Fire("/function/setpowerdownload?id=" + id + "&Powerdownload=" + value + "&password=" + _config.Password);
+
         public Task ConnectServerAsync(int serverId)
-            => FireFunctionAsync("/function/serverlogin?id=" + serverId + "&password=" + _config.Password);
+            => Fire("/function/serverlogin?id=" + serverId + "&password=" + _config.Password);
 
-        /// <summary>
-        /// Startet einen Download zu einem ajfsp-Datei-Link (Name|Hash|Groesse) ueber processlink -
-        /// derselbe Weg, den auch der WPF-Client fuer Links/Suchtreffer nutzt.
-        /// </summary>
+        public Task RemoveServerAsync(int serverId)
+            => Fire("/function/removeserver?id=" + serverId + "&password=" + _config.Password);
+
+        public Task ExitCoreAsync()
+            => Fire("/function/exitcore?password=" + _config.Password);
+
+        /// <summary>Startet einen Download/verarbeitet einen ajfsp-Link (AJLink-Transfer, Suchtreffer).</summary>
+        public Task ProcessLinkAsync(string ajfspLink)
+            => Fire("/function/processlink?link=" + ajfspLink + "&password=" + _config.Password);
+
+        /// <summary>Baut aus Name/Hash/Groesse einen ajfsp-Datei-Link und startet den Download.</summary>
         public Task StartDownloadAsync(string fileName, string hash, string size)
         {
             string ajfsp = "ajfsp://file%7C" + Uri.EscapeDataString(fileName ?? string.Empty) + "%7C" + hash + "%7C" + size + "/";
-            return FireFunctionAsync("/function/processlink?link=" + ajfsp + "&password=" + _config.Password);
+            return ProcessLinkAsync(ajfsp);
         }
 
-        private Task FireFunctionAsync(string function)
+        /// <summary>Holt die offizielle Serverliste und uebergibt jeden Server-Link an den Core.</summary>
+        public Task AddOfficialServersAsync()
+        {
+            return Task.Run(() =>
+            {
+                try
+                {
+                    var list = WebConnect.GetXMLServerList();
+                    if (list?.Server == null) return;
+                    foreach (var s in list.Server)
+                    {
+                        using var web = new WebConnect(_config.HostName, _config.Port);
+                        web.StartXMLFunction("/function/processlink?link=" + s.Link + "&password=" + _config.Password);
+                    }
+                }
+                catch (Exception) { }
+            });
+        }
+
+        private Task Fire(string function)
         {
             return Task.Run(() =>
             {
@@ -98,10 +120,7 @@ namespace Apfelmus.Avalonia.Services
                     using var web = new WebConnect(_config.HostName, _config.Port);
                     web.StartXMLFunction(function);
                 }
-                catch (Exception)
-                {
-                    // Kommando-Fehler hier schlucken; der Poll-Zyklus spiegelt den Effekt ohnehin wider.
-                }
+                catch (Exception) { }
             });
         }
 
@@ -114,16 +133,11 @@ namespace Apfelmus.Avalonia.Services
                     using var web = new WebConnect(_config.HostName, _config.Port);
                     var appleJuice = new AppleJuice();
                     string xml = web.GetHttpResult(query, _config.UseCompression);
-                    if (string.IsNullOrWhiteSpace(xml))
-                    {
-                        return null;
-                    }
-
+                    if (string.IsNullOrWhiteSpace(xml)) return null;
                     return appleJuice.DeserializeToObj(xml) as AppleJuice;
                 }
                 catch (Exception)
                 {
-                    // Netzwerk-/Parsefehler hier schlucken - der aufrufende Poll-Zyklus laeuft weiter.
                     return null;
                 }
             });
