@@ -55,6 +55,9 @@ namespace Apfelmus.Avalonia.ViewModels
             ApplyDarkThemeCommand = new RelayCommand(() => ApplyTheme(ThemeNames.Dark));
             ApplyLightThemeCommand = new RelayCommand(() => ApplyTheme(ThemeNames.Light));
             SaveSettingsCommand = new RelayCommand(SaveSettings);
+            LoadCoreSettingsCommand = new RelayCommand(LoadCoreSettingsAsync);
+            SaveCoreSettingsCommand = new RelayCommand(SaveCoreSettingsAsync);
+            ChangePasswordCommand = new RelayCommand(ChangePasswordAsync, () => !string.IsNullOrEmpty(NewPassword));
 
             // Downloads
             ContinueCommand = new RelayCommand(async () => await WithDownload(id => _client.ResumeDownloadAsync(id)), () => SelectedDownload != null);
@@ -88,6 +91,7 @@ namespace Apfelmus.Avalonia.ViewModels
             _timer.Tick += async (_, _) => await PollAsync();
             _timer.Start();
             _ = PollAsync();
+            _ = LoadCoreSettingsAsync();
         }
 
         /// <summary>Wird von der View gesetzt/abonniert, um Text in die Zwischenablage zu legen.</summary>
@@ -109,6 +113,9 @@ namespace Apfelmus.Avalonia.ViewModels
         public RelayCommand ApplyDarkThemeCommand { get; }
         public RelayCommand ApplyLightThemeCommand { get; }
         public RelayCommand SaveSettingsCommand { get; }
+        public RelayCommand LoadCoreSettingsCommand { get; }
+        public RelayCommand SaveCoreSettingsCommand { get; }
+        public RelayCommand ChangePasswordCommand { get; }
         public RelayCommand ContinueCommand { get; }
         public RelayCommand BreakCommand { get; }
         public RelayCommand CancelCommand { get; }
@@ -204,6 +211,27 @@ namespace Apfelmus.Avalonia.ViewModels
         public int RefreshRate { get => _refreshRate; set => SetProperty(ref _refreshRate, value); }
         public string ReleaseInfoHost { get => _releaseInfoHost; set => SetProperty(ref _releaseInfoHost, value); }
         public string SettingsStatus { get => _settingsStatus; private set => SetProperty(ref _settingsStatus, value); }
+
+        // ---- Core-Einstellungen (settings.xml) ----
+        private string _coreNick = string.Empty, _coreIncomingDir = string.Empty, _coreTempDir = string.Empty;
+        private string _newPassword = string.Empty, _coreSettingsStatus = string.Empty;
+        private int _corePort, _coreXmlPort, _coreMaxConnections, _coreMaxUpload, _coreMaxDownload, _coreSpeedPerSlot, _coreMaxNewConn, _coreMaxSources;
+        private bool _coreAutoConnect;
+
+        public string CoreNick { get => _coreNick; set => SetProperty(ref _coreNick, value); }
+        public string CoreIncomingDir { get => _coreIncomingDir; set => SetProperty(ref _coreIncomingDir, value); }
+        public string CoreTempDir { get => _coreTempDir; set => SetProperty(ref _coreTempDir, value); }
+        public int CorePort { get => _corePort; set => SetProperty(ref _corePort, value); }
+        public int CoreXmlPort { get => _coreXmlPort; set => SetProperty(ref _coreXmlPort, value); }
+        public int CoreMaxConnections { get => _coreMaxConnections; set => SetProperty(ref _coreMaxConnections, value); }
+        public int CoreMaxUpload { get => _coreMaxUpload; set => SetProperty(ref _coreMaxUpload, value); }
+        public int CoreMaxDownload { get => _coreMaxDownload; set => SetProperty(ref _coreMaxDownload, value); }
+        public int CoreSpeedPerSlot { get => _coreSpeedPerSlot; set => SetProperty(ref _coreSpeedPerSlot, value); }
+        public int CoreMaxNewConnectionsPerTurn { get => _coreMaxNewConn; set => SetProperty(ref _coreMaxNewConn, value); }
+        public int CoreMaxSourcesPerFile { get => _coreMaxSources; set => SetProperty(ref _coreMaxSources, value); }
+        public bool CoreAutoConnect { get => _coreAutoConnect; set => SetProperty(ref _coreAutoConnect, value); }
+        public string NewPassword { get => _newPassword; set { if (SetProperty(ref _newPassword, value)) ChangePasswordCommand.RaiseCanExecuteChanged(); } }
+        public string CoreSettingsStatus { get => _coreSettingsStatus; private set => SetProperty(ref _coreSettingsStatus, value); }
 
         // ---- Polling ----
         private async Task PollAsync()
@@ -374,6 +402,47 @@ namespace Apfelmus.Avalonia.ViewModels
             }
             catch (Exception ex) { SettingsStatus = "Fehler: " + ex.Message; }
             return Task.CompletedTask;
+        }
+
+        private async Task LoadCoreSettingsAsync()
+        {
+            var s = await _client.GetSettingsAsync();
+            if (s == null) { CoreSettingsStatus = "Core-Einstellungen nicht erreichbar."; return; }
+            CoreNick = s.Nick ?? string.Empty;
+            CorePort = s.Port; CoreXmlPort = s.XmlPort;
+            CoreMaxConnections = s.MaxConnections; CoreMaxUpload = s.MaxUpload; CoreMaxDownload = s.MaxDownload;
+            CoreSpeedPerSlot = s.SpeedPerSlot; CoreMaxNewConnectionsPerTurn = s.MaxNewConnectionsPerTurn;
+            CoreMaxSourcesPerFile = s.MaxSourcesPerFile;
+            CoreIncomingDir = s.IncomingDirectory ?? string.Empty; CoreTempDir = s.TemporaryDirectory ?? string.Empty;
+            CoreAutoConnect = s.AutoConnect;
+            CoreSettingsStatus = "Geladen.";
+        }
+
+        private async Task SaveCoreSettingsAsync()
+        {
+            var s = new ApfelmusFramework.Classes.Settings.Settings
+            {
+                Nick = CoreNick, Port = CorePort, XmlPort = CoreXmlPort,
+                MaxConnections = CoreMaxConnections, MaxUpload = CoreMaxUpload, MaxDownload = CoreMaxDownload,
+                SpeedPerSlot = CoreSpeedPerSlot, MaxNewConnectionsPerTurn = CoreMaxNewConnectionsPerTurn,
+                MaxSourcesPerFile = CoreMaxSourcesPerFile, IncomingDirectory = CoreIncomingDir,
+                TemporaryDirectory = CoreTempDir, AutoConnect = CoreAutoConnect,
+            };
+            await _client.SetSettingsAsync(s);
+            CoreSettingsStatus = "An Core gesendet.";
+        }
+
+        private async Task ChangePasswordAsync()
+        {
+            string newMd5 = await _client.SetPasswordAsync(NewPassword);
+            try
+            {
+                _config.Password = newMd5;
+                ConfigSerializer.SerializeToFile(_config);
+                CoreSettingsStatus = "Passwort geändert.";
+            }
+            catch (Exception ex) { CoreSettingsStatus = "Passwort-Fehler: " + ex.Message; }
+            NewPassword = string.Empty;
         }
 
         private Task ApplyTheme(string theme)

@@ -46,6 +46,58 @@ namespace Apfelmus.Avalonia.Services
         public Task<AppleJuice?> GetShareAsync()
             => QueryAsync(string.Format("/xml/share.xml?timestamp=0&password={0}&mode=zip", _config.Password));
 
+        /// <summary>Liest die Core-Einstellungen (settings.xml).</summary>
+        public Task<ApfelmusFramework.Classes.Settings.Settings?> GetSettingsAsync()
+        {
+            return Task.Run(() =>
+            {
+                try
+                {
+                    using var web = new WebConnect(_config.HostName, _config.Port);
+                    var settings = new ApfelmusFramework.Classes.Settings.Settings();
+                    string xml = web.GetHttpResult("/xml/settings.xml?password=" + _config.Password + "&mode=zip", _config.UseCompression);
+                    if (string.IsNullOrWhiteSpace(xml)) return null;
+                    return settings.DeserializeToObj(xml) as ApfelmusFramework.Classes.Settings.Settings;
+                }
+                catch (Exception) { return null; }
+            });
+        }
+
+        /// <summary>Schreibt die Core-Einstellungen (setsettings). Verzeichnisse werden URL-kodiert.</summary>
+        public Task SetSettingsAsync(ApfelmusFramework.Classes.Settings.Settings s)
+        {
+            string q = "/function/setsettings?"
+                + "Incomingdirectory=" + Uri.EscapeDataString(s.IncomingDirectory ?? string.Empty) + "&"
+                + "Temporarydirectory=" + Uri.EscapeDataString(s.TemporaryDirectory ?? string.Empty) + "&"
+                + "Port=" + s.Port + "&"
+                + "XMLPort=" + s.XmlPort + "&"
+                + "Nickname=" + Uri.EscapeDataString(s.Nick ?? string.Empty) + "&"
+                + "MaxConnections=" + s.MaxConnections + "&"
+                + "MaxDownload=" + s.MaxDownload + "&"
+                + "MaxUpload=" + s.MaxUpload + "&"
+                + "Speedperslot=" + s.SpeedPerSlot + "&"
+                + "MaxNewConnectionsPerTurn=" + s.MaxNewConnectionsPerTurn + "&"
+                + "MaxSourcesPerFile=" + s.MaxSourcesPerFile + "&"
+                + "password=" + _config.Password;
+            return Fire(q);
+        }
+
+        /// <summary>Aendert das Core-Passwort (Klartext -> MD5) und liefert den neuen MD5-Wert zurueck.</summary>
+        public Task<string> SetPasswordAsync(string newPlainPassword)
+        {
+            return Task.Run(() =>
+            {
+                string newMd5 = CreateMd5Hash.GetMD5Hash(newPlainPassword);
+                try
+                {
+                    using var web = new WebConnect(_config.HostName, _config.Port);
+                    web.StartXMLFunction("/function/setpassword?newpassword=" + newMd5 + "&password=" + _config.Password);
+                }
+                catch (Exception) { }
+                return newMd5;
+            });
+        }
+
         // ---- Kommandos (/function/*) -----------------------------------------------------------
 
         public Task StartSearchAsync(string searchText)

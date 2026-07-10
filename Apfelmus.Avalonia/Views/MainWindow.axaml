@@ -257,9 +257,10 @@
 
             <!-- ===================== EINSTELLUNGEN ===================== -->
             <TabItem Header="Einstellungen">
-                <StackPanel Margin="16" Spacing="12" MaxWidth="620" HorizontalAlignment="Left">
+                <ScrollViewer>
+                <StackPanel Margin="16" Spacing="12" MaxWidth="680" HorizontalAlignment="Left">
                     <TextBlock Text="GUI" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
-                    <Grid ColumnDefinitions="200,*" RowDefinitions="Auto,Auto,Auto">
+                    <Grid ColumnDefinitions="220,*" RowDefinitions="Auto,Auto,Auto">
                         <TextBlock Grid.Row="0" Grid.Column="0" Text="Refreshrate (ms)" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" />
                         <TextBox Grid.Row="0" Grid.Column="1" Width="120" HorizontalAlignment="Left" Text="{Binding RefreshRate, Mode=TwoWay}" />
                         <TextBlock Grid.Row="1" Grid.Column="0" Text="Info-URL (%s = Dateilink)" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,8,0,0" />
@@ -271,10 +272,53 @@
                         </StackPanel>
                     </Grid>
                     <StackPanel Orientation="Horizontal" Spacing="10">
-                        <Button Content="Speichern" Command="{Binding SaveSettingsCommand}" Background="{StaticResource AccentBrush}" Foreground="White" />
+                        <Button Content="GUI speichern" Command="{Binding SaveSettingsCommand}" Background="{StaticResource AccentBrush}" Foreground="White" />
                         <TextBlock Text="{Binding SettingsStatus}" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" />
                     </StackPanel>
+
+                    <Border Height="1" Background="{StaticResource SurfaceBrush}" Margin="0,8" />
+
+                    <TextBlock Text="Core-Einstellungen" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
+                    <Grid ColumnDefinitions="220,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Nickname" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBox  Grid.Row="0" Grid.Column="1" Text="{Binding CoreNick, Mode=TwoWay}" />
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Temp-Verzeichnis" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,0" />
+                        <TextBox  Grid.Row="1" Grid.Column="1" Margin="0,6,0,0" Text="{Binding CoreTempDir, Mode=TwoWay}" />
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Incoming-Verzeichnis" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,0" />
+                        <TextBox  Grid.Row="2" Grid.Column="1" Margin="0,6,0,0" Text="{Binding CoreIncomingDir, Mode=TwoWay}" />
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Core-Port" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,0" />
+                        <TextBox  Grid.Row="3" Grid.Column="1" Width="120" HorizontalAlignment="Left" Margin="0,6,0,0" Text="{Binding CorePort, Mode=TwoWay}" />
+                        <TextBlock Grid.Row="4" Grid.Column="0" Text="XML-Port" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,0" />
+                        <TextBox  Grid.Row="4" Grid.Column="1" Width="120" HorizontalAlignment="Left" Margin="0,6,0,0" Text="{Binding CoreXmlPort, Mode=TwoWay}" />
+                        <TextBlock Grid.Row="5" Grid.Column="0" Text="Max. Verbindungen" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,0" />
+                        <TextBox  Grid.Row="5" Grid.Column="1" Width="120" HorizontalAlignment="Left" Margin="0,6,0,0" Text="{Binding CoreMaxConnections, Mode=TwoWay}" />
+                        <TextBlock Grid.Row="6" Grid.Column="0" Text="Max. Upload (Bytes/s)" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,0" />
+                        <TextBox  Grid.Row="6" Grid.Column="1" Width="160" HorizontalAlignment="Left" Margin="0,6,0,0" Text="{Binding CoreMaxUpload, Mode=TwoWay}" />
+                        <TextBlock Grid.Row="7" Grid.Column="0" Text="Max. Download (Bytes/s)" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,0" />
+                        <TextBox  Grid.Row="7" Grid.Column="1" Width="160" HorizontalAlignment="Left" Margin="0,6,0,0" Text="{Binding CoreMaxDownload, Mode=TwoWay}" />
+                        <TextBlock Grid.Row="8" Grid.Column="0" Text="Speed pro Slot" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,0" />
+                        <TextBox  Grid.Row="8" Grid.Column="1" Width="160" HorizontalAlignment="Left" Margin="0,6,0,0" Text="{Binding CoreSpeedPerSlot, Mode=TwoWay}" />
+                        <TextBlock Grid.Row="9" Grid.Column="0" Text="Neue Verb./Runde" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,0" />
+                        <TextBox  Grid.Row="9" Grid.Column="1" Width="120" HorizontalAlignment="Left" Margin="0,6,0,0" Text="{Binding CoreMaxNewConnectionsPerTurn, Mode=TwoWay}" />
+                        <TextBlock Grid.Row="10" Grid.Column="0" Text="Quellen pro Datei" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,0" />
+                        <TextBox  Grid.Row="10" Grid.Column="1" Width="120" HorizontalAlignment="Left" Margin="0,6,0,0" Text="{Binding CoreMaxSourcesPerFile, Mode=TwoWay}" />
+                    </Grid>
+                    <CheckBox Content="Automatisch verbinden" IsChecked="{Binding CoreAutoConnect, Mode=TwoWay}" Foreground="{StaticResource TextPrimaryBrush}" />
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <Button Content="Core laden" Command="{Binding LoadCoreSettingsCommand}" />
+                        <Button Content="Core speichern" Command="{Binding SaveCoreSettingsCommand}" Background="{StaticResource AccentBrush}" Foreground="White" />
+                        <TextBlock Text="{Binding CoreSettingsStatus}" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" />
+                    </StackPanel>
+
+                    <Border Height="1" Background="{StaticResource SurfaceBrush}" Margin="0,8" />
+
+                    <TextBlock Text="Passwort ändern" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBox Width="220" PasswordChar="•" Watermark="Neues Passwort" Text="{Binding NewPassword, Mode=TwoWay}" />
+                        <Button Content="Passwort setzen" Command="{Binding ChangePasswordCommand}" />
+                    </StackPanel>
                 </StackPanel>
+                </ScrollViewer>
             </TabItem>
         </TabControl>
     </DockPanel>
