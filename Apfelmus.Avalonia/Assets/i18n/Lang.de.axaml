@@ -99,6 +99,7 @@
     <sys:String x:Key="sh_dirs">Verzeichnisse</sys:String>
     <sys:String x:Key="sh_refresh">Anzeige erneuern</sys:String>
     <sys:String x:Key="sh_check">Shareprüfung starten</sys:String>
+    <sys:String x:Key="sh_shared">Freigegebene Ordner</sys:String>
     <sys:String x:Key="sh_filter">Filter:</sys:String>
     <sys:String x:Key="sh_showall">Alle anzeigen</sys:String>
 

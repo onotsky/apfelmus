@@ -45,6 +45,7 @@ namespace Apfelmus.Avalonia.ViewModels
             Shares = new ObservableCollection<ShareItem>();
             FilteredShares = new ObservableCollection<ShareItem>();
             ShareTree = new ObservableCollection<DirNodeViewModel>();
+            SharedFolders = new ObservableCollection<SharedFolderEntry>();
 
             PowerValues = new ObservableCollection<int> { 0, 1, 2, 3, 4, 5 };
             PriorityValues = new ObservableCollection<int> { 1, 2, 3, 4, 5 };
@@ -107,6 +108,7 @@ namespace Apfelmus.Avalonia.ViewModels
                 ShareFilterText = string.Empty; // loest ApplyShareFilter aus
                 return Task.CompletedTask;
             });
+            RemoveSharedFolderCommand = new RelayCommand(RemoveSharedFolderAsync, () => SelectedSharedFolder != null);
 
             // Freigabe-Verzeichnisbaum
             LoadShareTreeCommand = new RelayCommand(LoadShareTreeAsync);
@@ -184,12 +186,23 @@ namespace Apfelmus.Avalonia.ViewModels
         public RelayCommand RefreshShareCommand { get; }
         public RelayCommand CheckShareCommand { get; }
         public RelayCommand ShowAllSharesCommand { get; }
+        public RelayCommand RemoveSharedFolderCommand { get; }
         public RelayCommand LoadShareTreeCommand { get; }
         public RelayCommand ShareFolderCommand { get; }
         public RelayCommand ShareFolderNoSubCommand { get; }
         public RelayCommand UnshareFolderCommand { get; }
 
         public ObservableCollection<DirNodeViewModel> ShareTree { get; }
+
+        /// <summary>Aktuell freigegebene Verzeichnisse (aus den Core-Einstellungen) - Anzeige im Share-Tab.</summary>
+        public ObservableCollection<SharedFolderEntry> SharedFolders { get; }
+
+        private SharedFolderEntry? _selectedSharedFolder;
+        public SharedFolderEntry? SelectedSharedFolder
+        {
+            get => _selectedSharedFolder;
+            set { if (SetProperty(ref _selectedSharedFolder, value)) RemoveSharedFolderCommand.RaiseCanExecuteChanged(); }
+        }
 
         /// <summary>Freigegebene Dateien, gefiltert auf den im Baum gewaehlten Ordner (explorer-artig, wie WPF).</summary>
         public ObservableCollection<ShareItem> FilteredShares { get; }
@@ -232,14 +245,17 @@ namespace Apfelmus.Avalonia.ViewModels
 
         private void ApplyShareFilter()
         {
-            string? path = SelectedShareNode?.Path;
+            // Ordner-Eingrenzung ueber den Ordnernamen (== Share.Path, dem Gruppierschluessel), NICHT
+            // ueber den vollen Baum-Pfad: dessen Form ("incoming/") passt nicht auf den Datei-Pfad des
+            // Cores ("/incoming/..."), wodurch ein Klick im Baum die Liste faelschlich leerte.
+            string? folder = SelectedShareNode?.Name;
             string? text = string.IsNullOrWhiteSpace(_shareFilterText) ? null : _shareFilterText.Trim();
             FilteredShares.Clear();
             foreach (var s in Shares)
             {
                 // (a) auf den im Baum gewaehlten Ordner eingrenzen ...
-                if (!string.IsNullOrEmpty(path)
-                    && (s.FileName == null || !s.FileName.StartsWith(path, StringComparison.OrdinalIgnoreCase)))
+                if (!string.IsNullOrEmpty(folder)
+                    && !string.Equals(s.Path, folder, StringComparison.OrdinalIgnoreCase))
                     continue;
                 // (b) ... und auf den Freitext im Dateinamen (Teilstring, wie WPF).
                 if (text != null
@@ -710,6 +726,24 @@ namespace Apfelmus.Avalonia.ViewModels
             CoreIncomingDir = s.IncomingDirectory ?? string.Empty; CoreTempDir = s.TemporaryDirectory ?? string.Empty;
             CoreAutoConnect = s.AutoConnect;
             CoreSettingsStatus = "Geladen.";
+            RefreshSharedFolders();
+        }
+
+        /// <summary>Uebernimmt die aktuell freigegebenen Verzeichnisse aus den Core-Einstellungen in die Anzeige.</summary>
+        private void RefreshSharedFolders()
+        {
+            SharedFolders.Clear();
+            foreach (var (path, sub) in CurrentShares())
+                SharedFolders.Add(new SharedFolderEntry(path, sub));
+        }
+
+        private async Task RemoveSharedFolderAsync()
+        {
+            var sel = SelectedSharedFolder;
+            if (sel == null) return;
+            var list = CurrentShares().Where(x => !string.Equals(x.path, sel.Path, StringComparison.OrdinalIgnoreCase)).ToList();
+            await _client.SetSharesAsync(list);
+            await LoadCoreSettingsAsync();   // aktualisiert auch SharedFolders
         }
 
         private async Task SaveCoreSettingsAsync()

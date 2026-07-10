@@ -99,6 +99,7 @@
     <sys:String x:Key="sh_dirs">Cartelle</sys:String>
     <sys:String x:Key="sh_refresh">Aggiorna vista</sys:String>
     <sys:String x:Key="sh_check">Avvia verifica share</sys:String>
+    <sys:String x:Key="sh_shared">Cartelle condivise</sys:String>
     <sys:String x:Key="sh_filter">Filtro:</sys:String>
     <sys:String x:Key="sh_showall">Mostra tutto</sys:String>
 

@@ -397,6 +397,18 @@
                             <Button Content="{DynamicResource sh_sharesub}" Command="{Binding ShareFolderCommand}" />
                         </StackPanel>
                         <TextBlock DockPanel.Dock="Top" Text="{DynamicResource sh_dirs}" Classes="lbl" Margin="2,0,0,2" />
+                        <!-- Bereits freigegebene Ordner (aus den Core-Einstellungen) -->
+                        <DockPanel DockPanel.Dock="Bottom" Height="160" Margin="0,4,0,0">
+                            <TextBlock DockPanel.Dock="Top" Text="{DynamicResource sh_shared}" Classes="lbl" Margin="2,0,0,2" />
+                            <Button DockPanel.Dock="Bottom" Content="{DynamicResource sh_unshare}" Command="{Binding RemoveSharedFolderCommand}" Margin="2" HorizontalAlignment="Left" />
+                            <ListBox x:CompileBindings="False" ItemsSource="{Binding SharedFolders}" SelectedItem="{Binding SelectedSharedFolder}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Display}" Foreground="{DynamicResource TextPrimaryBrush}" />
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </DockPanel>
                         <TreeView x:CompileBindings="False" ItemsSource="{Binding ShareTree}" SelectedItem="{Binding SelectedShareNode}">
                             <TreeView.Styles>
                                 <Style Selector="TreeViewItem">
