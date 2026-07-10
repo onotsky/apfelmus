@@ -30,6 +30,7 @@
             <conv:UserStatusConverter x:Key="UserStatusConverter" />
             <conv:DownloadRowBrushConverter x:Key="DownloadRowBrushConverter" />
             <conv:ServerRowBrushConverter x:Key="ServerRowBrushConverter" />
+            <conv:ExtensionToIconConverter x:Key="FileIconConverter" />
         </ResourceDictionary>
     </Application.Resources>
 

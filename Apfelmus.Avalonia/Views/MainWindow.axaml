@@ -162,7 +162,16 @@
                                 </Style>
                             </DataGrid.Styles>
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="{DynamicResource col_file}" Binding="{Binding FileName}" Width="*" />
+                                <DataGridTemplateColumn Header="{DynamicResource col_file}" Width="*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
+                                                <Image Width="16" Height="16" Source="{Binding FileName, Converter={StaticResource FileIconConverter}}" />
+                                                <TextBlock Text="{Binding FileName}" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
                                 <DataGridTextColumn Header="{DynamicResource col_status}" Binding="{Binding Status, Converter={StaticResource DownloadStatusConverter}}" Width="110" />
                                 <DataGridTextColumn Header="{DynamicResource col_size}" Binding="{Binding Size, Converter={StaticResource FileSizeConverter}}" Width="90" />
                                 <DataGridTextColumn Header="{DynamicResource col_loaded}" Binding="{Binding DownloadedFilesize, Converter={StaticResource FileSizeConverter}}" Width="90" />
@@ -215,7 +224,16 @@
                 <DataGrid x:CompileBindings="False" Margin="4" ItemsSource="{Binding Uploads}" IsReadOnly="True"
                           GridLinesVisibility="Horizontal" CanUserResizeColumns="True">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="{DynamicResource col_file}" Binding="{Binding FileName}" Width="*" />
+                        <DataGridTemplateColumn Header="{DynamicResource col_file}" Width="*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
+                                                <Image Width="16" Height="16" Source="{Binding FileName, Converter={StaticResource FileIconConverter}}" />
+                                                <TextBlock Text="{Binding FileName}" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
                         <DataGridTextColumn Header="{DynamicResource col_nick}" Binding="{Binding Nick}" Width="140" />
                         <DataGridTextColumn Header="{DynamicResource col_speed}" Binding="{Binding Speed, Converter={StaticResource FileSizeConverter}}" Width="90" />
                         <DataGridTextColumn Header="{DynamicResource col_percent}" Binding="{Binding Percentages}" Width="70" />
@@ -243,7 +261,16 @@
                               SelectedItem="{Binding SelectedSearchResult}" IsReadOnly="True"
                               GridLinesVisibility="Horizontal" CanUserResizeColumns="True">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="{DynamicResource col_file}" Binding="{Binding FileName.Name}" Width="*" />
+                            <DataGridTemplateColumn Header="{DynamicResource col_file}" Width="*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
+                                                <Image Width="16" Height="16" Source="{Binding FileName.Name, Converter={StaticResource FileIconConverter}}" />
+                                                <TextBlock Text="{Binding FileName.Name}" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
                             <DataGridTextColumn Header="{DynamicResource col_size}" Binding="{Binding Size, Converter={StaticResource FileSizeConverter}}" Width="100" />
                             <DataGridTextColumn Header="{DynamicResource col_checksum}" Binding="{Binding Checksum}" Width="260" />
                         </DataGrid.Columns>
@@ -322,7 +349,16 @@
                                   SelectedItem="{Binding SelectedShare}" IsReadOnly="True"
                                   GridLinesVisibility="Horizontal" CanUserResizeColumns="True">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="{DynamicResource col_file}" Binding="{Binding ShortFileName}" Width="*" />
+                                <DataGridTemplateColumn Header="{DynamicResource col_file}" Width="*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
+                                                <Image Width="16" Height="16" Source="{Binding ShortFileName, Converter={StaticResource FileIconConverter}}" />
+                                                <TextBlock Text="{Binding ShortFileName}" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
                                 <DataGridTextColumn Header="{DynamicResource col_size}" Binding="{Binding Size, Converter={StaticResource FileSizeConverter}}" Width="100" />
                                 <DataGridTextColumn Header="{DynamicResource col_prio}" Binding="{Binding Priority}" Width="80" />
                                 <DataGridTextColumn Header="{DynamicResource col_lastasked}" Binding="{Binding LastAsked, Converter={StaticResource SecondsToDateConverter}}" Width="150" />

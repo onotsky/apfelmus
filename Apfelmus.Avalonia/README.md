@@ -36,15 +36,21 @@ laufenden appleJuice-Core steht noch aus.
 - **Einstellungen:** Refreshrate, Info-URL (`ReleaseInfoHost`), Theme; via `ConfigSerializer` persistiert.
 - „Suche nach mehr Informationen“ über `ReleaseInfo.Open` (Framework, plattformübergreifend).
 
-**Noch offen / bewusst vereinfacht gegenüber dem WPF-Client:**
-- Partlisten-Balken (WPF `RenderPartList`/`WriteableBitmap`) – nicht dargestellt.
-- Mehrsprachigkeit (DE/EN/IT) – Avalonia-UI aktuell deutschsprachig.
-- Rahmenlose Custom-Titelleiste (WPF `WindowChrome`) – hier normale OS-Chrome.
-- Datei-Typ-Icons (WPF Windows-Shell-Icons, Windows-only) – keine Per-Datei-Icons.
-- Verzeichnisbaum/Freigabe-Verwaltung im Share-Tab (Ordner freigeben, Baum-Browsing).
-- Voller Core-Einstellungsdialog (Verzeichnisse, Ports, Nick, Limits, Slots,
-  Passwortänderung, Protokoll-Handler) – hier nur lokale GUI-Optionen.
-- Download-Umbenennen-Dialog, „Quelle kopieren“, Zeilenfärbung nach Status.
+**Inzwischen ebenfalls umgesetzt (Parität weitgehend erreicht):**
+- Voller Core-Einstellungsdialog (`settings.xml`/`setsettings`) + Passwortänderung.
+- Partlisten-Verfügbarkeitsbalken (`downloadpartlist.xml`, WriteableBitmap-Rendering).
+- Zeilenfärbung (Downloads nach Status, Server nach Verbindung).
+- Rahmenlose Custom-Titelleiste (analog WPF `WindowChrome`).
+- Mehrsprachigkeit DE/EN/IT (Menü „Sprache“, Laufzeitumschaltung, persistiert).
+- Share-Verzeichnisbaum + Freigabe-Verwaltung (Ordner freigeben/entfernen).
+- Datei-Typ-Icons als plattformneutrale Vektor-Kategorie-Icons.
+
+**Bewusst vereinfacht / nicht 1:1:**
+- Datei-Icons sind Kategorie-Vektor-Icons statt echter Windows-Shell-Icons
+  (letztere sind plattformgebunden und cross-platform nicht reproduzierbar).
+- Suche zeigt eine gemeinsame Ergebnisliste statt dynamischer Ergebnis-Tabs pro Suche.
+- Kein Download-Umbenennen-Dialog, kein „Quelle kopieren“ (nur „Link kopieren“),
+  kein Upload-Detail-Untergrid.
 
 ## Bauen & Starten
 
