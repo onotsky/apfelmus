@@ -1137,12 +1137,19 @@ namespace Apfelmus
                     return;
                 }
 
-                searchInfo.FoundFiles = searchEntrys.Count();
-                searchInfo.Id = _getSearch.id;
-                searchInfo.OpenSearches = _getSearch.OpenSearches;
-                searchInfo.Running = _getSearch.Running;
-                searchInfo.SumSearches = _getSearch.SumSearches;
-                searchInfo.Users = appleJuice.NetworkInfo.Users;
+                // Die an die Fortschrittsbalken/Labels gebundene searchInfo NUR aktualisieren, wenn
+                // diese Suche auch die des aktuell gewaehlten Tabs ist - sonst wuerden bei parallelen
+                // Suchen alle Threads in dasselbe Panel schreiben und es zeigte die zuletzt
+                // aktualisierte statt der aktiven Suche.
+                if (IsActiveSearchTab(id))
+                {
+                    searchInfo.FoundFiles = searchEntrys.Count();
+                    searchInfo.Id = _getSearch.id;
+                    searchInfo.OpenSearches = _getSearch.OpenSearches;
+                    searchInfo.Running = _getSearch.Running;
+                    searchInfo.SumSearches = _getSearch.SumSearches;
+                    searchInfo.Users = appleJuice.NetworkInfo.Users;
+                }
 
                 // Nach der eigenen Such-Id filtern (Parameter id), NICHT ueber das Feld cTabItem.Tag:
                 // bei parallelen Suchen zeigt cTabItem auf den zuletzt erzeugten Tab und wuerde die
@@ -1158,6 +1165,66 @@ namespace Apfelmus
             catch (Exception ex)
             {
                 logger.Error("Fehler beim durchführen der Suche", ex);
+            }
+        }
+
+        /// <summary>
+        /// Prueft, ob die Suche mit dieser Id die des aktuell gewaehlten Such-Tabs ist. Muss auf dem
+        /// UI-Thread laufen (Zugriff auf tControlSearches.SelectedItem).
+        /// </summary>
+        private bool IsActiveSearchTab(int id)
+        {
+            return tControlSearches.SelectedItem is CloseableTab.CloseableTabItem tab
+                && tab.Tag != null
+                && int.TryParse(tab.Tag.ToString(), out int selectedId)
+                && selectedId == id;
+        }
+
+        /// <summary>
+        /// Setzt die an die Fortschrittsbalken/Labels gebundene searchInfo auf den aktuell gewaehlten
+        /// Such-Tab - fuer den sofortigen Wechsel, ohne auf den naechsten Poll zu warten.
+        /// </summary>
+        private void UpdateSearchInfoForSelectedTab()
+        {
+            if (!(tControlSearches.SelectedItem is CloseableTab.CloseableTabItem tab)
+                || tab.Tag == null
+                || !int.TryParse(tab.Tag.ToString(), out int selectedId))
+            {
+                return;
+            }
+
+            Search sel = appleJuice.Search?.AsEnumerable().FirstOrDefault(a => a.id.Equals(selectedId));
+            if (sel == null)
+            {
+                return;
+            }
+
+            searchInfo.Id = sel.id;
+            searchInfo.OpenSearches = sel.OpenSearches;
+            searchInfo.Running = sel.Running;
+            searchInfo.SumSearches = sel.SumSearches;
+            searchInfo.Users = appleJuice.NetworkInfo.Users;
+            searchInfo.FoundFiles = (tab.Content is DataGrid grid) ? grid.Items.Count : sel.FoundFiles;
+        }
+
+        /// <summary>
+        /// Beim Wechsel des aktiven Such-Tabs die Fortschrittsanzeige sofort auf die neue Suche
+        /// umstellen. Gebubbelte SelectionChanged-Events innerer DataGrids werden ignoriert.
+        /// </summary>
+        private void tControlSearches_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                if (!ReferenceEquals(e.OriginalSource, tControlSearches))
+                {
+                    return;
+                }
+
+                UpdateSearchInfoForSelectedTab();
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Fehler beim Wechsel des Such-Tabs!", ex);
             }
         }
 

@@ -406,7 +406,7 @@
                             </Grid>
                         </StackPanel>
                     </Grid>
-                    <TabControl Name="tControlSearches" Grid.Column="1" Margin="2,-14,0,14" MouseRightButtonDown="tControlSearches_MouseRightButtonDown">
+                    <TabControl Name="tControlSearches" Grid.Column="1" Margin="2,-14,0,14" MouseRightButtonDown="tControlSearches_MouseRightButtonDown" SelectionChanged="tControlSearches_SelectionChanged">
                         <TabControl.Resources>
                             <conv:FileSizeConverter1 x:Key="FileSizeConverter" />
                             <conv:FilenameToImage x:Key="FilenameToImage" />
