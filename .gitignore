@@ -22,3 +22,6 @@ packages/
 
 # Sonstiges
 *.log
+
+# Lokale Release-Artefakte (werden als GitHub-Release-Assets veroeffentlicht, nicht ins Repo committet)
+releases/
