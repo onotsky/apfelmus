@@ -29,12 +29,17 @@
 
         <!-- ===== Menueleiste ===== -->
         <Menu DockPanel.Dock="Top">
-            <MenuItem Header="Design">
-                <MenuItem Header="Dunkel" Command="{Binding ApplyDarkThemeCommand}" />
-                <MenuItem Header="Hell" Command="{Binding ApplyLightThemeCommand}" />
+            <MenuItem Header="{DynamicResource m_design}">
+                <MenuItem Header="{DynamicResource m_dark}" Command="{Binding ApplyDarkThemeCommand}" />
+                <MenuItem Header="{DynamicResource m_light}" Command="{Binding ApplyLightThemeCommand}" />
             </MenuItem>
-            <MenuItem Header="Core">
-                <MenuItem Header="Core beenden" Command="{Binding CoreExitCommand}" />
+            <MenuItem Header="{DynamicResource m_language}">
+                <MenuItem Header="{DynamicResource m_german}" Command="{Binding GermanCommand}" />
+                <MenuItem Header="{DynamicResource m_english}" Command="{Binding EnglishCommand}" />
+                <MenuItem Header="{DynamicResource m_italian}" Command="{Binding ItalianCommand}" />
+            </MenuItem>
+            <MenuItem Header="{DynamicResource m_core}">
+                <MenuItem Header="{DynamicResource m_coreexit}" Command="{Binding CoreExitCommand}" />
             </MenuItem>
         </Menu>
 
@@ -42,9 +47,9 @@
         <Border DockPanel.Dock="Top" Background="{StaticResource SurfaceBrush}" Padding="8,6">
             <StackPanel Orientation="Horizontal" Spacing="8">
                 <Image Source="avares://Apfelmus.Avalonia/Assets/Images/Apple-icon.png" Width="18" Height="18" VerticalAlignment="Center" />
-                <TextBlock Text="AJLink:" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" />
+                <TextBlock Text="{DynamicResource ajlink}" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" />
                 <TextBox Width="640" Watermark="ajfsp://file|..." Text="{Binding AjLinkText, Mode=TwoWay}" />
-                <Button Content="Übertragen" Command="{Binding TransferAjLinkCommand}" />
+                <Button Content="{DynamicResource transfer}" Command="{Binding TransferAjLinkCommand}" />
                 <TextBlock Text="{Binding ConnectionStatus}" VerticalAlignment="Center" Margin="12,0,0,0" Foreground="{StaticResource AccentBrush}" />
             </StackPanel>
         </Border>
@@ -69,16 +74,16 @@
 
         <TabControl Margin="6">
             <!-- ===================== START ===================== -->
-            <TabItem Header="Start">
+            <TabItem Header="{DynamicResource t_start}">
                 <ScrollViewer>
                     <WrapPanel Margin="12">
                         <Border Classes="card" Width="280" Height="110">
                             <StackPanel Spacing="4">
-                                <TextBlock Text="Client" Classes="cardheader" />
+                                <TextBlock Text="{DynamicResource c_client}" Classes="cardheader" />
                                 <Grid ColumnDefinitions="120,*" RowDefinitions="Auto,Auto">
-                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="GUI" Classes="lbl" />
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource c_gui}" Classes="lbl" />
                                     <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding GuiVersion}" Classes="val" />
-                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Core" Classes="lbl" />
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{DynamicResource c_core}" Classes="lbl" />
                                     <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding CoreVersion}" Classes="val" />
                                 </Grid>
                             </StackPanel>
@@ -86,24 +91,24 @@
 
                         <Border Classes="card" Width="300" Height="230">
                             <StackPanel Spacing="4">
-                                <TextBlock Text="Netzwerk" Classes="cardheader" />
+                                <TextBlock Text="{DynamicResource c_network}" Classes="cardheader" />
                                 <Grid ColumnDefinitions="150,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto">
-                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Nutzer" Classes="lbl" />
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource c_users}" Classes="lbl" />
                                     <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Users}" Classes="val" />
-                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Dateien" Classes="lbl" />
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{DynamicResource c_files}" Classes="lbl" />
                                     <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Files}" Classes="val" />
-                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Gesamtgröße" Classes="lbl" />
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="{DynamicResource c_totalsize}" Classes="lbl" />
                                     <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding FileSize, Converter={StaticResource FileSizeConverter}}" Classes="val" />
-                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Verbindungen" Classes="lbl" />
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="{DynamicResource c_connections}" Classes="lbl" />
                                     <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding OpenConnections}" Classes="val" />
-                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Upload-Queue" Classes="lbl" />
+                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="{DynamicResource c_uploadqueue}" Classes="lbl" />
                                     <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding UploadQueue}" Classes="val" />
-                                    <TextBlock Grid.Row="5" Grid.Column="0" Text="Firewall" Classes="lbl" />
+                                    <TextBlock Grid.Row="5" Grid.Column="0" Text="{DynamicResource c_firewall}" Classes="lbl" />
                                     <StackPanel Grid.Row="5" Grid.Column="1" Orientation="Horizontal" Spacing="6">
                                         <Image Width="14" Height="14" Source="{Binding Firewalled, Converter={StaticResource FirewallConverter}}" />
                                         <TextBlock Classes="val" Text="{Binding Firewalled, Converter={StaticResource BoolToFirewallTextConverter}}" />
                                     </StackPanel>
-                                    <TextBlock Grid.Row="6" Grid.Column="0" Text="IP" Classes="lbl" />
+                                    <TextBlock Grid.Row="6" Grid.Column="0" Text="{DynamicResource c_ip}" Classes="lbl" />
                                     <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding OwnIp}" Classes="val" />
                                 </Grid>
                             </StackPanel>
@@ -111,14 +116,14 @@
 
                         <Border Classes="card" Width="420" Height="230">
                             <StackPanel Spacing="4">
-                                <TextBlock Text="Server" Classes="cardheader" />
+                                <TextBlock Text="{DynamicResource c_server}" Classes="cardheader" />
                                 <Grid ColumnDefinitions="120,*" RowDefinitions="Auto,Auto">
-                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Servername" Classes="lbl" />
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource c_servername}" Classes="lbl" />
                                     <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding ServerName}" Classes="val" />
-                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Verbunden seit" Classes="lbl" />
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{DynamicResource c_connectedsince}" Classes="lbl" />
                                     <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding ConnectedSince}" Classes="val" />
                                 </Grid>
-                                <TextBlock Text="Nachricht" Classes="lbl" Margin="0,6,0,0" />
+                                <TextBlock Text="{DynamicResource c_message}" Classes="lbl" Margin="0,6,0,0" />
                                 <ScrollViewer Height="120">
                                     <TextBlock Text="{Binding WelcomeMessage}" Classes="val" TextWrapping="Wrap" />
                                 </ScrollViewer>
@@ -129,22 +134,22 @@
             </TabItem>
 
             <!-- ===================== DOWNLOADS ===================== -->
-            <TabItem Header="Downloads">
+            <TabItem Header="{DynamicResource t_downloads}">
                 <DockPanel Margin="4">
                     <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" Margin="4">
-                        <Button Content="Fortsetzen" Command="{Binding ContinueCommand}" />
-                        <Button Content="Pause" Command="{Binding BreakCommand}" />
-                        <Button Content="Abbrechen" Command="{Binding CancelCommand}" />
-                        <Button Content="Fertige entfernen" Command="{Binding CleanFinishedCommand}" />
-                        <Button Content="Info-URL" Command="{Binding ReleaseInfoDownloadCommand}" />
-                        <Button Content="Link kopieren" Command="{Binding CopyDownloadLinkCommand}" />
+                        <Button Content="{DynamicResource d_continue}" Command="{Binding ContinueCommand}" />
+                        <Button Content="{DynamicResource d_break}" Command="{Binding BreakCommand}" />
+                        <Button Content="{DynamicResource d_cancel}" Command="{Binding CancelCommand}" />
+                        <Button Content="{DynamicResource d_clean}" Command="{Binding CleanFinishedCommand}" />
+                        <Button Content="{DynamicResource d_releaseinfo}" Command="{Binding ReleaseInfoDownloadCommand}" />
+                        <Button Content="{DynamicResource d_copylink}" Command="{Binding CopyDownloadLinkCommand}" />
                         <Border Width="1" Background="{StaticResource TextSecondaryBrush}" Margin="4,0" />
-                        <TextBlock Text="Power" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Text="{DynamicResource d_power}" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" />
                         <ComboBox x:CompileBindings="False" Width="70" ItemsSource="{Binding PowerValues}" SelectedItem="{Binding SelectedPowerValue}" />
-                        <Button Content="Anwenden" Command="{Binding ApplyPowerDownloadCommand}" />
-                        <TextBlock Text="Priorität" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <Button Content="{DynamicResource d_apply}" Command="{Binding ApplyPowerDownloadCommand}" />
+                        <TextBlock Text="{DynamicResource d_priority}" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" />
                         <ComboBox x:CompileBindings="False" Width="70" ItemsSource="{Binding PriorityValues}" SelectedItem="{Binding SelectedPriority}" />
-                        <Button Content="Setzen" Command="{Binding SetDownloadPriorityCommand}" />
+                        <Button Content="{DynamicResource d_setprio}" Command="{Binding SetDownloadPriorityCommand}" />
                     </StackPanel>
 
                     <Grid RowDefinitions="*,4,160,74">
@@ -157,30 +162,30 @@
                                 </Style>
                             </DataGrid.Styles>
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="Datei" Binding="{Binding FileName}" Width="*" />
-                                <DataGridTextColumn Header="Status" Binding="{Binding Status, Converter={StaticResource DownloadStatusConverter}}" Width="110" />
-                                <DataGridTextColumn Header="Größe" Binding="{Binding Size, Converter={StaticResource FileSizeConverter}}" Width="90" />
-                                <DataGridTextColumn Header="Geladen" Binding="{Binding DownloadedFilesize, Converter={StaticResource FileSizeConverter}}" Width="90" />
-                                <DataGridTextColumn Header="Speed/s" Binding="{Binding Speed, Converter={StaticResource FileSizeConverter}}" Width="90" />
-                                <DataGridTextColumn Header="Restzeit" Binding="{Binding TimeToEnd, Converter={StaticResource TimeConverter}}" Width="90" />
-                                <DataGridTextColumn Header="%" Binding="{Binding Percentages}" Width="60" />
-                                <DataGridTextColumn Header="Rest" Binding="{Binding DownloadRest, Converter={StaticResource FileSizeConverter}}" Width="90" />
-                                <DataGridTextColumn Header="Power" Binding="{Binding PowerDownload, Converter={StaticResource PowerDownloadConverter}}" Width="70" />
+                                <DataGridTextColumn Header="{DynamicResource col_file}" Binding="{Binding FileName}" Width="*" />
+                                <DataGridTextColumn Header="{DynamicResource col_status}" Binding="{Binding Status, Converter={StaticResource DownloadStatusConverter}}" Width="110" />
+                                <DataGridTextColumn Header="{DynamicResource col_size}" Binding="{Binding Size, Converter={StaticResource FileSizeConverter}}" Width="90" />
+                                <DataGridTextColumn Header="{DynamicResource col_loaded}" Binding="{Binding DownloadedFilesize, Converter={StaticResource FileSizeConverter}}" Width="90" />
+                                <DataGridTextColumn Header="{DynamicResource col_speed}" Binding="{Binding Speed, Converter={StaticResource FileSizeConverter}}" Width="90" />
+                                <DataGridTextColumn Header="{DynamicResource col_time}" Binding="{Binding TimeToEnd, Converter={StaticResource TimeConverter}}" Width="90" />
+                                <DataGridTextColumn Header="{DynamicResource col_percent}" Binding="{Binding Percentages}" Width="60" />
+                                <DataGridTextColumn Header="{DynamicResource col_rest}" Binding="{Binding DownloadRest, Converter={StaticResource FileSizeConverter}}" Width="90" />
+                                <DataGridTextColumn Header="{DynamicResource col_power}" Binding="{Binding PowerDownload, Converter={StaticResource PowerDownloadConverter}}" Width="70" />
                             </DataGrid.Columns>
                         </DataGrid>
 
                         <GridSplitter Grid.Row="1" ResizeDirection="Rows" HorizontalAlignment="Stretch" Background="{StaticResource SurfaceBrush}" />
 
                         <DockPanel Grid.Row="2">
-                            <TextBlock DockPanel.Dock="Top" Text="Quellen des gewählten Downloads" Classes="lbl" Margin="2" />
+                            <TextBlock DockPanel.Dock="Top" Text="{DynamicResource d_sources}" Classes="lbl" Margin="2" />
                             <DataGrid x:CompileBindings="False" ItemsSource="{Binding DownloadSources}" IsReadOnly="True"
                                       GridLinesVisibility="Horizontal" CanUserResizeColumns="True">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Nick" Binding="{Binding NickName}" Width="*" />
-                                    <DataGridTextColumn Header="Status" Binding="{Binding Status, Converter={StaticResource UserStatusConverter}}" Width="120" />
-                                    <DataGridTextColumn Header="Speed/s" Binding="{Binding Speed, Converter={StaticResource FileSizeConverter}}" Width="90" />
-                                    <DataGridTextColumn Header="Version" Binding="{Binding Version}" Width="120" />
-                                    <DataGridTextColumn Header="Power" Binding="{Binding PowerDownload, Converter={StaticResource PowerDownloadConverter}}" Width="70" />
+                                    <DataGridTextColumn Header="{DynamicResource col_nick}" Binding="{Binding NickName}" Width="*" />
+                                    <DataGridTextColumn Header="{DynamicResource col_status}" Binding="{Binding Status, Converter={StaticResource UserStatusConverter}}" Width="120" />
+                                    <DataGridTextColumn Header="{DynamicResource col_speed}" Binding="{Binding Speed, Converter={StaticResource FileSizeConverter}}" Width="90" />
+                                    <DataGridTextColumn Header="{DynamicResource col_version}" Binding="{Binding Version}" Width="120" />
+                                    <DataGridTextColumn Header="{DynamicResource col_power}" Binding="{Binding PowerDownload, Converter={StaticResource PowerDownloadConverter}}" Width="70" />
                                 </DataGrid.Columns>
                             </DataGrid>
                         </DockPanel>
@@ -188,13 +193,13 @@
                         <!-- Partlisten-Verfuegbarkeitsbalken des gewaehlten Downloads -->
                         <DockPanel Grid.Row="3" Margin="2,4,2,2">
                             <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="12" Margin="0,0,0,3">
-                                <TextBlock Text="Partliste" Classes="lbl" VerticalAlignment="Center" />
+                                <TextBlock Text="{DynamicResource pl_title}" Classes="lbl" VerticalAlignment="Center" />
                                 <StackPanel Orientation="Horizontal" Spacing="3" VerticalAlignment="Center">
-                                    <Rectangle Width="10" Height="10" Fill="Red" /><TextBlock Text="nicht verfügbar" Classes="lbl" />
-                                    <Rectangle Width="10" Height="10" Fill="#4C6BFF" Margin="8,0,0,0" /><TextBlock Text="verfügbar" Classes="lbl" />
-                                    <Rectangle Width="10" Height="10" Fill="Orange" Margin="8,0,0,0" /><TextBlock Text="geladen" Classes="lbl" />
-                                    <Rectangle Width="10" Height="10" Fill="Yellow" Margin="8,0,0,0" /><TextBlock Text="aktiv" Classes="lbl" />
-                                    <Rectangle Width="10" Height="10" Fill="Green" Margin="8,0,0,0" /><TextBlock Text="fertig" Classes="lbl" />
+                                    <Rectangle Width="10" Height="10" Fill="Red" /><TextBlock Text="{DynamicResource pl_unavail}" Classes="lbl" />
+                                    <Rectangle Width="10" Height="10" Fill="#4C6BFF" Margin="8,0,0,0" /><TextBlock Text="{DynamicResource pl_avail}" Classes="lbl" />
+                                    <Rectangle Width="10" Height="10" Fill="Orange" Margin="8,0,0,0" /><TextBlock Text="{DynamicResource pl_loaded}" Classes="lbl" />
+                                    <Rectangle Width="10" Height="10" Fill="Yellow" Margin="8,0,0,0" /><TextBlock Text="{DynamicResource pl_active}" Classes="lbl" />
+                                    <Rectangle Width="10" Height="10" Fill="Green" Margin="8,0,0,0" /><TextBlock Text="{DynamicResource pl_finished}" Classes="lbl" />
                                 </StackPanel>
                             </StackPanel>
                             <Border BorderBrush="{StaticResource TextSecondaryBrush}" BorderThickness="1">
@@ -206,30 +211,30 @@
             </TabItem>
 
             <!-- ===================== UPLOADS ===================== -->
-            <TabItem Header="Uploads">
+            <TabItem Header="{DynamicResource t_uploads}">
                 <DataGrid x:CompileBindings="False" Margin="4" ItemsSource="{Binding Uploads}" IsReadOnly="True"
                           GridLinesVisibility="Horizontal" CanUserResizeColumns="True">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Datei" Binding="{Binding FileName}" Width="*" />
-                        <DataGridTextColumn Header="Nick" Binding="{Binding Nick}" Width="140" />
-                        <DataGridTextColumn Header="Speed/s" Binding="{Binding Speed, Converter={StaticResource FileSizeConverter}}" Width="90" />
-                        <DataGridTextColumn Header="%" Binding="{Binding Percentages}" Width="70" />
-                        <DataGridTextColumn Header="Priorität" Binding="{Binding Priority}" Width="80" />
-                        <DataGridTextColumn Header="Version" Binding="{Binding Version}" Width="140" />
+                        <DataGridTextColumn Header="{DynamicResource col_file}" Binding="{Binding FileName}" Width="*" />
+                        <DataGridTextColumn Header="{DynamicResource col_nick}" Binding="{Binding Nick}" Width="140" />
+                        <DataGridTextColumn Header="{DynamicResource col_speed}" Binding="{Binding Speed, Converter={StaticResource FileSizeConverter}}" Width="90" />
+                        <DataGridTextColumn Header="{DynamicResource col_percent}" Binding="{Binding Percentages}" Width="70" />
+                        <DataGridTextColumn Header="{DynamicResource col_prio}" Binding="{Binding Priority}" Width="80" />
+                        <DataGridTextColumn Header="{DynamicResource col_version}" Binding="{Binding Version}" Width="140" />
                     </DataGrid.Columns>
                 </DataGrid>
             </TabItem>
 
             <!-- ===================== SUCHEN ===================== -->
-            <TabItem Header="Suchen">
+            <TabItem Header="{DynamicResource t_search}">
                 <DockPanel Margin="4">
                     <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" Margin="4">
-                        <TextBox Width="300" Watermark="Suchbegriff..." Text="{Binding SearchText, Mode=TwoWay}" />
-                        <Button Content="Suchen" Command="{Binding StartSearchCommand}" />
-                        <Button Content="Stopp" Command="{Binding StopSearchCommand}" />
-                        <Button Content="Download" Command="{Binding DownloadSearchResultCommand}" />
-                        <Button Content="Info-URL" Command="{Binding ReleaseInfoSearchCommand}" />
-                        <Button Content="Link kopieren" Command="{Binding CopySearchLinkCommand}" />
+                        <TextBox Width="300" Watermark="{DynamicResource s_placeholder}" Text="{Binding SearchText, Mode=TwoWay}" />
+                        <Button Content="{DynamicResource s_search}" Command="{Binding StartSearchCommand}" />
+                        <Button Content="{DynamicResource s_stop}" Command="{Binding StopSearchCommand}" />
+                        <Button Content="{DynamicResource s_download}" Command="{Binding DownloadSearchResultCommand}" />
+                        <Button Content="{DynamicResource d_releaseinfo}" Command="{Binding ReleaseInfoSearchCommand}" />
+                        <Button Content="{DynamicResource d_copylink}" Command="{Binding CopySearchLinkCommand}" />
                         <TextBlock VerticalAlignment="Center" Margin="10,0,0,0" Foreground="{StaticResource TextSecondaryBrush}">
                             <Run Text="Treffer: " /><Run Text="{Binding FoundFiles}" /><Run Text="  Quellen: " /><Run Text="{Binding SumSearches}" />
                         </TextBlock>
@@ -238,21 +243,21 @@
                               SelectedItem="{Binding SelectedSearchResult}" IsReadOnly="True"
                               GridLinesVisibility="Horizontal" CanUserResizeColumns="True">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Datei" Binding="{Binding FileName.Name}" Width="*" />
-                            <DataGridTextColumn Header="Größe" Binding="{Binding Size, Converter={StaticResource FileSizeConverter}}" Width="100" />
-                            <DataGridTextColumn Header="Prüfsumme" Binding="{Binding Checksum}" Width="260" />
+                            <DataGridTextColumn Header="{DynamicResource col_file}" Binding="{Binding FileName.Name}" Width="*" />
+                            <DataGridTextColumn Header="{DynamicResource col_size}" Binding="{Binding Size, Converter={StaticResource FileSizeConverter}}" Width="100" />
+                            <DataGridTextColumn Header="{DynamicResource col_checksum}" Binding="{Binding Checksum}" Width="260" />
                         </DataGrid.Columns>
                     </DataGrid>
                 </DockPanel>
             </TabItem>
 
             <!-- ===================== SERVER ===================== -->
-            <TabItem Header="Server">
+            <TabItem Header="{DynamicResource t_server}">
                 <DockPanel Margin="4">
                     <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" Margin="4">
-                        <Button Content="Verbinden" Command="{Binding ConnectServerCommand}" />
-                        <Button Content="Entfernen" Command="{Binding RemoveServerCommand}" />
-                        <Button Content="Serverliste holen" Command="{Binding AddOfficialServersCommand}" />
+                        <Button Content="{DynamicResource sv_connect}" Command="{Binding ConnectServerCommand}" />
+                        <Button Content="{DynamicResource sv_remove}" Command="{Binding RemoveServerCommand}" />
+                        <Button Content="{DynamicResource sv_getlist}" Command="{Binding AddOfficialServersCommand}" />
                     </StackPanel>
                     <DataGrid x:CompileBindings="False" ItemsSource="{Binding Servers}"
                               SelectedItem="{Binding SelectedServer}" IsReadOnly="True"
@@ -263,103 +268,103 @@
                             </Style>
                         </DataGrid.Styles>
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*" />
-                            <DataGridTextColumn Header="Host" Binding="{Binding Host}" Width="220" />
-                            <DataGridTextColumn Header="Port" Binding="{Binding Port}" Width="80" />
-                            <DataGridTextColumn Header="Zuletzt gesehen" Binding="{Binding LastSeen, Converter={StaticResource SecondsToDateConverter}}" Width="150" />
-                            <DataGridTextColumn Header="Versuche" Binding="{Binding ConnectionTry}" Width="90" />
+                            <DataGridTextColumn Header="{DynamicResource col_name}" Binding="{Binding Name}" Width="*" />
+                            <DataGridTextColumn Header="{DynamicResource col_host}" Binding="{Binding Host}" Width="220" />
+                            <DataGridTextColumn Header="{DynamicResource col_port}" Binding="{Binding Port}" Width="80" />
+                            <DataGridTextColumn Header="{DynamicResource col_lastseen}" Binding="{Binding LastSeen, Converter={StaticResource SecondsToDateConverter}}" Width="150" />
+                            <DataGridTextColumn Header="{DynamicResource col_tries}" Binding="{Binding ConnectionTry}" Width="90" />
                         </DataGrid.Columns>
                     </DataGrid>
                 </DockPanel>
             </TabItem>
 
             <!-- ===================== MEIN SHARE ===================== -->
-            <TabItem Header="Mein Share">
+            <TabItem Header="{DynamicResource t_share}">
                 <DockPanel Margin="4">
                     <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" Margin="4">
-                        <TextBlock Text="Priorität" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Text="{DynamicResource d_priority}" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" />
                         <ComboBox x:CompileBindings="False" Width="70" ItemsSource="{Binding PriorityValues}" SelectedItem="{Binding SelectedPriority}" />
-                        <Button Content="Priorität setzen" Command="{Binding SetSharePriorityCommand}" />
-                        <Button Content="Priorität zurück" Command="{Binding DelSharePriorityCommand}" />
-                        <Button Content="Link kopieren" Command="{Binding CopyShareLinkCommand}" />
-                        <Button Content="Info-URL" Command="{Binding ReleaseInfoShareCommand}" />
+                        <Button Content="{DynamicResource sh_setprio}" Command="{Binding SetSharePriorityCommand}" />
+                        <Button Content="{DynamicResource sh_delprio}" Command="{Binding DelSharePriorityCommand}" />
+                        <Button Content="{DynamicResource d_copylink}" Command="{Binding CopyShareLinkCommand}" />
+                        <Button Content="{DynamicResource d_releaseinfo}" Command="{Binding ReleaseInfoShareCommand}" />
                     </StackPanel>
                     <DataGrid x:CompileBindings="False" ItemsSource="{Binding Shares}"
                               SelectedItem="{Binding SelectedShare}" IsReadOnly="True"
                               GridLinesVisibility="Horizontal" CanUserResizeColumns="True">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Datei" Binding="{Binding ShortFileName}" Width="*" />
-                            <DataGridTextColumn Header="Größe" Binding="{Binding Size, Converter={StaticResource FileSizeConverter}}" Width="100" />
-                            <DataGridTextColumn Header="Priorität" Binding="{Binding Priority}" Width="80" />
-                            <DataGridTextColumn Header="Zuletzt" Binding="{Binding LastAsked, Converter={StaticResource SecondsToDateConverter}}" Width="150" />
-                            <DataGridTextColumn Header="Anfragen" Binding="{Binding AskCount}" Width="90" />
-                            <DataGridTextColumn Header="Suchtreffer" Binding="{Binding SearchCount}" Width="100" />
+                            <DataGridTextColumn Header="{DynamicResource col_file}" Binding="{Binding ShortFileName}" Width="*" />
+                            <DataGridTextColumn Header="{DynamicResource col_size}" Binding="{Binding Size, Converter={StaticResource FileSizeConverter}}" Width="100" />
+                            <DataGridTextColumn Header="{DynamicResource col_prio}" Binding="{Binding Priority}" Width="80" />
+                            <DataGridTextColumn Header="{DynamicResource col_lastasked}" Binding="{Binding LastAsked, Converter={StaticResource SecondsToDateConverter}}" Width="150" />
+                            <DataGridTextColumn Header="{DynamicResource col_asks}" Binding="{Binding AskCount}" Width="90" />
+                            <DataGridTextColumn Header="{DynamicResource col_hits}" Binding="{Binding SearchCount}" Width="100" />
                         </DataGrid.Columns>
                     </DataGrid>
                 </DockPanel>
             </TabItem>
 
             <!-- ===================== EINSTELLUNGEN ===================== -->
-            <TabItem Header="Einstellungen">
+            <TabItem Header="{DynamicResource t_settings}">
                 <ScrollViewer>
                 <StackPanel Margin="16" Spacing="12" MaxWidth="680" HorizontalAlignment="Left">
-                    <TextBlock Text="GUI" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
+                    <TextBlock Text="{DynamicResource c_gui}" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
                     <Grid ColumnDefinitions="220,*" RowDefinitions="Auto,Auto,Auto">
-                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Refreshrate (ms)" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource set_refresh}" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" />
                         <TextBox Grid.Row="0" Grid.Column="1" Width="120" HorizontalAlignment="Left" Text="{Binding RefreshRate, Mode=TwoWay}" />
-                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Info-URL (%s = Dateilink)" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,8,0,0" />
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="{DynamicResource set_infourl}" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,8,0,0" />
                         <TextBox Grid.Row="1" Grid.Column="1" Margin="0,8,0,0" Text="{Binding ReleaseInfoHost, Mode=TwoWay}" />
-                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Design" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,8,0,0" />
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="{DynamicResource set_design}" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,8,0,0" />
                         <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0,8,0,0">
                             <Button Content="Dunkel" Command="{Binding ApplyDarkThemeCommand}" />
                             <Button Content="Hell" Command="{Binding ApplyLightThemeCommand}" />
                         </StackPanel>
                     </Grid>
                     <StackPanel Orientation="Horizontal" Spacing="10">
-                        <Button Content="GUI speichern" Command="{Binding SaveSettingsCommand}" Background="{StaticResource AccentBrush}" Foreground="White" />
+                        <Button Content="{DynamicResource set_guisave}" Command="{Binding SaveSettingsCommand}" Background="{StaticResource AccentBrush}" Foreground="White" />
                         <TextBlock Text="{Binding SettingsStatus}" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" />
                     </StackPanel>
 
                     <Border Height="1" Background="{StaticResource SurfaceBrush}" Margin="0,8" />
 
-                    <TextBlock Text="Core-Einstellungen" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
+                    <TextBlock Text="{DynamicResource set_core}" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
                     <Grid ColumnDefinitions="220,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
-                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Nickname" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource set_nick}" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" />
                         <TextBox  Grid.Row="0" Grid.Column="1" Text="{Binding CoreNick, Mode=TwoWay}" />
-                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Temp-Verzeichnis" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,0" />
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="{DynamicResource set_tempdir}" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,0" />
                         <TextBox  Grid.Row="1" Grid.Column="1" Margin="0,6,0,0" Text="{Binding CoreTempDir, Mode=TwoWay}" />
-                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Incoming-Verzeichnis" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,0" />
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="{DynamicResource set_incdir}" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,0" />
                         <TextBox  Grid.Row="2" Grid.Column="1" Margin="0,6,0,0" Text="{Binding CoreIncomingDir, Mode=TwoWay}" />
-                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Core-Port" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,0" />
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="{DynamicResource set_coreport}" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,0" />
                         <TextBox  Grid.Row="3" Grid.Column="1" Width="120" HorizontalAlignment="Left" Margin="0,6,0,0" Text="{Binding CorePort, Mode=TwoWay}" />
-                        <TextBlock Grid.Row="4" Grid.Column="0" Text="XML-Port" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,0" />
+                        <TextBlock Grid.Row="4" Grid.Column="0" Text="{DynamicResource set_xmlport}" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,0" />
                         <TextBox  Grid.Row="4" Grid.Column="1" Width="120" HorizontalAlignment="Left" Margin="0,6,0,0" Text="{Binding CoreXmlPort, Mode=TwoWay}" />
-                        <TextBlock Grid.Row="5" Grid.Column="0" Text="Max. Verbindungen" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,0" />
+                        <TextBlock Grid.Row="5" Grid.Column="0" Text="{DynamicResource set_maxconn}" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,0" />
                         <TextBox  Grid.Row="5" Grid.Column="1" Width="120" HorizontalAlignment="Left" Margin="0,6,0,0" Text="{Binding CoreMaxConnections, Mode=TwoWay}" />
-                        <TextBlock Grid.Row="6" Grid.Column="0" Text="Max. Upload (Bytes/s)" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,0" />
+                        <TextBlock Grid.Row="6" Grid.Column="0" Text="{DynamicResource set_maxup}" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,0" />
                         <TextBox  Grid.Row="6" Grid.Column="1" Width="160" HorizontalAlignment="Left" Margin="0,6,0,0" Text="{Binding CoreMaxUpload, Mode=TwoWay}" />
-                        <TextBlock Grid.Row="7" Grid.Column="0" Text="Max. Download (Bytes/s)" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,0" />
+                        <TextBlock Grid.Row="7" Grid.Column="0" Text="{DynamicResource set_maxdown}" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,0" />
                         <TextBox  Grid.Row="7" Grid.Column="1" Width="160" HorizontalAlignment="Left" Margin="0,6,0,0" Text="{Binding CoreMaxDownload, Mode=TwoWay}" />
-                        <TextBlock Grid.Row="8" Grid.Column="0" Text="Speed pro Slot" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,0" />
+                        <TextBlock Grid.Row="8" Grid.Column="0" Text="{DynamicResource set_speedslot}" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,0" />
                         <TextBox  Grid.Row="8" Grid.Column="1" Width="160" HorizontalAlignment="Left" Margin="0,6,0,0" Text="{Binding CoreSpeedPerSlot, Mode=TwoWay}" />
-                        <TextBlock Grid.Row="9" Grid.Column="0" Text="Neue Verb./Runde" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,0" />
+                        <TextBlock Grid.Row="9" Grid.Column="0" Text="{DynamicResource set_newconn}" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,0" />
                         <TextBox  Grid.Row="9" Grid.Column="1" Width="120" HorizontalAlignment="Left" Margin="0,6,0,0" Text="{Binding CoreMaxNewConnectionsPerTurn, Mode=TwoWay}" />
-                        <TextBlock Grid.Row="10" Grid.Column="0" Text="Quellen pro Datei" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,0" />
+                        <TextBlock Grid.Row="10" Grid.Column="0" Text="{DynamicResource set_sources}" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,0" />
                         <TextBox  Grid.Row="10" Grid.Column="1" Width="120" HorizontalAlignment="Left" Margin="0,6,0,0" Text="{Binding CoreMaxSourcesPerFile, Mode=TwoWay}" />
                     </Grid>
-                    <CheckBox Content="Automatisch verbinden" IsChecked="{Binding CoreAutoConnect, Mode=TwoWay}" Foreground="{StaticResource TextPrimaryBrush}" />
+                    <CheckBox Content="{DynamicResource set_autoconnect}" IsChecked="{Binding CoreAutoConnect, Mode=TwoWay}" Foreground="{StaticResource TextPrimaryBrush}" />
                     <StackPanel Orientation="Horizontal" Spacing="10">
-                        <Button Content="Core laden" Command="{Binding LoadCoreSettingsCommand}" />
-                        <Button Content="Core speichern" Command="{Binding SaveCoreSettingsCommand}" Background="{StaticResource AccentBrush}" Foreground="White" />
+                        <Button Content="{DynamicResource set_coreload}" Command="{Binding LoadCoreSettingsCommand}" />
+                        <Button Content="{DynamicResource set_coresave}" Command="{Binding SaveCoreSettingsCommand}" Background="{StaticResource AccentBrush}" Foreground="White" />
                         <TextBlock Text="{Binding CoreSettingsStatus}" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" />
                     </StackPanel>
 
                     <Border Height="1" Background="{StaticResource SurfaceBrush}" Margin="0,8" />
 
-                    <TextBlock Text="Passwort ändern" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
+                    <TextBlock Text="{DynamicResource set_pwchange}" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
                     <StackPanel Orientation="Horizontal" Spacing="10">
-                        <TextBox Width="220" PasswordChar="•" Watermark="Neues Passwort" Text="{Binding NewPassword, Mode=TwoWay}" />
-                        <Button Content="Passwort setzen" Command="{Binding ChangePasswordCommand}" />
+                        <TextBox Width="220" PasswordChar="•" Watermark="{DynamicResource set_newpw}" Text="{Binding NewPassword, Mode=TwoWay}" />
+                        <Button Content="{DynamicResource set_pwset}" Command="{Binding ChangePasswordCommand}" />
                     </StackPanel>
                 </StackPanel>
                 </ScrollViewer>

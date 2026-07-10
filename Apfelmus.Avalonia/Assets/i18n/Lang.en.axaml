@@ -1,0 +1,119 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="using:System">
+    <sys:String x:Key="m_design">Theme</sys:String>
+    <sys:String x:Key="m_dark">Dark</sys:String>
+    <sys:String x:Key="m_light">Light</sys:String>
+    <sys:String x:Key="m_language">Language</sys:String>
+    <sys:String x:Key="m_german">Deutsch</sys:String>
+    <sys:String x:Key="m_english">English</sys:String>
+    <sys:String x:Key="m_italian">Italiano</sys:String>
+    <sys:String x:Key="m_core">Core</sys:String>
+    <sys:String x:Key="m_coreexit">Quit core</sys:String>
+
+    <sys:String x:Key="ajlink">AJLink:</sys:String>
+    <sys:String x:Key="transfer">Transfer</sys:String>
+
+    <sys:String x:Key="t_start">Home</sys:String>
+    <sys:String x:Key="t_downloads">Downloads</sys:String>
+    <sys:String x:Key="t_uploads">Uploads</sys:String>
+    <sys:String x:Key="t_search">Search</sys:String>
+    <sys:String x:Key="t_server">Server</sys:String>
+    <sys:String x:Key="t_share">My share</sys:String>
+    <sys:String x:Key="t_settings">Settings</sys:String>
+
+    <sys:String x:Key="c_client">Client</sys:String>
+    <sys:String x:Key="c_gui">GUI</sys:String>
+    <sys:String x:Key="c_core">Core</sys:String>
+    <sys:String x:Key="c_network">Network</sys:String>
+    <sys:String x:Key="c_users">Users</sys:String>
+    <sys:String x:Key="c_files">Files</sys:String>
+    <sys:String x:Key="c_totalsize">Total size</sys:String>
+    <sys:String x:Key="c_connections">Connections</sys:String>
+    <sys:String x:Key="c_uploadqueue">Upload queue</sys:String>
+    <sys:String x:Key="c_firewall">Firewall</sys:String>
+    <sys:String x:Key="c_ip">IP</sys:String>
+    <sys:String x:Key="c_server">Server</sys:String>
+    <sys:String x:Key="c_servername">Server name</sys:String>
+    <sys:String x:Key="c_connectedsince">Connected since</sys:String>
+    <sys:String x:Key="c_message">Message</sys:String>
+
+    <sys:String x:Key="d_continue">Continue</sys:String>
+    <sys:String x:Key="d_break">Pause</sys:String>
+    <sys:String x:Key="d_cancel">Cancel</sys:String>
+    <sys:String x:Key="d_clean">Remove finished</sys:String>
+    <sys:String x:Key="d_releaseinfo">Info URL</sys:String>
+    <sys:String x:Key="d_copylink">Copy link</sys:String>
+    <sys:String x:Key="d_power">Power</sys:String>
+    <sys:String x:Key="d_apply">Apply</sys:String>
+    <sys:String x:Key="d_priority">Priority</sys:String>
+    <sys:String x:Key="d_setprio">Set</sys:String>
+    <sys:String x:Key="d_sources">Sources of the selected download</sys:String>
+
+    <sys:String x:Key="col_file">File</sys:String>
+    <sys:String x:Key="col_status">Status</sys:String>
+    <sys:String x:Key="col_size">Size</sys:String>
+    <sys:String x:Key="col_loaded">Loaded</sys:String>
+    <sys:String x:Key="col_speed">Speed/s</sys:String>
+    <sys:String x:Key="col_time">Time left</sys:String>
+    <sys:String x:Key="col_percent">%</sys:String>
+    <sys:String x:Key="col_rest">Rest</sys:String>
+    <sys:String x:Key="col_power">Power</sys:String>
+    <sys:String x:Key="col_nick">Nick</sys:String>
+    <sys:String x:Key="col_version">Version</sys:String>
+    <sys:String x:Key="col_prio">Priority</sys:String>
+    <sys:String x:Key="col_name">Name</sys:String>
+    <sys:String x:Key="col_host">Host</sys:String>
+    <sys:String x:Key="col_port">Port</sys:String>
+    <sys:String x:Key="col_lastseen">Last seen</sys:String>
+    <sys:String x:Key="col_tries">Tries</sys:String>
+    <sys:String x:Key="col_checksum">Checksum</sys:String>
+    <sys:String x:Key="col_lastasked">Last</sys:String>
+    <sys:String x:Key="col_asks">Requests</sys:String>
+    <sys:String x:Key="col_hits">Search hits</sys:String>
+
+    <sys:String x:Key="s_search">Search</sys:String>
+    <sys:String x:Key="s_stop">Stop</sys:String>
+    <sys:String x:Key="s_download">Download</sys:String>
+    <sys:String x:Key="s_placeholder">Search term...</sys:String>
+    <sys:String x:Key="s_hits">Hits:</sys:String>
+    <sys:String x:Key="s_sources">Sources:</sys:String>
+
+    <sys:String x:Key="sv_connect">Connect</sys:String>
+    <sys:String x:Key="sv_remove">Remove</sys:String>
+    <sys:String x:Key="sv_getlist">Get server list</sys:String>
+
+    <sys:String x:Key="sh_setprio">Set priority</sys:String>
+    <sys:String x:Key="sh_delprio">Reset priority</sys:String>
+
+    <sys:String x:Key="set_gui">GUI</sys:String>
+    <sys:String x:Key="set_refresh">Refresh rate (ms)</sys:String>
+    <sys:String x:Key="set_infourl">Info URL (%s = file link)</sys:String>
+    <sys:String x:Key="set_design">Theme</sys:String>
+    <sys:String x:Key="set_guisave">Save GUI</sys:String>
+    <sys:String x:Key="set_core">Core settings</sys:String>
+    <sys:String x:Key="set_nick">Nickname</sys:String>
+    <sys:String x:Key="set_tempdir">Temp directory</sys:String>
+    <sys:String x:Key="set_incdir">Incoming directory</sys:String>
+    <sys:String x:Key="set_coreport">Core port</sys:String>
+    <sys:String x:Key="set_xmlport">XML port</sys:String>
+    <sys:String x:Key="set_maxconn">Max. connections</sys:String>
+    <sys:String x:Key="set_maxup">Max. upload (bytes/s)</sys:String>
+    <sys:String x:Key="set_maxdown">Max. download (bytes/s)</sys:String>
+    <sys:String x:Key="set_speedslot">Speed per slot</sys:String>
+    <sys:String x:Key="set_newconn">New conn./turn</sys:String>
+    <sys:String x:Key="set_sources">Sources per file</sys:String>
+    <sys:String x:Key="set_autoconnect">Connect automatically</sys:String>
+    <sys:String x:Key="set_coreload">Load core</sys:String>
+    <sys:String x:Key="set_coresave">Save core</sys:String>
+    <sys:String x:Key="set_pwchange">Change password</sys:String>
+    <sys:String x:Key="set_newpw">New password</sys:String>
+    <sys:String x:Key="set_pwset">Set password</sys:String>
+
+    <sys:String x:Key="pl_title">Part list</sys:String>
+    <sys:String x:Key="pl_unavail">unavailable</sys:String>
+    <sys:String x:Key="pl_avail">available</sys:String>
+    <sys:String x:Key="pl_loaded">loaded</sys:String>
+    <sys:String x:Key="pl_active">active</sys:String>
+    <sys:String x:Key="pl_finished">finished</sys:String>
+</ResourceDictionary>

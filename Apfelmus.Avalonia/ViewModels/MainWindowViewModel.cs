@@ -55,6 +55,9 @@ namespace Apfelmus.Avalonia.ViewModels
             CoreExitCommand = new RelayCommand(() => _client.ExitCoreAsync());
             ApplyDarkThemeCommand = new RelayCommand(() => ApplyTheme(ThemeNames.Dark));
             ApplyLightThemeCommand = new RelayCommand(() => ApplyTheme(ThemeNames.Light));
+            GermanCommand = new RelayCommand(() => ApplyLanguage("de"));
+            EnglishCommand = new RelayCommand(() => ApplyLanguage("en"));
+            ItalianCommand = new RelayCommand(() => ApplyLanguage("it"));
             SaveSettingsCommand = new RelayCommand(SaveSettings);
             LoadCoreSettingsCommand = new RelayCommand(LoadCoreSettingsAsync);
             SaveCoreSettingsCommand = new RelayCommand(SaveCoreSettingsAsync);
@@ -93,6 +96,9 @@ namespace Apfelmus.Avalonia.ViewModels
             _timer.Start();
             _ = PollAsync();
             _ = LoadCoreSettingsAsync();
+
+            // Gespeicherte Sprache anwenden.
+            LanguageManager.Apply(LanguageManager.Normalize(config.LanguageFile));
         }
 
         /// <summary>Wird von der View gesetzt/abonniert, um Text in die Zwischenablage zu legen.</summary>
@@ -113,6 +119,9 @@ namespace Apfelmus.Avalonia.ViewModels
         public RelayCommand CoreExitCommand { get; }
         public RelayCommand ApplyDarkThemeCommand { get; }
         public RelayCommand ApplyLightThemeCommand { get; }
+        public RelayCommand GermanCommand { get; }
+        public RelayCommand EnglishCommand { get; }
+        public RelayCommand ItalianCommand { get; }
         public RelayCommand SaveSettingsCommand { get; }
         public RelayCommand LoadCoreSettingsCommand { get; }
         public RelayCommand SaveCoreSettingsCommand { get; }
@@ -464,6 +473,13 @@ namespace Apfelmus.Avalonia.ViewModels
             }
             catch (Exception ex) { CoreSettingsStatus = "Passwort-Fehler: " + ex.Message; }
             NewPassword = string.Empty;
+        }
+
+        private Task ApplyLanguage(string code)
+        {
+            LanguageManager.Apply(code);
+            try { _config.LanguageFile = code; ConfigSerializer.SerializeToFile(_config); } catch { }
+            return Task.CompletedTask;
         }
 
         private Task ApplyTheme(string theme)
