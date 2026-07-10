@@ -1,6 +1,7 @@
-# ARCHITECTURE.md
+# Architektur & Entwicklungshinweise
 
-This file provides guidance to the development environment when working with code in this repository.
+Diese Datei fasst Aufbau, Konventionen und Fallstricke des Repositories fuer die
+Weiterentwicklung zusammen.
 
 ## Repository Overview
 
@@ -69,4 +70,4 @@ Runtime-switchable Dark/Light theme (`Apfelmus/Logic/ThemeManager.cs`), charcoal
 
 ### Git conventions
 
-Do not add a `AI trailer` trailer to commit messages in this repo (explicit user preference).
+Do not add any AI/tool `Co-Authored-By:` trailer to commit messages in this repo (explicit user preference).
