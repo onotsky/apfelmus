@@ -37,6 +37,7 @@
             <conv:DownloadRowBrushConverter x:Key="DownloadRowBrushConverter" />
             <conv:ServerRowBrushConverter x:Key="ServerRowBrushConverter" />
             <conv:ExtensionToIconConverter x:Key="FileIconConverter" />
+            <conv:PercentTextConverter x:Key="PercentTextConverter" />
         </ResourceDictionary>
     </Application.Resources>
 

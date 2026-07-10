@@ -45,6 +45,17 @@ namespace Apfelmus.Avalonia.Views
             }
         }
 
+        // ---- Mein Share: Mehrfachauswahl ----
+        // Avalonias DataGrid.SelectedItems ist nicht bindbar; die markierten Freigaben werden
+        // daher hier ausgelesen und dem ViewModel zum Kopieren der ajfsp-Links uebergeben.
+        private void CopyShareLinks_Click(object? sender, RoutedEventArgs e)
+        {
+            if (DataContext is MainWindowViewModel vm && SharesGrid?.SelectedItems is { Count: > 0 } sel)
+            {
+                vm.CopyShareLinks(sel);
+            }
+        }
+
         // ---- Eigene Titelleiste ----
         private void TitleBar_PointerPressed(object? sender, PointerPressedEventArgs e)
         {

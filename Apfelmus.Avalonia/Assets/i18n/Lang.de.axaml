@@ -45,6 +45,7 @@
     <sys:String x:Key="d_releaseinfo">Info-URL</sys:String>
     <sys:String x:Key="d_copylink">Link kopieren</sys:String>
     <sys:String x:Key="d_copysource">Quelle kopieren</sys:String>
+    <sys:String x:Key="d_copylinks">Links kopieren</sys:String>
     <sys:String x:Key="d_rename">Neuer Dateiname</sys:String>
     <sys:String x:Key="d_renamebtn">Umbenennen</sys:String>
     <sys:String x:Key="u_active">Aktive Uploads</sys:String>
@@ -96,6 +97,10 @@
     <sys:String x:Key="sh_sharesub">Freigeben + Unterordner</sys:String>
     <sys:String x:Key="sh_unshare">Freigabe entfernen</sys:String>
     <sys:String x:Key="sh_dirs">Verzeichnisse</sys:String>
+    <sys:String x:Key="sh_refresh">Anzeige erneuern</sys:String>
+    <sys:String x:Key="sh_check">Shareprüfung starten</sys:String>
+    <sys:String x:Key="sh_filter">Filter:</sys:String>
+    <sys:String x:Key="sh_showall">Alle anzeigen</sys:String>
 
     <sys:String x:Key="set_gui">GUI</sys:String>
     <sys:String x:Key="set_refresh">Refreshrate (ms)</sys:String>

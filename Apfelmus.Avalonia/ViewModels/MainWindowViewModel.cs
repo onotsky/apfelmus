@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Avalonia;
+using Avalonia.Collections;
 using Avalonia.Media.Imaging;
 using Avalonia.Styling;
 using Avalonia.Threading;
@@ -98,6 +99,14 @@ namespace Apfelmus.Avalonia.ViewModels
             DelSharePriorityCommand = new RelayCommand(async () => { if (SelectedShare != null) { await _client.SetDownloadPriorityAsync(SelectedShare.Id, 1); } }, () => SelectedShare != null);
             ReleaseInfoShareCommand = new RelayCommand(() => { if (SelectedShare != null) OpenReleaseInfo(SelectedShare.ShortFileName, SelectedShare.CheckSum, SelectedShare.Size.ToString()); return Task.CompletedTask; }, () => SelectedShare != null);
             CopyShareLinkCommand = new RelayCommand(() => { if (SelectedShare != null) RaiseCopy(BuildAjfsp(SelectedShare.ShortFileName, SelectedShare.CheckSum, SelectedShare.Size.ToString())); return Task.CompletedTask; }, () => SelectedShare != null);
+            RefreshShareCommand = new RelayCommand(RefreshSharesAsync);
+            CheckShareCommand = new RelayCommand(CheckShareAsync);
+            ShowAllSharesCommand = new RelayCommand(() =>
+            {
+                SelectedShareNode = null;
+                ShareFilterText = string.Empty; // loest ApplyShareFilter aus
+                return Task.CompletedTask;
+            });
 
             // Freigabe-Verzeichnisbaum
             LoadShareTreeCommand = new RelayCommand(LoadShareTreeAsync);
@@ -110,6 +119,7 @@ namespace Apfelmus.Avalonia.ViewModels
             _timer.Start();
             _ = PollAsync();
             _ = LoadCoreSettingsAsync();
+            _ = RefreshSharesAsync();   // Freigaben einmalig laden (danach nur manuell, siehe PollAsync).
 
             // Gespeicherte Sprache anwenden.
             LanguageManager.Apply(LanguageManager.Normalize(config.LanguageFile));
@@ -171,6 +181,9 @@ namespace Apfelmus.Avalonia.ViewModels
         public RelayCommand DelSharePriorityCommand { get; }
         public RelayCommand ReleaseInfoShareCommand { get; }
         public RelayCommand CopyShareLinkCommand { get; }
+        public RelayCommand RefreshShareCommand { get; }
+        public RelayCommand CheckShareCommand { get; }
+        public RelayCommand ShowAllSharesCommand { get; }
         public RelayCommand LoadShareTreeCommand { get; }
         public RelayCommand ShareFolderCommand { get; }
         public RelayCommand ShareFolderNoSubCommand { get; }
@@ -180,6 +193,18 @@ namespace Apfelmus.Avalonia.ViewModels
 
         /// <summary>Freigegebene Dateien, gefiltert auf den im Baum gewaehlten Ordner (explorer-artig, wie WPF).</summary>
         public ObservableCollection<ShareItem> FilteredShares { get; }
+
+        /// <summary>
+        /// Nach Ordner gruppierte Sicht auf <see cref="FilteredShares"/> (Gruppierschluessel = Share.Path,
+        /// analog zur WPF-PropertyGroupDescription "Path"). Der DataGrid rendert die Gruppen als
+        /// aufklappbare Kopfzeilen. Wird bei Filterwechsel/Refresh neu aufgebaut.
+        /// </summary>
+        private DataGridCollectionView? _sharesView;
+        public DataGridCollectionView? SharesView
+        {
+            get => _sharesView;
+            private set => SetProperty(ref _sharesView, value);
+        }
 
         private DirNodeViewModel? _selectedShareNode;
         public DirNodeViewModel? SelectedShareNode
@@ -197,18 +222,36 @@ namespace Apfelmus.Avalonia.ViewModels
             }
         }
 
+        private string _shareFilterText = string.Empty;
+        /// <summary>Freitext-Filter der Share-Anzeige (Teilstring im Dateinamen), analog zum WPF-Filterfeld.</summary>
+        public string ShareFilterText
+        {
+            get => _shareFilterText;
+            set { if (SetProperty(ref _shareFilterText, value)) ApplyShareFilter(); }
+        }
+
         private void ApplyShareFilter()
         {
             string? path = SelectedShareNode?.Path;
+            string? text = string.IsNullOrWhiteSpace(_shareFilterText) ? null : _shareFilterText.Trim();
             FilteredShares.Clear();
             foreach (var s in Shares)
             {
-                if (string.IsNullOrEmpty(path)
-                    || (s.FileName != null && s.FileName.StartsWith(path, System.StringComparison.OrdinalIgnoreCase)))
-                {
-                    FilteredShares.Add(s);
-                }
+                // (a) auf den im Baum gewaehlten Ordner eingrenzen ...
+                if (!string.IsNullOrEmpty(path)
+                    && (s.FileName == null || !s.FileName.StartsWith(path, StringComparison.OrdinalIgnoreCase)))
+                    continue;
+                // (b) ... und auf den Freitext im Dateinamen (Teilstring, wie WPF).
+                if (text != null
+                    && (s.ShortFileName == null || s.ShortFileName.IndexOf(text, StringComparison.OrdinalIgnoreCase) < 0))
+                    continue;
+                FilteredShares.Add(s);
             }
+
+            // Gruppierte Sicht neu aufbauen (Gruppierung nach Ordner = Share.Path).
+            var view = new DataGridCollectionView(FilteredShares);
+            view.GroupDescriptions.Add(new DataGridPathGroupDescription(nameof(ShareItem.Path)));
+            SharesView = view;
         }
 
         // ---- Start / Uebersicht ----
@@ -320,10 +363,20 @@ namespace Apfelmus.Avalonia.ViewModels
             if (info == null) { ConnectionStatus = "Keine Verbindung zum Core"; return; }
             ConnectionStatus = "Verbunden";
 
-            if (info.GeneralInformation != null) CoreVersion = info.GeneralInformation.Version ?? "-";
-            if (info.NetworkInfo != null)
+            // information.xml liefert NUR die GeneralInformation (Core-Version + Dateisystem-Trenner).
+            if (info.GeneralInformation != null)
             {
-                var n = info.NetworkInfo;
+                CoreVersion = info.GeneralInformation.Version ?? "-";
+                if (!string.IsNullOrEmpty(info.GeneralInformation.FileSystem?.Seperator))
+                    _fileSeparator = info.GeneralInformation.FileSystem.Seperator;
+            }
+
+            // Netzwerk- UND Client-Kennzahlen stehen beide in modified.xml?filter=informations.
+            // information.xml enthaelt KEINE <networkinfo> - daher blieben Start-/Server-Felder leer
+            // (Users/Dateien/IP/Willkommensnachricht/Servername/verbundener Server ungesetzt).
+            var infos = await _client.GetInformationsAsync();
+            if (infos?.NetworkInfo is { } n)
+            {
                 Users = n.Users; Files = n.Files; FileSize = n.FileSize ?? "-";
                 Firewalled = n.Firewalled; OwnIp = n.Ip ?? "-";
                 WelcomeMessage = n.WelcomeMessage ?? "";
@@ -332,8 +385,6 @@ namespace Apfelmus.Avalonia.ViewModels
                     : "-";
                 _connectedServerId = n.ConnectedWithServerId;
             }
-
-            var infos = await _client.GetInformationsAsync();
             if (infos?.Information is { } d)
             {
                 Credits = d.Credits; UploadSpeed = d.UploadSpeed; DownloadSpeed = d.DownloadSpeed;
@@ -343,13 +394,15 @@ namespace Apfelmus.Avalonia.ViewModels
 
             await RefreshUsersAsync();
             await RefreshDownloadsAsync();
-            await RefreshSharesAsync();
             await RefreshUploadsAsync();
             await RefreshServersAsync();
             await RefreshSearchAsync();
+            // "Mein Share" wird NICHT bei jedem Poll neu geladen (wuerde Auswahl/Mehrfachauswahl
+            // staendig verwerfen). Aktualisierung erfolgt einmalig beim Start und manuell per Button.
         }
 
         private int _connectedServerId;
+        private string _fileSeparator = "/";
 
         private async Task RefreshDownloadsAsync()
         {
@@ -472,9 +525,51 @@ namespace Apfelmus.Avalonia.ViewModels
             if (r?.Shares?.Share != null)
             {
                 Shares.Clear();
-                foreach (var s in r.Shares.Share) Shares.Add(s);
+                foreach (var s in r.Shares.Share)
+                {
+                    s.Path = ComputeSharePath(s);
+                    Shares.Add(s);
+                }
                 ApplyShareFilter();
             }
+        }
+
+        /// <summary>
+        /// Ermittelt den Gruppierschluessel einer Freigabe: den unmittelbaren Elternordner
+        /// (wie der WPF-Client, der nach "Path" gruppiert). ".data"-Ordner (Core-Temp) werden
+        /// eine Ebene hoeher gruppiert.
+        /// </summary>
+        private string ComputeSharePath(ShareItem s)
+        {
+            if (string.IsNullOrEmpty(s.FileName)) return _fileSeparator;
+            string dir = s.FileName;
+            if (!string.IsNullOrEmpty(s.ShortFileName) && dir.EndsWith(s.ShortFileName, StringComparison.Ordinal))
+                dir = dir.Substring(0, dir.Length - s.ShortFileName.Length);
+            var parts = dir.Split(new[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length == 0) return _fileSeparator;
+            if (s.FileName.Contains(".data") && parts.Length >= 2) return parts[parts.Length - 2];
+            return parts[parts.Length - 1];
+        }
+
+        /// <summary>
+        /// Stoesst eine Shareueberpruefung des Cores an. Der Core kennt keine eigene Pruef-Funktion;
+        /// laut API loest das Neu-Setzen der Freigabeliste (setsettings countshares) die Ueberpruefung aus.
+        /// </summary>
+        private async Task CheckShareAsync()
+        {
+            await LoadCoreSettingsAsync();
+            await _client.SetSharesAsync(CurrentShares());
+            CoreSettingsStatus = "Shareüberprüfung gestartet.";
+        }
+
+        /// <summary>Kopiert die ajfsp-Links aller markierten Freigaben (mehrzeilig) - fuer die Mehrfachauswahl.</summary>
+        public void CopyShareLinks(System.Collections.IEnumerable selected)
+        {
+            var sb = new System.Text.StringBuilder();
+            foreach (var item in selected)
+                if (item is ShareItem s)
+                    sb.Append(BuildAjfsp(s.ShortFileName, s.CheckSum, s.Size.ToString())).Append('\n');
+            if (sb.Length > 0) RaiseCopy(sb.ToString());
         }
 
         private async Task RefreshSearchAsync()
@@ -669,8 +764,9 @@ namespace Apfelmus.Avalonia.ViewModels
             return list;
         }
 
+        // settings.xml liefert den Modus als "subdirectory" (mit Unterordnern) bzw. "singledirectory".
         private static bool ParseShareMode(string? mode)
-            => !string.IsNullOrEmpty(mode) && (mode.Equals("true", StringComparison.OrdinalIgnoreCase) || mode == "1");
+            => !string.IsNullOrEmpty(mode) && mode.Equals("subdirectory", StringComparison.OrdinalIgnoreCase);
 
         private async Task ShareSelectedAsync(bool includeSubdirs)
         {

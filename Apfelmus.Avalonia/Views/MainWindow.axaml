@@ -192,7 +192,19 @@
                                 <DataGridTextColumn Header="{DynamicResource col_loaded}" Binding="{Binding DownloadedFilesize, Converter={StaticResource FileSizeConverter}}" Width="90" />
                                 <DataGridTextColumn Header="{DynamicResource col_speed}" Binding="{Binding Speed, Converter={StaticResource FileSizeConverter}}" Width="90" />
                                 <DataGridTextColumn Header="{DynamicResource col_time}" Binding="{Binding TimeToEnd, Converter={StaticResource TimeConverter}}" Width="90" />
-                                <DataGridTextColumn Header="{DynamicResource col_percent}" Binding="{Binding Percentages}" Width="60" />
+                                <DataGridTemplateColumn Header="{DynamicResource col_percent}" Width="100">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Panel Margin="2,3">
+                                                <ProgressBar Minimum="0" Maximum="100" Height="14"
+                                                             Value="{Binding Percentages, Converter={StaticResource PercentTextConverter}}" />
+                                                <TextBlock Text="{Binding Percentages}" FontSize="10"
+                                                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                           Foreground="{DynamicResource TextPrimaryBrush}" />
+                                            </Panel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
                                 <DataGridTextColumn Header="{DynamicResource col_rest}" Binding="{Binding DownloadRest, Converter={StaticResource FileSizeConverter}}" Width="90" />
                                 <DataGridTextColumn Header="{DynamicResource col_power}" Binding="{Binding PowerDownload, Converter={StaticResource PowerDownloadConverter}}" Width="70" />
                             </DataGrid.Columns>
@@ -404,15 +416,24 @@
                     <!-- Rechts: freigegebene Dateien -->
                     <DockPanel Grid.Column="2">
                         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" Margin="4">
+                            <Button Content="{DynamicResource sh_refresh}" Command="{Binding RefreshShareCommand}" />
+                            <Button Content="{DynamicResource sh_check}" Command="{Binding CheckShareCommand}" />
+                            <Border Width="1" Background="{DynamicResource TextSecondaryBrush}" Margin="2,0" />
                             <TextBlock Text="{DynamicResource d_priority}" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" />
                             <ComboBox x:CompileBindings="False" Width="70" ItemsSource="{Binding PriorityValues}" SelectedItem="{Binding SelectedPriority}" />
                             <Button Content="{DynamicResource sh_setprio}" Command="{Binding SetSharePriorityCommand}" />
                             <Button Content="{DynamicResource sh_delprio}" Command="{Binding DelSharePriorityCommand}" />
                             <Button Content="{DynamicResource d_copylink}" Command="{Binding CopyShareLinkCommand}" />
+                            <Button Content="{DynamicResource d_copylinks}" Click="CopyShareLinks_Click" />
                             <Button Content="{DynamicResource d_releaseinfo}" Command="{Binding ReleaseInfoShareCommand}" />
                         </StackPanel>
-                        <DataGrid x:CompileBindings="False" ItemsSource="{Binding FilteredShares}"
-                                  SelectedItem="{Binding SelectedShare}" IsReadOnly="True"
+                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" Margin="4,0,4,4">
+                            <TextBlock Text="{DynamicResource sh_filter}" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" />
+                            <TextBox Width="240" Text="{Binding ShareFilterText, Mode=TwoWay}" />
+                            <Button Content="{DynamicResource sh_showall}" Command="{Binding ShowAllSharesCommand}" />
+                        </StackPanel>
+                        <DataGrid x:CompileBindings="False" x:Name="SharesGrid" ItemsSource="{Binding SharesView}"
+                                  SelectedItem="{Binding SelectedShare}" IsReadOnly="True" SelectionMode="Extended"
                                   GridLinesVisibility="Horizontal" CanUserResizeColumns="True" CanUserReorderColumns="True">
                             <DataGrid.ContextMenu>
                                 <ContextMenu>
@@ -420,6 +441,7 @@
                                     <MenuItem Header="{DynamicResource sh_delprio}" Command="{Binding DelSharePriorityCommand}" />
                                     <Separator />
                                     <MenuItem Header="{DynamicResource d_copylink}" Command="{Binding CopyShareLinkCommand}" />
+                                    <MenuItem Header="{DynamicResource d_copylinks}" Click="CopyShareLinks_Click" />
                                     <MenuItem Header="{DynamicResource d_releaseinfo}" Command="{Binding ReleaseInfoShareCommand}" />
                                 </ContextMenu>
                             </DataGrid.ContextMenu>
