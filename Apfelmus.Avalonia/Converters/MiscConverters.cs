@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using Avalonia.Data.Converters;
+using Avalonia.Media;
 
 namespace Apfelmus.Avalonia.Converters
 {
@@ -55,6 +56,38 @@ namespace Apfelmus.Avalonia.Converters
     {
         public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
             => value is int i && i > 0 ? i.ToString() : "aus";
+
+        public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+            => throw new NotSupportedException();
+    }
+
+    /// <summary>Download-Status -> dezente Zeilen-Hintergrundfarbe (analog WPF DownloadsColor).</summary>
+    public sealed class DownloadRowBrushConverter : IValueConverter
+    {
+        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            int s = value is int i ? i : -999;
+            return s switch
+            {
+                2 => new SolidColorBrush(Color.FromArgb(40, 76, 175, 125)),    // überträgt
+                14 => new SolidColorBrush(Color.FromArgb(50, 0, 160, 0)),       // fertig
+                18 => new SolidColorBrush(Color.FromArgb(40, 150, 150, 150)),   // pausiert
+                13 or 17 => new SolidColorBrush(Color.FromArgb(45, 200, 60, 60)), // Fehler/abgebrochen
+                _ => Brushes.Transparent
+            };
+        }
+
+        public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+            => throw new NotSupportedException();
+    }
+
+    /// <summary>Server verbunden -> gruener Zeilen-Hintergrund (analog WPF ServerColor).</summary>
+    public sealed class ServerRowBrushConverter : IValueConverter
+    {
+        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+            => value is bool b && b
+                ? new SolidColorBrush(Color.FromArgb(55, 76, 175, 125))
+                : Brushes.Transparent;
 
         public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
             => throw new NotSupportedException();

@@ -28,6 +28,8 @@
             <conv:SecondsToDateConverter x:Key="SecondsToDateConverter" />
             <conv:PowerDownloadConverter x:Key="PowerDownloadConverter" />
             <conv:UserStatusConverter x:Key="UserStatusConverter" />
+            <conv:DownloadRowBrushConverter x:Key="DownloadRowBrushConverter" />
+            <conv:ServerRowBrushConverter x:Key="ServerRowBrushConverter" />
         </ResourceDictionary>
     </Application.Resources>
 

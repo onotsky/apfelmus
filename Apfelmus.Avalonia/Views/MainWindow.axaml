@@ -134,6 +134,11 @@
                         <DataGrid Grid.Row="0" x:CompileBindings="False" ItemsSource="{Binding Downloads}"
                                   SelectedItem="{Binding SelectedDownload}" IsReadOnly="True"
                                   GridLinesVisibility="Horizontal" CanUserResizeColumns="True">
+                            <DataGrid.Styles>
+                                <Style Selector="DataGridRow">
+                                    <Setter Property="Background" Value="{Binding Status, Converter={StaticResource DownloadRowBrushConverter}}" />
+                                </Style>
+                            </DataGrid.Styles>
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Datei" Binding="{Binding FileName}" Width="*" />
                                 <DataGridTextColumn Header="Status" Binding="{Binding Status, Converter={StaticResource DownloadStatusConverter}}" Width="110" />
@@ -235,6 +240,11 @@
                     <DataGrid x:CompileBindings="False" ItemsSource="{Binding Servers}"
                               SelectedItem="{Binding SelectedServer}" IsReadOnly="True"
                               GridLinesVisibility="Horizontal" CanUserResizeColumns="True">
+                        <DataGrid.Styles>
+                            <Style Selector="DataGridRow">
+                                <Setter Property="Background" Value="{Binding IsConnected, Converter={StaticResource ServerRowBrushConverter}}" />
+                            </Style>
+                        </DataGrid.Styles>
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*" />
                             <DataGridTextColumn Header="Host" Binding="{Binding Host}" Width="220" />
