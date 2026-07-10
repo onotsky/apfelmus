@@ -1805,7 +1805,7 @@ namespace Apfelmus
 
                     sPanelShareFolders.Children.Add(sPanel);
                 }
-            }
+
                 // Gespeichertes Spaltenlayout (Reihenfolge + Breite) von Download- und Upload-Tabelle
                 // wiederherstellen, damit es wie in der zuletzt gestarteten Version aussieht.
                 RestoreColumnLayout(dGridDownloads, Properties.Settings.Default.DownloadColumnLayout);
