@@ -7,9 +7,26 @@
         Title="Apfelmus" Width="1000" Height="680"
         WindowStartupLocation="CenterScreen"
         Icon="avares://Apfelmus.Avalonia/Assets/Images/Apple-icon.png"
-        Background="{StaticResource WindowBackgroundBrush}">
+        Background="{StaticResource WindowBackgroundBrush}"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="NoChrome"
+        ExtendClientAreaTitleBarHeightHint="-1">
 
     <DockPanel>
+        <!-- ===== Eigene Titelleiste (rahmenloses Fenster, folgt dem App-Theme) ===== -->
+        <Grid DockPanel.Dock="Top" Height="34" Background="{StaticResource SurfaceBrush}"
+              PointerPressed="TitleBar_PointerPressed" DoubleTapped="TitleBar_DoubleTapped">
+            <StackPanel Orientation="Horizontal" Spacing="8" Margin="10,0" VerticalAlignment="Center" HorizontalAlignment="Left">
+                <Image Source="avares://Apfelmus.Avalonia/Assets/Images/Apple-icon.png" Width="16" Height="16" />
+                <TextBlock Text="Apfelmus" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="{StaticResource TextPrimaryBrush}" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="0">
+                <Button Classes="titlebtn" Click="Minimize_Click">—</Button>
+                <Button Classes="titlebtn" Click="MaxRestore_Click">▢</Button>
+                <Button Classes="titlebtn titleclose" Click="Close_Click">✕</Button>
+            </StackPanel>
+        </Grid>
+
         <!-- ===== Menueleiste ===== -->
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="Design">
