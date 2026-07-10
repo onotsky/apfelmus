@@ -29,10 +29,11 @@ namespace Apfelmus.Avalonia.ViewModels
         private readonly DispatcherTimer _timer;
         private List<User> _allUsers = new();
 
-        public MainWindowViewModel(Config config)
+        public MainWindowViewModel(Config config, string? startupLink = null)
         {
             _config = config;
             _client = new CoreClient(config);
+            _registerProtocol = config.ProtocolHandler;
 
             Downloads = new ObservableCollection<Download>();
             DownloadSources = new ObservableCollection<User>();
@@ -112,6 +113,10 @@ namespace Apfelmus.Avalonia.ViewModels
 
             // Gespeicherte Sprache anwenden.
             LanguageManager.Apply(LanguageManager.Normalize(config.LanguageFile));
+
+            // Beim Start uebergebener ajfsp-Link (Protokoll-Handler) -> an den Core weiterreichen.
+            if (!string.IsNullOrWhiteSpace(startupLink))
+                _ = _client.ProcessLinkAsync(Uri.EscapeDataString(startupLink!.Trim()));
         }
 
         /// <summary>Wird von der View gesetzt/abonniert, um Text in die Zwischenablage zu legen.</summary>
@@ -248,6 +253,7 @@ namespace Apfelmus.Avalonia.ViewModels
         private int _refreshRate;
         private string _releaseInfoHost, _settingsStatus = string.Empty;
         private bool _showLoginNextStart;
+        private bool _registerProtocol;
 
         public Download? SelectedDownload
         {
@@ -276,6 +282,9 @@ namespace Apfelmus.Avalonia.ViewModels
         public int RefreshRate { get => _refreshRate; set => SetProperty(ref _refreshRate, value); }
         public string ReleaseInfoHost { get => _releaseInfoHost; set => SetProperty(ref _releaseInfoHost, value); }
         public bool ShowLoginNextStart { get => _showLoginNextStart; set => SetProperty(ref _showLoginNextStart, value); }
+        public bool RegisterAjfspProtocol { get => _registerProtocol; set => SetProperty(ref _registerProtocol, value); }
+        /// <summary>Nur unter Windows sinnvoll (Registry) - steuert die Sichtbarkeit der Checkbox.</summary>
+        public bool IsProtocolSupported => Services.ProtocolHandlerService.IsSupported;
         public string SettingsStatus { get => _settingsStatus; private set => SetProperty(ref _settingsStatus, value); }
 
         // ---- Core-Einstellungen (settings.xml) ----
@@ -568,9 +577,19 @@ namespace Apfelmus.Avalonia.ViewModels
                 _config.RefreshRate = RefreshRate > 0 ? RefreshRate : 1500;
                 _config.ReleaseInfoHost = string.IsNullOrWhiteSpace(ReleaseInfoHost) ? ReleaseInfo.DefaultHost : ReleaseInfoHost.Trim();
                 _config.HideLoginWindow = !ShowLoginNextStart;
+                _config.ProtocolHandler = RegisterAjfspProtocol;
                 ConfigSerializer.SerializeToFile(_config);
                 _timer.Interval = TimeSpan.FromMilliseconds(_config.RefreshRate);
-                SettingsStatus = "Gespeichert.";
+
+                if (RegisterAjfspProtocol && Services.ProtocolHandlerService.IsSupported)
+                {
+                    bool ok = Services.ProtocolHandlerService.Register();
+                    SettingsStatus = ok ? "Gespeichert. ajfsp-Verknüpfung registriert." : "Gespeichert (ajfsp-Registrierung fehlgeschlagen).";
+                }
+                else
+                {
+                    SettingsStatus = "Gespeichert.";
+                }
             }
             catch (Exception ex) { SettingsStatus = "Fehler: " + ex.Message; }
             return Task.CompletedTask;

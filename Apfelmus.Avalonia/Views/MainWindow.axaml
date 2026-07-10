@@ -158,6 +158,19 @@
                         <DataGrid Grid.Row="0" x:CompileBindings="False" ItemsSource="{Binding Downloads}"
                                   SelectedItem="{Binding SelectedDownload}" IsReadOnly="True"
                                   GridLinesVisibility="Horizontal" CanUserResizeColumns="True" CanUserReorderColumns="True">
+                            <DataGrid.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="{DynamicResource d_continue}" Command="{Binding ContinueCommand}" />
+                                    <MenuItem Header="{DynamicResource d_break}" Command="{Binding BreakCommand}" />
+                                    <MenuItem Header="{DynamicResource d_cancel}" Command="{Binding CancelCommand}" />
+                                    <MenuItem Header="{DynamicResource d_renamebtn}" Command="{Binding RenameCommand}" />
+                                    <MenuItem Header="{DynamicResource d_clean}" Command="{Binding CleanFinishedCommand}" />
+                                    <Separator />
+                                    <MenuItem Header="{DynamicResource d_copylink}" Command="{Binding CopyDownloadLinkCommand}" />
+                                    <MenuItem Header="{DynamicResource d_copysource}" Command="{Binding CopyDownloadSourceCommand}" />
+                                    <MenuItem Header="{DynamicResource d_releaseinfo}" Command="{Binding ReleaseInfoDownloadCommand}" />
+                                </ContextMenu>
+                            </DataGrid.ContextMenu>
                             <DataGrid.Styles>
                                 <Style Selector="DataGridRow">
                                     <Setter Property="Background" Value="{Binding Status, Converter={StaticResource DownloadRowBrushConverter}}" />
@@ -335,6 +348,13 @@
                     <DataGrid x:CompileBindings="False" ItemsSource="{Binding Servers}"
                               SelectedItem="{Binding SelectedServer}" IsReadOnly="True"
                               GridLinesVisibility="Horizontal" CanUserResizeColumns="True" CanUserReorderColumns="True">
+                        <DataGrid.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="{DynamicResource sv_connect}" Command="{Binding ConnectServerCommand}" />
+                                <MenuItem Header="{DynamicResource sv_getlist}" Command="{Binding AddOfficialServersCommand}" />
+                                <MenuItem Header="{DynamicResource sv_remove}" Command="{Binding RemoveServerCommand}" />
+                            </ContextMenu>
+                        </DataGrid.ContextMenu>
                         <DataGrid.Styles>
                             <Style Selector="DataGridRow">
                                 <Setter Property="Background" Value="{Binding IsConnected, Converter={StaticResource ServerRowBrushConverter}}" />
@@ -394,6 +414,15 @@
                         <DataGrid x:CompileBindings="False" ItemsSource="{Binding FilteredShares}"
                                   SelectedItem="{Binding SelectedShare}" IsReadOnly="True"
                                   GridLinesVisibility="Horizontal" CanUserResizeColumns="True" CanUserReorderColumns="True">
+                            <DataGrid.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="{DynamicResource sh_setprio}" Command="{Binding SetSharePriorityCommand}" />
+                                    <MenuItem Header="{DynamicResource sh_delprio}" Command="{Binding DelSharePriorityCommand}" />
+                                    <Separator />
+                                    <MenuItem Header="{DynamicResource d_copylink}" Command="{Binding CopyShareLinkCommand}" />
+                                    <MenuItem Header="{DynamicResource d_releaseinfo}" Command="{Binding ReleaseInfoShareCommand}" />
+                                </ContextMenu>
+                            </DataGrid.ContextMenu>
                             <DataGrid.Columns>
                                 <DataGridTemplateColumn Header="{DynamicResource col_file}" Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
@@ -434,6 +463,8 @@
                     </Grid>
                     <CheckBox Content="{DynamicResource set_showlogin}" IsChecked="{Binding ShowLoginNextStart, Mode=TwoWay}"
                               Foreground="{DynamicResource TextPrimaryBrush}" />
+                    <CheckBox Content="{DynamicResource set_protocol}" IsChecked="{Binding RegisterAjfspProtocol, Mode=TwoWay}"
+                              IsVisible="{Binding IsProtocolSupported}" Foreground="{DynamicResource TextPrimaryBrush}" />
                     <StackPanel Orientation="Horizontal" Spacing="10">
                         <Button Content="{DynamicResource set_guisave}" Command="{Binding SaveSettingsCommand}" Background="{DynamicResource AccentBrush}" Foreground="White" />
                         <TextBlock Text="{Binding SettingsStatus}" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" />

@@ -103,6 +103,7 @@
     <sys:String x:Key="set_design">Design</sys:String>
     <sys:String x:Key="set_guisave">GUI speichern</sys:String>
     <sys:String x:Key="set_showlogin">Login-Fenster beim nächsten Start anzeigen</sys:String>
+    <sys:String x:Key="set_protocol">ajfsp-Links mit Apfelmus verknüpfen (Windows)</sys:String>
     <sys:String x:Key="set_core">Core-Einstellungen</sys:String>
     <sys:String x:Key="set_nick">Nickname</sys:String>
     <sys:String x:Key="set_tempdir">Temp-Verzeichnis</sys:String>
