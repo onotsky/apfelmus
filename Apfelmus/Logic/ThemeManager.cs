@@ -7,9 +7,10 @@ namespace ApfelmusFramework.Classes.Logic
 {
     /// <summary>
     /// Verwaltet das aktive Farbschema (Dunkel/Hell) der Anwendung. Die Theme-Resourcedictionaries
-    /// liegen als lose XAML-Dateien im Apfelmus-Hauptprojekt (Resourcen\Theme.*.xaml) und werden
-    /// - analog zu LanguageDictionary - relativ zum Hauptassembly aufgeloest (".." verlaesst das
-    /// "ApfelmusFramework;component"-Praefix des aufrufenden Assemblies).
+    /// liegen als lose XAML-Dateien im Apfelmus-Hauptprojekt (Resourcen\Theme.*.xaml). Der relative
+    /// URI (".." + Resourcen\...) normalisiert unabhaengig vom aufrufenden Assembly auf
+    /// pack://application:,,,/Resourcen/... im Anwendungsassembly - daher bleibt die Aufloesung
+    /// korrekt, seit diese Klasse aus ApfelmusFramework hierher (Apfelmus) verschoben wurde.
     /// </summary>
     public static class ThemeManager
     {

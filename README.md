@@ -17,8 +17,8 @@ Mehrsprachig (Deutsch/Englisch/Italienisch), umschaltbar über das Menü. Zwei F
 
 | Projekt | Inhalt |
 |---|---|
-| `Apfelmus` | Die GUI selbst (Hauptfenster, Dialoge, Splashscreen) |
-| `ApfelmusFramework` | Core-Kommunikation (XML-API), Datenmodelle, Value-Converter, Theme-Verwaltung |
+| `Apfelmus` | Die WPF-GUI selbst (Hauptfenster, Dialoge, Splashscreen) samt WPF-spezifischem Präsentationscode: Value-Converter (`Converters/`), Theme-/Sprachverwaltung und Single-Instance-Logik (`Logic/`) sowie die Bildressourcen (`Images/`) |
+| `ApfelmusFramework` | **Plattformneutrale Kernbibliothek (`net10.0`, kein WPF/Windows):** Core-Kommunikation (XML/HTTP-API), Datenmodelle/DTOs, XML-(De)Serialisierung, Config und Hilfslogik. Bewusst UI-frameworkunabhängig, damit der WPF-Client und eine künftige Cross-Platform-Umsetzung (Avalonia) sich denselben Kern teilen |
 | `WpfCustomControlLibrary1` | Eigenes `CloseableTabItem`-Control für die Such-Ergebnis-Tabs |
 | `ConfigMigrator` | Einmal-Kommandozeilentool zur Migration alter `Config.dat` (BinaryFormatter) auf `Config.xml` (XmlSerializer), siehe unten |
 
@@ -36,7 +36,7 @@ Das Tool liest `Config.dat`, schreibt `Config.xml` im selben Ordner und benennt 
 
 ## Bauen
 
-Zielplattform ist **.NET 10 (`net10.0-windows7.0`) mit WPF – ausschließlich unter Windows**. WPF hat keine Cross-Plattform-Runtime, das gilt unabhängig von .NET Framework vs. .NET (Core).
+Die WPF-GUI (`Apfelmus`) hat als Zielplattform **.NET 10 (`net10.0-windows7.0`) mit WPF – ausschließlich unter Windows**. WPF hat keine Cross-Plattform-Runtime, das gilt unabhängig von .NET Framework vs. .NET (Core). Die Kernbibliothek `ApfelmusFramework` ist dagegen plattformneutral (`net10.0`) und ließe sich auch außerhalb von Windows bauen.
 
 Voraussetzung: Visual Studio 2022 (oder neuer) mit der Workload „.NET-Desktopentwicklung“.
 

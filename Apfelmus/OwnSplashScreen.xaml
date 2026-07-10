@@ -51,7 +51,7 @@
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,8,0,14">
-                <Image Name="Apple" Source="/ApfelmusFramework;component/Images/Apple-icon.png" Width="88" Height="88"
+                <Image Name="Apple" Source="/Images/Apple-icon.png" Width="88" Height="88"
                        RenderOptions.BitmapScalingMode="HighQuality" Margin="0,0,0,16" />
                 <TextBlock Text="Apfelmus" FontFamily="Segoe UI Semibold" FontSize="27" FontWeight="SemiBold"
                            Foreground="#FFECEFF1" HorizontalAlignment="Center" />

@@ -1,12 +1,12 @@
 ﻿<Window x:Class="Apfelmus.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:conv="clr-namespace:ApfelmusFramework.Classes.Converter;assembly=ApfelmusFramework"
+        xmlns:conv="clr-namespace:ApfelmusFramework.Classes.Converter"
         xmlns:local="clr-namespace:ApfelmusFramework.Classes.Modified;assembly=ApfelmusFramework"
         xmlns:src="clr-namespace:ApfelmusFramework.Classes.Share;assembly=ApfelmusFramework"
         xmlns:help="clr-namespace:ApfelmusFramework.Classes.Help;assembly=ApfelmusFramework"
         xmlns:props="clr-namespace:Apfelmus.Properties"
-        Title="Apfelmus" Loaded="Window_Loaded" Width="{Binding Source={x:Static props:Settings.Default}, Path=WindowWidth}" Height="{Binding Source={x:Static props:Settings.Default}, Path=WindowHeight}" Left="{Binding Source={x:Static props:Settings.Default}, Path=WindowLeft}" Top="{Binding Source={x:Static props:Settings.Default}, Path=WindowTop}" WindowState="{Binding Source={x:Static props:Settings.Default}, Path=WindowState}" Icon="/ApfelmusFramework;component/Images/Apple-icon.png" WindowStyle="None" Background="{DynamicResource WindowBackgroundBrush}" Closing="Window_Closing" SizeChanged="MainWindow_SizeChanged" LocationChanged="MainWindow_LocationChanged" StateChanged="MainWindow_StateChanged">
+        Title="Apfelmus" Loaded="Window_Loaded" Width="{Binding Source={x:Static props:Settings.Default}, Path=WindowWidth}" Height="{Binding Source={x:Static props:Settings.Default}, Path=WindowHeight}" Left="{Binding Source={x:Static props:Settings.Default}, Path=WindowLeft}" Top="{Binding Source={x:Static props:Settings.Default}, Path=WindowTop}" WindowState="{Binding Source={x:Static props:Settings.Default}, Path=WindowState}" Icon="/Images/Apple-icon.png" WindowStyle="None" Background="{DynamicResource WindowBackgroundBrush}" Closing="Window_Closing" SizeChanged="MainWindow_SizeChanged" LocationChanged="MainWindow_LocationChanged" StateChanged="MainWindow_StateChanged">
     <WindowChrome.WindowChrome>
         <WindowChrome CaptionHeight="32" ResizeBorderThickness="5" GlassFrameThickness="0" CornerRadius="0" UseAeroCaptionButtons="False" />
     </WindowChrome.WindowChrome>
@@ -29,7 +29,7 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="10,0,0,0" VerticalAlignment="Center">
-                <Image Source="/ApfelmusFramework;component/Images/Apple-icon.png" Width="18" Height="18" />
+                <Image Source="/Images/Apple-icon.png" Width="18" Height="18" />
                 <TextBlock Text="Apfelmus" Margin="8,0,0,0" Foreground="{DynamicResource TextPrimaryBrush}" FontWeight="SemiBold" VerticalAlignment="Center" />
             </StackPanel>
             <StackPanel Grid.Column="2" Orientation="Horizontal" WindowChrome.IsHitTestVisibleInChrome="True">
@@ -68,17 +68,17 @@
             <MenuItem Name="mItemLanguage" Header="{DynamicResource language}">
                 <MenuItem Header="{DynamicResource german}" Click="German_Click">
                     <MenuItem.Icon>
-                        <Image Source="/ApfelmusFramework;component/Images/germany.png" Width="18" Height="18" />
+                        <Image Source="/Images/germany.png" Width="18" Height="18" />
                     </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem Header="{DynamicResource english}" Click="English_Click">
                     <MenuItem.Icon>
-                        <Image Source="/ApfelmusFramework;component/Images/uk.png" Width="18" Height="18" />
+                        <Image Source="/Images/uk.png" Width="18" Height="18" />
                     </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem Header="{DynamicResource italian}" Click="Italian_Click">
                     <MenuItem.Icon>
-                        <Image Source="/ApfelmusFramework;component/Images/italy.png" Width="18" Height="18" />
+                        <Image Source="/Images/italy.png" Width="18" Height="18" />
                     </MenuItem.Icon>
                 </MenuItem>
             </MenuItem>
