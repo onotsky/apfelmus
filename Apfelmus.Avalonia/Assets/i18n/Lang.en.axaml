@@ -85,6 +85,11 @@
 
     <sys:String x:Key="sh_setprio">Set priority</sys:String>
     <sys:String x:Key="sh_delprio">Reset priority</sys:String>
+    <sys:String x:Key="sh_loadtree">Load tree</sys:String>
+    <sys:String x:Key="sh_share">Share</sys:String>
+    <sys:String x:Key="sh_sharesub">Share + subfolders</sys:String>
+    <sys:String x:Key="sh_unshare">Unshare</sys:String>
+    <sys:String x:Key="sh_dirs">Directories</sys:String>
 
     <sys:String x:Key="set_gui">GUI</sys:String>
     <sys:String x:Key="set_refresh">Refresh rate (ms)</sys:String>

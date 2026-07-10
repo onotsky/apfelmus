@@ -85,6 +85,11 @@
 
     <sys:String x:Key="sh_setprio">Priorität setzen</sys:String>
     <sys:String x:Key="sh_delprio">Priorität zurück</sys:String>
+    <sys:String x:Key="sh_loadtree">Baum laden</sys:String>
+    <sys:String x:Key="sh_share">Freigeben</sys:String>
+    <sys:String x:Key="sh_sharesub">Freigeben + Unterordner</sys:String>
+    <sys:String x:Key="sh_unshare">Freigabe entfernen</sys:String>
+    <sys:String x:Key="sh_dirs">Verzeichnisse</sys:String>
 
     <sys:String x:Key="set_gui">GUI</sys:String>
     <sys:String x:Key="set_refresh">Refreshrate (ms)</sys:String>

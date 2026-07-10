@@ -40,6 +40,7 @@ namespace Apfelmus.Avalonia.ViewModels
             Servers = new ObservableCollection<Server>();
             SearchResults = new ObservableCollection<SearchEntry>();
             Shares = new ObservableCollection<ShareItem>();
+            ShareTree = new ObservableCollection<DirNodeViewModel>();
 
             PowerValues = new ObservableCollection<int> { 0, 1, 2, 3, 4, 5 };
             PriorityValues = new ObservableCollection<int> { 1, 2, 3, 4, 5 };
@@ -90,6 +91,12 @@ namespace Apfelmus.Avalonia.ViewModels
             DelSharePriorityCommand = new RelayCommand(async () => { if (SelectedShare != null) { await _client.SetDownloadPriorityAsync(SelectedShare.Id, 1); } }, () => SelectedShare != null);
             ReleaseInfoShareCommand = new RelayCommand(() => { if (SelectedShare != null) OpenReleaseInfo(SelectedShare.ShortFileName, SelectedShare.CheckSum, SelectedShare.Size.ToString()); return Task.CompletedTask; }, () => SelectedShare != null);
             CopyShareLinkCommand = new RelayCommand(() => { if (SelectedShare != null) RaiseCopy(BuildAjfsp(SelectedShare.ShortFileName, SelectedShare.CheckSum, SelectedShare.Size.ToString())); return Task.CompletedTask; }, () => SelectedShare != null);
+
+            // Freigabe-Verzeichnisbaum
+            LoadShareTreeCommand = new RelayCommand(LoadShareTreeAsync);
+            ShareFolderCommand = new RelayCommand(() => ShareSelectedAsync(true), () => SelectedShareNode != null);
+            ShareFolderNoSubCommand = new RelayCommand(() => ShareSelectedAsync(false), () => SelectedShareNode != null);
+            UnshareFolderCommand = new RelayCommand(UnshareSelectedAsync, () => SelectedShareNode != null);
 
             _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(_refreshRate) };
             _timer.Tick += async (_, _) => await PollAsync();
@@ -146,6 +153,27 @@ namespace Apfelmus.Avalonia.ViewModels
         public RelayCommand DelSharePriorityCommand { get; }
         public RelayCommand ReleaseInfoShareCommand { get; }
         public RelayCommand CopyShareLinkCommand { get; }
+        public RelayCommand LoadShareTreeCommand { get; }
+        public RelayCommand ShareFolderCommand { get; }
+        public RelayCommand ShareFolderNoSubCommand { get; }
+        public RelayCommand UnshareFolderCommand { get; }
+
+        public ObservableCollection<DirNodeViewModel> ShareTree { get; }
+
+        private DirNodeViewModel? _selectedShareNode;
+        public DirNodeViewModel? SelectedShareNode
+        {
+            get => _selectedShareNode;
+            set
+            {
+                if (SetProperty(ref _selectedShareNode, value))
+                {
+                    ShareFolderCommand.RaiseCanExecuteChanged();
+                    ShareFolderNoSubCommand.RaiseCanExecuteChanged();
+                    UnshareFolderCommand.RaiseCanExecuteChanged();
+                }
+            }
+        }
 
         // ---- Start / Uebersicht ----
         private string _connectionStatus = "Verbinde...";
@@ -227,6 +255,7 @@ namespace Apfelmus.Avalonia.ViewModels
         private string _newPassword = string.Empty, _coreSettingsStatus = string.Empty;
         private int _corePort, _coreXmlPort, _coreMaxConnections, _coreMaxUpload, _coreMaxDownload, _coreSpeedPerSlot, _coreMaxNewConn, _coreMaxSources;
         private bool _coreAutoConnect;
+        private ApfelmusFramework.Classes.Settings.Settings? _coreSettings;
 
         public string CoreNick { get => _coreNick; set => SetProperty(ref _coreNick, value); }
         public string CoreIncomingDir { get => _coreIncomingDir; set => SetProperty(ref _coreIncomingDir, value); }
@@ -438,6 +467,7 @@ namespace Apfelmus.Avalonia.ViewModels
         {
             var s = await _client.GetSettingsAsync();
             if (s == null) { CoreSettingsStatus = "Core-Einstellungen nicht erreichbar."; return; }
+            _coreSettings = s;
             CoreNick = s.Nick ?? string.Empty;
             CorePort = s.Port; CoreXmlPort = s.XmlPort;
             CoreMaxConnections = s.MaxConnections; CoreMaxUpload = s.MaxUpload; CoreMaxDownload = s.MaxDownload;
@@ -473,6 +503,55 @@ namespace Apfelmus.Avalonia.ViewModels
             }
             catch (Exception ex) { CoreSettingsStatus = "Passwort-Fehler: " + ex.Message; }
             NewPassword = string.Empty;
+        }
+
+        private async Task LoadShareTreeAsync()
+        {
+            var aj = await _client.GetDirectoryAsync(null);
+            ShareTree.Clear();
+            if (aj?.Dir == null) return;
+            string sep = aj.FileSystem?.Seperator ?? "/";
+            foreach (var d in aj.Dir.OrderBy(x => x.Name))
+            {
+                if (string.IsNullOrEmpty(d.Path))
+                    d.Path = sep == "/" ? $"{d.Name}{sep}" : $"{d.Name}{sep}";
+                ShareTree.Add(new DirNodeViewModel(d, _client));
+            }
+        }
+
+        /// <summary>Aktuelle Freigabeliste aus den geladenen Core-Einstellungen (Pfad + Unterordner-Flag).</summary>
+        private List<(string path, bool sub)> CurrentShares()
+        {
+            var list = new List<(string, bool)>();
+            var dirs = _coreSettings?.share?.Directory;
+            if (dirs != null)
+                foreach (var d in dirs)
+                    list.Add((d.Name ?? string.Empty, ParseShareMode(d.ShareMode)));
+            return list;
+        }
+
+        private static bool ParseShareMode(string? mode)
+            => !string.IsNullOrEmpty(mode) && (mode.Equals("true", StringComparison.OrdinalIgnoreCase) || mode == "1");
+
+        private async Task ShareSelectedAsync(bool includeSubdirs)
+        {
+            var node = SelectedShareNode;
+            if (node == null) return;
+            var list = CurrentShares();
+            int idx = list.FindIndex(x => x.path == node.Path);
+            if (idx >= 0) list[idx] = (node.Path, includeSubdirs);
+            else list.Add((node.Path, includeSubdirs));
+            await _client.SetSharesAsync(list);
+            await LoadCoreSettingsAsync();
+        }
+
+        private async Task UnshareSelectedAsync()
+        {
+            var node = SelectedShareNode;
+            if (node == null) return;
+            var list = CurrentShares().Where(x => x.path != node.Path).ToList();
+            await _client.SetSharesAsync(list);
+            await LoadCoreSettingsAsync();
         }
 
         private Task ApplyLanguage(string code)

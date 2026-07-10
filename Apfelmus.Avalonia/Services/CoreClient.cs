@@ -46,6 +46,28 @@ namespace Apfelmus.Avalonia.Services
         public Task<AppleJuice?> GetShareAsync()
             => QueryAsync(string.Format("/xml/share.xml?timestamp=0&password={0}&mode=zip", _config.Password));
 
+        /// <summary>directory.xml: Verzeichnisknoten. path=null liefert die Wurzeln, sonst die Unterordner.</summary>
+        public Task<AppleJuice?> GetDirectoryAsync(string? path)
+        {
+            string q = string.IsNullOrEmpty(path)
+                ? "/xml/directory.xml?password=" + _config.Password + "&mode=zip"
+                : "/xml/directory.xml?directory=" + path!.Replace(" ", "%20") + "&password=" + _config.Password + "&mode=zip";
+            return QueryAsync(q);
+        }
+
+        /// <summary>Setzt die komplette Freigabeliste (setsettings countshares) - wie der WPF-Client.</summary>
+        public Task SetSharesAsync(System.Collections.Generic.IList<(string path, bool sub)> shares)
+        {
+            var sb = new System.Text.StringBuilder("/function/setsettings?countshares=" + shares.Count);
+            for (int i = 0; i < shares.Count; i++)
+            {
+                sb.Append("&sharedirectory").Append(i + 1).Append('=').Append((shares[i].path ?? string.Empty).Replace(" ", "%20"));
+                sb.Append("&sharesub").Append(i + 1).Append('=').Append(shares[i].sub ? "true" : "false");
+            }
+            sb.Append("&password=").Append(_config.Password);
+            return Fire(sb.ToString());
+        }
+
         /// <summary>downloadpartlist.xml: Verfuegbarkeitssegmente (Parts) + Dateigroesse eines Downloads.</summary>
         public Task<AppleJuice?> GetDownloadPartlistAsync(int downloadId)
             => QueryAsync(string.Format("/xml/downloadpartlist.xml?id={0}&password={1}&mode=zip", downloadId, _config.Password));

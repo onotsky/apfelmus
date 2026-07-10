@@ -280,28 +280,58 @@
 
             <!-- ===================== MEIN SHARE ===================== -->
             <TabItem Header="{DynamicResource t_share}">
-                <DockPanel Margin="4">
-                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" Margin="4">
-                        <TextBlock Text="{DynamicResource d_priority}" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" />
-                        <ComboBox x:CompileBindings="False" Width="70" ItemsSource="{Binding PriorityValues}" SelectedItem="{Binding SelectedPriority}" />
-                        <Button Content="{DynamicResource sh_setprio}" Command="{Binding SetSharePriorityCommand}" />
-                        <Button Content="{DynamicResource sh_delprio}" Command="{Binding DelSharePriorityCommand}" />
-                        <Button Content="{DynamicResource d_copylink}" Command="{Binding CopyShareLinkCommand}" />
-                        <Button Content="{DynamicResource d_releaseinfo}" Command="{Binding ReleaseInfoShareCommand}" />
-                    </StackPanel>
-                    <DataGrid x:CompileBindings="False" ItemsSource="{Binding Shares}"
-                              SelectedItem="{Binding SelectedShare}" IsReadOnly="True"
-                              GridLinesVisibility="Horizontal" CanUserResizeColumns="True">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="{DynamicResource col_file}" Binding="{Binding ShortFileName}" Width="*" />
-                            <DataGridTextColumn Header="{DynamicResource col_size}" Binding="{Binding Size, Converter={StaticResource FileSizeConverter}}" Width="100" />
-                            <DataGridTextColumn Header="{DynamicResource col_prio}" Binding="{Binding Priority}" Width="80" />
-                            <DataGridTextColumn Header="{DynamicResource col_lastasked}" Binding="{Binding LastAsked, Converter={StaticResource SecondsToDateConverter}}" Width="150" />
-                            <DataGridTextColumn Header="{DynamicResource col_asks}" Binding="{Binding AskCount}" Width="90" />
-                            <DataGridTextColumn Header="{DynamicResource col_hits}" Binding="{Binding SearchCount}" Width="100" />
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </DockPanel>
+                <Grid ColumnDefinitions="320,4,*" Margin="4">
+                    <!-- Links: Freigabe-Verzeichnisbaum -->
+                    <DockPanel Grid.Column="0">
+                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" Margin="2">
+                            <Button Content="{DynamicResource sh_loadtree}" Command="{Binding LoadShareTreeCommand}" />
+                            <Button Content="{DynamicResource sh_unshare}" Command="{Binding UnshareFolderCommand}" />
+                        </StackPanel>
+                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" Margin="2,0,2,2">
+                            <Button Content="{DynamicResource sh_share}" Command="{Binding ShareFolderNoSubCommand}" />
+                            <Button Content="{DynamicResource sh_sharesub}" Command="{Binding ShareFolderCommand}" />
+                        </StackPanel>
+                        <TextBlock DockPanel.Dock="Top" Text="{DynamicResource sh_dirs}" Classes="lbl" Margin="2,0,0,2" />
+                        <TreeView x:CompileBindings="False" ItemsSource="{Binding ShareTree}" SelectedItem="{Binding SelectedShareNode}">
+                            <TreeView.Styles>
+                                <Style Selector="TreeViewItem">
+                                    <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                                </Style>
+                            </TreeView.Styles>
+                            <TreeView.ItemTemplate>
+                                <TreeDataTemplate ItemsSource="{Binding Children}">
+                                    <TextBlock Text="{Binding Name}" Foreground="{StaticResource TextPrimaryBrush}" />
+                                </TreeDataTemplate>
+                            </TreeView.ItemTemplate>
+                        </TreeView>
+                    </DockPanel>
+
+                    <GridSplitter Grid.Column="1" ResizeDirection="Columns" Background="{StaticResource SurfaceBrush}" />
+
+                    <!-- Rechts: freigegebene Dateien -->
+                    <DockPanel Grid.Column="2">
+                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" Margin="4">
+                            <TextBlock Text="{DynamicResource d_priority}" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" />
+                            <ComboBox x:CompileBindings="False" Width="70" ItemsSource="{Binding PriorityValues}" SelectedItem="{Binding SelectedPriority}" />
+                            <Button Content="{DynamicResource sh_setprio}" Command="{Binding SetSharePriorityCommand}" />
+                            <Button Content="{DynamicResource sh_delprio}" Command="{Binding DelSharePriorityCommand}" />
+                            <Button Content="{DynamicResource d_copylink}" Command="{Binding CopyShareLinkCommand}" />
+                            <Button Content="{DynamicResource d_releaseinfo}" Command="{Binding ReleaseInfoShareCommand}" />
+                        </StackPanel>
+                        <DataGrid x:CompileBindings="False" ItemsSource="{Binding Shares}"
+                                  SelectedItem="{Binding SelectedShare}" IsReadOnly="True"
+                                  GridLinesVisibility="Horizontal" CanUserResizeColumns="True">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="{DynamicResource col_file}" Binding="{Binding ShortFileName}" Width="*" />
+                                <DataGridTextColumn Header="{DynamicResource col_size}" Binding="{Binding Size, Converter={StaticResource FileSizeConverter}}" Width="100" />
+                                <DataGridTextColumn Header="{DynamicResource col_prio}" Binding="{Binding Priority}" Width="80" />
+                                <DataGridTextColumn Header="{DynamicResource col_lastasked}" Binding="{Binding LastAsked, Converter={StaticResource SecondsToDateConverter}}" Width="150" />
+                                <DataGridTextColumn Header="{DynamicResource col_asks}" Binding="{Binding AskCount}" Width="90" />
+                                <DataGridTextColumn Header="{DynamicResource col_hits}" Binding="{Binding SearchCount}" Width="100" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </DockPanel>
+                </Grid>
             </TabItem>
 
             <!-- ===================== EINSTELLUNGEN ===================== -->
