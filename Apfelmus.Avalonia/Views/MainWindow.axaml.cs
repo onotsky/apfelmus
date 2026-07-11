@@ -1,9 +1,12 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.VisualTree;
 using Apfelmus.Avalonia.ViewModels;
 
 namespace Apfelmus.Avalonia.Views
@@ -17,6 +20,46 @@ namespace Apfelmus.Avalonia.Views
         {
             // InitializeComponent wird vom Avalonia-XAML-Compiler generiert (partial).
             InitializeComponent();
+            // Doppelklick auf einen Spaltentrenner -> Spalte an den Inhalt anpassen (wie Excel/WPF).
+            AddHandler(Gestures.DoubleTappedEvent, OnGridSeparatorDoubleTapped, RoutingStrategies.Bubble);
+        }
+
+        private static readonly PropertyInfo? OwningColumnProp =
+            typeof(DataGridColumnHeader).GetProperty("OwningColumn", BindingFlags.NonPublic | BindingFlags.Instance);
+
+        private void OnGridSeparatorDoubleTapped(object? sender, TappedEventArgs e)
+        {
+            if (e.Source is not Visual v) return;
+            var header = v as DataGridColumnHeader ?? v.FindAncestorOfType<DataGridColumnHeader>();
+            var grid = header?.FindAncestorOfType<DataGrid>();
+            if (header == null || grid == null) return;
+            if (OwningColumnProp?.GetValue(header) is not DataGridColumn col) return;
+
+            // Avalonia hat keine benannten Resize-Griffe: der Trenner ist der schmale Randbereich
+            // des Spaltenkopfes. Doppelklick am rechten Rand -> diese Spalte, am linken -> die vorige.
+            var pos = e.GetPosition(header);
+            const double edge = 9;
+            DataGridColumn target;
+            if (pos.X >= header.Bounds.Width - edge) target = col;
+            else if (pos.X <= edge) target = PreviousVisibleColumn(grid, col) ?? col;
+            else return; // Mitte des Kopfes -> das ist Sortieren, nicht anpassen
+
+            // Auto = an den breitesten Inhalt (inkl. Kopf) anpassen.
+            target.Width = new DataGridLength(1, DataGridLengthUnitType.Auto);
+            e.Handled = true;
+        }
+
+        private static DataGridColumn? PreviousVisibleColumn(DataGrid grid, DataGridColumn col)
+        {
+            DataGridColumn? best = null;
+            int bestIdx = -1;
+            foreach (var c in grid.Columns)
+                if (c.IsVisible && c.DisplayIndex < col.DisplayIndex && c.DisplayIndex > bestIdx)
+                {
+                    best = c;
+                    bestIdx = c.DisplayIndex;
+                }
+            return best;
         }
 
         // Alle Tabellen, deren Spaltenlayout gespeichert wird.
