@@ -49,6 +49,8 @@ namespace Apfelmus.Avalonia.ViewModels
 
             PowerValues = new ObservableCollection<int> { 0, 1, 2, 3, 4, 5 };
             PriorityValues = new ObservableCollection<int> { 1, 2, 3, 4, 5 };
+            PartlistSizes = new ObservableCollection<int> { 12, 16, 20, 24, 30, 40, 60 };
+            _partlistSize = config.PartlistRowHeight > 0 ? config.PartlistRowHeight : 24;
             _selectedPowerValue = 0;
             _selectedPriority = 1;
 
@@ -125,6 +127,7 @@ namespace Apfelmus.Avalonia.ViewModels
 
             // Gespeicherte Sprache anwenden.
             LanguageManager.Apply(LanguageManager.Normalize(config.LanguageFile));
+            UpdateConnectionStatusText(); // lokalisierter Startwert ("Verbinde…")
 
             // Beim Start uebergebener ajfsp-Link (Protokoll-Handler) -> an den Core weiterreichen.
             if (!string.IsNullOrWhiteSpace(startupLink))
@@ -144,6 +147,20 @@ namespace Apfelmus.Avalonia.ViewModels
         public ObservableCollection<ShareItem> Shares { get; }
         public ObservableCollection<int> PowerValues { get; }
         public ObservableCollection<int> PriorityValues { get; }
+        public ObservableCollection<int> PartlistSizes { get; }
+
+        // ---- Partlisten-Groesse (Dicke/Aufloesung der Zeilen, einstellbar wie im WPF-Client) ----
+        private int _partlistSize;
+        public int PartlistSize
+        {
+            get => _partlistSize;
+            set
+            {
+                if (!SetProperty(ref _partlistSize, value)) return;
+                try { _config.PartlistRowHeight = value > 0 ? value : 24; ConfigSerializer.SerializeToFile(_config); } catch { }
+                _ = BuildPartlistAsync(); // sofort neu zeichnen
+            }
+        }
 
         // ---- Commands ----
         public RelayCommand TransferAjLinkCommand { get; }
@@ -271,7 +288,12 @@ namespace Apfelmus.Avalonia.ViewModels
         }
 
         // ---- Start / Uebersicht ----
-        private string _connectionStatus = "Verbinde...";
+        private string _connectionStatus = "…";
+        private int _connState; // 0=Verbinde, 1=Verbunden, 2=keine Verbindung
+
+        /// <summary>Setzt den Verbindungs-Statustext lokalisiert (fuer Live-Sprachwechsel).</summary>
+        private void UpdateConnectionStatusText()
+            => ConnectionStatus = LanguageManager.Get(_connState switch { 1 => "st_connected", 2 => "st_noconn", _ => "st_connecting" });
         private string _guiVersion;
         private string _coreVersion = "-";
         private int _users, _files, _openConnections, _uploadQueue;
@@ -376,8 +398,8 @@ namespace Apfelmus.Avalonia.ViewModels
         private async Task PollAsync()
         {
             var info = await _client.GetInformationAsync();
-            if (info == null) { ConnectionStatus = "Keine Verbindung zum Core"; return; }
-            ConnectionStatus = "Verbunden";
+            if (info == null) { _connState = 2; UpdateConnectionStatusText(); return; }
+            _connState = 1; UpdateConnectionStatusText();
 
             // information.xml liefert NUR die GeneralInformation (Core-Version + Dateisystem-Trenner).
             if (info.GeneralInformation != null)
@@ -495,7 +517,11 @@ namespace Apfelmus.Avalonia.ViewModels
             if (pl?.FileInformation == null || pl.Parts == null) { PartlistImage = null; return; }
 
             var sources = DownloadSources.Where(u => u.Status == 2 || u.ActualDownloadPosition > u.DownloadFrom).ToList();
-            PartlistImage = PartlistRenderer.Render(pl.FileInformation.Filesize, pl.Parts, sources, 240, 4);
+            // "Kurze Seite" verdoppelt (Anzeigebereich 148px); Zeilenzahl ergibt sich aus der einstellbaren
+            // Part-Groesse (groesser = dickere, dafuer weniger Zeilen - analog WPF-PartlistRowHeight).
+            const int shortSide = 148;
+            int rows = Math.Max(1, shortSide / Math.Max(1, _partlistSize));
+            PartlistImage = PartlistRenderer.Render(pl.FileInformation.Filesize, pl.Parts, sources, 240, rows);
         }
 
         private async Task RefreshUploadsAsync()
@@ -668,8 +694,11 @@ namespace Apfelmus.Avalonia.ViewModels
         /// <summary>Verarbeitet einen von aussen (Protokoll-Handler/Aktivierung) uebergebenen ajfsp-Link.</summary>
         public void ProcessExternalLink(string link)
         {
-            if (!string.IsNullOrWhiteSpace(link))
-                _ = _client.ProcessLinkAsync(Uri.EscapeDataString(link.Trim()));
+            if (string.IsNullOrWhiteSpace(link)) return;
+            // Der Link kann roh (ajfsp://file|...) ODER bereits %-kodiert (aus dem Browser: %7C) sein.
+            // Erst dekodieren, dann einheitlich EINMAL kodieren - sonst wird %7C zu %257C (Doppelkodierung).
+            string raw = Uri.UnescapeDataString(link.Trim());
+            _ = _client.ProcessLinkAsync(Uri.EscapeDataString(raw));
         }
 
         /// <summary>Fuehrt das Umbenennen aus (vom Dialog der View aufgerufen).</summary>
@@ -827,6 +856,9 @@ namespace Apfelmus.Avalonia.ViewModels
         {
             LanguageManager.Apply(code);
             try { _config.LanguageFile = code; ConfigSerializer.SerializeToFile(_config); } catch { }
+            // Im Code gesetzte/konvertierte Texte sofort neu lokalisieren (Verbindungsstatus + Firewall-Text).
+            UpdateConnectionStatusText();
+            OnPropertyChanged(nameof(Firewalled));
             return Task.CompletedTask;
         }
 

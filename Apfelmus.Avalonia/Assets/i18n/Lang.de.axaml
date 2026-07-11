@@ -135,4 +135,11 @@
     <sys:String x:Key="pl_loaded">geladen</sys:String>
     <sys:String x:Key="pl_active">aktiv</sys:String>
     <sys:String x:Key="pl_finished">fertig</sys:String>
+    <sys:String x:Key="pl_size">Partgröße</sys:String>
+    <sys:String x:Key="st_connecting">Verbinde…</sys:String>
+    <sys:String x:Key="st_connected">Verbunden</sys:String>
+    <sys:String x:Key="st_noconn">Keine Verbindung zum Core</sys:String>
+    <sys:String x:Key="fw_reachable">erreichbar</sys:String>
+    <sys:String x:Key="fw_behind">hinter Firewall</sys:String>
+
 </ResourceDictionary>

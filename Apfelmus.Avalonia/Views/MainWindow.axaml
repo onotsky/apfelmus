@@ -12,6 +12,17 @@
         ExtendClientAreaChromeHints="NoChrome"
         ExtendClientAreaTitleBarHeightHint="-1">
 
+    <!-- Tastenkuerzel fuer die Downloadliste (wie WPF-Client) -->
+    <Window.KeyBindings>
+        <KeyBinding Gesture="F2" Command="{Binding ContinueCommand}" />
+        <KeyBinding Gesture="F3" Command="{Binding BreakCommand}" />
+        <KeyBinding Gesture="F4" Command="{Binding CancelCommand}" />
+        <KeyBinding Gesture="F5" Command="{Binding CleanFinishedCommand}" />
+        <KeyBinding Gesture="F6" Command="{Binding RenameCommand}" />
+        <KeyBinding Gesture="F8" Command="{Binding CopyDownloadLinkCommand}" />
+        <KeyBinding Gesture="F9" Command="{Binding CopyDownloadSourceCommand}" />
+    </Window.KeyBindings>
+
     <DockPanel>
         <!-- ===== Eigene Titelleiste (rahmenloses Fenster, folgt dem App-Theme) ===== -->
         <Grid DockPanel.Dock="Top" Height="34" Background="{DynamicResource SurfaceBrush}"
@@ -154,7 +165,7 @@
                         <Button Content="{DynamicResource d_setprio}" Command="{Binding SetDownloadPriorityCommand}" />
                     </StackPanel>
 
-                    <Grid RowDefinitions="*,4,160,74">
+                    <Grid RowDefinitions="*,4,160,148">
                         <DataGrid Grid.Row="0" x:CompileBindings="False" ItemsSource="{Binding Downloads}"
                                   SelectedItem="{Binding SelectedDownload}" IsReadOnly="True"
                                   GridLinesVisibility="Horizontal" CanUserResizeColumns="True" CanUserReorderColumns="True">
@@ -236,6 +247,10 @@
                                     <Rectangle Width="10" Height="10" Fill="Orange" Margin="8,0,0,0" /><TextBlock Text="{DynamicResource pl_loaded}" Classes="lbl" />
                                     <Rectangle Width="10" Height="10" Fill="Yellow" Margin="8,0,0,0" /><TextBlock Text="{DynamicResource pl_active}" Classes="lbl" />
                                     <Rectangle Width="10" Height="10" Fill="Green" Margin="8,0,0,0" /><TextBlock Text="{DynamicResource pl_finished}" Classes="lbl" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center" Margin="18,0,0,0">
+                                    <TextBlock Text="{DynamicResource pl_size}" Classes="lbl" VerticalAlignment="Center" />
+                                    <ComboBox x:CompileBindings="False" Width="70" ItemsSource="{Binding PartlistSizes}" SelectedItem="{Binding PartlistSize}" />
                                 </StackPanel>
                             </StackPanel>
                             <Border BorderBrush="{DynamicResource TextSecondaryBrush}" BorderThickness="1">

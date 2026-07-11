@@ -28,6 +28,18 @@ namespace Apfelmus.Avalonia.Services
             _current = dict;
         }
 
+        /// <summary>
+        /// Liest einen lokalisierten Text zur Laufzeit aus den App-Ressourcen (fuer im Code gesetzte
+        /// Strings, die nicht per {DynamicResource} gebunden sind). Faellt auf den Schluessel zurueck.
+        /// </summary>
+        public static string Get(string key)
+        {
+            var app = Application.Current;
+            if (app != null && app.TryGetResource(key, app.ActualThemeVariant, out var val) && val is string s)
+                return s;
+            return key;
+        }
+
         /// <summary>Wandelt einen gespeicherten Sprach-Wert (Code oder alter Dateiname) in de/en/it.</summary>
         public static string Normalize(string? value)
         {

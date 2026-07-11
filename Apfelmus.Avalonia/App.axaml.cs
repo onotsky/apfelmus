@@ -28,6 +28,20 @@ namespace Apfelmus.Avalonia
                 activatable.Activated += OnActivated;
             }
 
+            // macOS: Avalonia 11.2 loest das OpenUri-Event nicht aus - deshalb faengt ein nativer
+            // NSAppleEventManager-Handler den ajfsp-Link direkt ueber das Apple-Event ab.
+            // WICHTIG: erst NACH Cocoas eigener finishLaunching-Registrierung setzen (sonst wird
+            // unser Handler ueberschrieben) -> per Timer leicht verzoegert registrieren.
+            if (OperatingSystem.IsMacOS())
+            {
+                global::Avalonia.Threading.DispatcherTimer.RunOnce(() =>
+                {
+                    if (OperatingSystem.IsMacOS())
+                        Services.MacUrlScheme.Register(url =>
+                            global::Avalonia.Threading.Dispatcher.UIThread.Post(() => HandleIncomingLink(url)));
+                }, TimeSpan.FromMilliseconds(1200));
+            }
+
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 desktop.ShutdownMode = ShutdownMode.OnLastWindowClose;
@@ -82,17 +96,18 @@ namespace Apfelmus.Avalonia
         {
             if (e is ProtocolActivatedEventArgs p && p.Kind == ActivationKind.OpenUri && p.Uri != null)
             {
-                string link = p.Uri.ToString();
-                if (_mainVm != null)
-                {
-                    _mainVm.ProcessExternalLink(link);
-                }
-                else
-                {
-                    // Aktivierung vor dem Erstellen des Hauptfensters -> merken und beim Start verarbeiten.
-                    _pendingLink = link;
-                }
+                HandleIncomingLink(p.Uri.ToString());
             }
+        }
+
+        /// <summary>Verarbeitet einen eingehenden ajfsp-Link (aus OpenUri ODER dem nativen macOS-Handler).</summary>
+        private void HandleIncomingLink(string? link)
+        {
+            if (string.IsNullOrWhiteSpace(link)) return;
+            if (_mainVm != null)
+                _mainVm.ProcessExternalLink(link!);
+            else
+                _pendingLink = link; // vor dem Hauptfenster -> beim Start verarbeiten
         }
     }
 }
