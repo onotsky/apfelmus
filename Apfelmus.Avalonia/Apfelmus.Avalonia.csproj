@@ -22,6 +22,8 @@
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <RootNamespace>Apfelmus.Avalonia</RootNamespace>
     <AssemblyName>Apfelmus.Avalonia</AssemblyName>
+    <!-- Icon der Windows-.exe (Taskleiste/Explorer). -->
+    <ApplicationIcon>Assets/apfelmus.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>

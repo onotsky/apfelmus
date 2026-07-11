@@ -19,8 +19,10 @@ namespace Apfelmus.Avalonia.Converters
                 return value?.ToString() ?? string.Empty;
             }
 
+            // Betrag fuer die Einheitenwahl heranziehen -> auch negative Werte (z.B. Credits-Defizit)
+            // werden korrekt umgerechnet (-2,16 GB statt "-2317980743 Bytes"); das Vorzeichen bleibt.
             int unit = 0;
-            while (bytes >= 1024 && unit < Units.Length - 1)
+            while (Math.Abs(bytes) >= 1024 && unit < Units.Length - 1)
             {
                 bytes /= 1024;
                 unit++;

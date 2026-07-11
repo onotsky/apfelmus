@@ -35,6 +35,13 @@ namespace Apfelmus.Avalonia
             // WICHTIG: erst NACH Cocoas eigener finishLaunching-Registrierung setzen (sonst wird unser
             // Handler ueberschrieben). Fuer den Kaltstart moeglichst FRUEH greifen -> mehrfach
             // (idempotent) registrieren: sofort per Post und dann gestaffelt.
+            // Windows/Linux: von weiteren (Single-Instance-)Instanzen weitergereichte Links verarbeiten.
+            if (!OperatingSystem.IsMacOS())
+            {
+                Services.SingleInstance.SetHandler(url =>
+                    global::Avalonia.Threading.Dispatcher.UIThread.Post(() => HandleIncomingLink(url)));
+            }
+
             if (OperatingSystem.IsMacOS())
             {
                 void RegisterMac()

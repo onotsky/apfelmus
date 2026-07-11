@@ -1,61 +1,44 @@
 # Apfelmus.Avalonia
 
 Cross-Platform-Umsetzung der Apfelmus-GUI mit [Avalonia](https://avaloniaui.net/)
-(Windows / macOS / Linux). Teilt sich mit dem WPF-Client die **plattformneutrale
-Kernbibliothek `ApfelmusFramework` (`net10.0`)** – nur die Präsentationsschicht
-(Views, ViewModels, Converter, Themes) ist Avalonia-spezifisch neu.
+(**Windows / macOS / Linux**). Teilt sich mit dem WPF-Client die plattformneutrale
+Kernbibliothek **`ApfelmusFramework` (`net10.0`)** – nur die Präsentationsschicht
+(Views, ViewModels, Converter, Themes) ist Avalonia-spezifisch neu. Liegt auf dem
+Git-Branch `avalonia`.
 
-Diese Umsetzung entstand auf dem Git-Branch `avalonia`, aufgesetzt auf der
-Entkopplung des Frameworks (siehe Commit „Framework von WPF entkoppeln“ auf `main`).
+## Verhältnis zum WPF-Client
 
-## Status: weitgehende Funktionsparität zum WPF-Client
+Der **Funktionsumfang** entspricht dem Windows-WPF-Original – Start/Übersicht,
+Downloads (inkl. Quellen, Partliste, Powerdownload), Uploads, Suche, Server, Mein
+Share und Einstellungen. Die Beschreibung dieser Funktionsbereiche steht bewusst nur
+einmal, in der Projekt-README ([`../README.md`](../README.md)); hier wird sie **nicht
+wiederholt**. Gegen einen echten, laufenden appleJuice-Core getestet.
 
-Gebaut mit .NET 10 (`dotnet build`, 0 Warnungen/0 Fehler); Startup und Laden des
-Hauptfensters (inkl. aller Tabs) per Smoke-Test geprüft. Ein Test gegen einen echten
-laufenden appleJuice-Core steht noch aus.
+Dieses Dokument beschreibt nur, was an der Avalonia-Fassung **anders oder zusätzlich**
+ist.
 
-**Verdrahtet gegen den echten Core über `WebConnect` (gemeinsame Kernbibliothek):**
-- **Menüleiste:** Design (Dunkel/Hell) und Core → „Core beenden“ (`/function/exitcore`).
-- **AJLink-Transfer** (Kopfzeile): Link einfügen → `/function/processlink`.
-- **Login/Verbindung:** Passwort → MD5, Socket-Test, `Config.xml` (`ConfigSerializer`).
-- **Start/Übersicht:** Client (GUI-/Core-Version), Netzwerk (Nutzer, Dateien,
-  Gesamtgröße, Verbindungen, Upload-Queue, Firewall-Icon, IP), Server (Name,
-  verbunden-seit, Willkommensnachricht) – aus `information.xml` + `modified.xml?filter=informations`.
-- **Statusleiste:** Credits, Up-/Download-Speed, Session-Traffic (in/out).
-- **Downloads:** DataGrid (Datei, Status-Text, Größe, geladen, Speed, Restzeit, %,
-  Rest, Power) + Quellen-Unterliste des gewählten Downloads (`filter=user`) +
-  Aktionen Fortsetzen/Pause/Abbrechen/Fertige-entfernen/Powerdownload/Priorität/
-  Info-URL/Link-kopieren.
-- **Uploads:** DataGrid (Datei, Nick, Speed, %, Priorität, Version).
-- **Suche:** Start/Stopp (`/function/search`, `/function/cancelsearch`), Treffer-/
-  Quellen-Zähler, Ergebnisliste (`filter=search`), Download (`processlink`),
-  Info-URL, Link-kopieren.
-- **Server:** DataGrid (Name, Host, Port, zuletzt gesehen, Versuche) + Verbinden
-  (`serverlogin`), Entfernen (`removeserver`), offizielle Serverliste holen.
-- **Mein Share:** DataGrid (`share.xml`) + Priorität setzen/zurück, Link-kopieren, Info-URL.
-- **Einstellungen:** Refreshrate, Info-URL (`ReleaseInfoHost`), Theme; via `ConfigSerializer` persistiert.
-- „Suche nach mehr Informationen“ über `ReleaseInfo.Open` (Framework, plattformübergreifend).
+## Was hier anders/zusätzlich ist
 
-**Inzwischen ebenfalls umgesetzt (Parität weitgehend erreicht):**
-- Voller Core-Einstellungsdialog (`settings.xml`/`setsettings`) + Passwortänderung.
-- Partlisten-Verfügbarkeitsbalken (`downloadpartlist.xml`, WriteableBitmap-Rendering).
-- Zeilenfärbung (Downloads nach Status, Server nach Verbindung).
-- Rahmenlose Custom-Titelleiste (analog WPF `WindowChrome`).
-- Mehrsprachigkeit DE/EN/IT (Menü „Sprache“, Laufzeitumschaltung, persistiert).
-- Share-Verzeichnisbaum + Freigabe-Verwaltung (Ordner freigeben/entfernen).
-- Datei-Typ-Icons als plattformneutrale Vektor-Kategorie-Icons.
+**Plattform & Verteilung**
+- Läuft unter Windows, macOS und Linux; Releases als self-contained ZIPs je Plattform,
+  macOS zusätzlich als `.app`-Bundle (`build-macos-app.sh`).
+- Rahmenlose Custom-Titelleiste (statt WPF `WindowChrome`).
+- Datei-Icons sind plattformneutrale Kategorie-Vektor-Icons (echte Windows-Shell-Icons
+  sind cross-platform nicht reproduzierbar).
 
-**Ebenfalls umgesetzt:**
-- Suche mit dynamischen Ergebnis-Tabs pro Suchlauf (mehrere parallele Suchen,
-  Tab schließen = Suche abbrechen) – analog WPF `CloseableTabItem`.
-- Download umbenennen (Dialog → `/function/renamedownload`) und „Quelle kopieren“
-  (ajfsp-Link inkl. IP/Port/Server) zusätzlich zu „Link kopieren“.
-- Uploads getrennt in „Aktive Uploads“ und „Warteschlange“ (Dateiname aus der
-  Freigabe per Shareid aufgelöst, Fortschritt berechnet).
+**Bedienkomfort (über den WPF-Stand hinaus bzw. neu umgesetzt)**
+- Tabellen standardmäßig alphabetisch sortiert, Sortierung per Spaltenkopf,
+  **Doppelklick auf den Spaltentrenner** passt die Spalte an den Inhalt an.
+- Spaltenlayout **aller** Tabellen sowie Fenstergröße/-zustand werden gespeichert.
+- Link-Übergabe holt das Fenster in den Vordergrund und wechselt auf den Downloads-Tab.
+- Einstellungen als eigener Tab (im WPF-Client ein separates Fenster).
 
-**Bewusst nicht 1:1:**
-- Datei-Icons sind plattformneutrale Kategorie-Vektor-Icons statt echter
-  Windows-Shell-Icons (letztere sind cross-platform nicht reproduzierbar).
+**ajfsp://-Verknüpfung – plattformabhängig** (siehe unten).
+
+**Single-Instance (Windows/Linux):** mehrere gleichzeitig übergebene Links starten
+nicht mehr mehrere Instanzen – weitere Instanzen reichen ihren Link über eine Named
+Pipe an die laufende Instanz weiter (Primärwahl über exklusive Lock-Datei). macOS ist
+über das `.app`-Bundle ohnehin Single-Instance.
 
 ## Bauen & Starten
 
@@ -66,42 +49,52 @@ dotnet restore
 dotnet run --project Apfelmus.Avalonia
 ```
 
-> Getestet mit .NET-SDK 10.0.301 (macOS/arm64): baut mit 0 Warnungen/0 Fehlern und
-> startet. Avalonia-Pakete sind auf `11.2.1` gepinnt; `Tmds.DBus.Protocol` ist auf
-> `0.21.3` hochgezogen (schließt Advisory GHSA-xrw6-gwf8-vvr9 des transitiven 0.20.0).
+> Avalonia-Pakete sind auf `11.2.1` gepinnt; `Tmds.DBus.Protocol` ist auf `0.21.3`
+> hochgezogen (schließt Advisory GHSA-xrw6-gwf8-vvr9 des transitiven 0.20.0).
 
-Es muss – wie beim WPF-Client – ein separater appleJuice-**Core** laufen, gegen den
-sich die GUI verbindet (Standard: `localhost:9851`).
+Es muss – wie beim WPF-Client – ein separater appleJuice-**Core** laufen
+(Standard: `localhost:9851`).
 
 ## Architektur
 
 ```
-Program.cs            → Avalonia-Bootstrap
-App.axaml(.cs)        → Theme/Ressourcen, Login→MainWindow-Übergang
+Program.cs            → Avalonia-Bootstrap + Single-Instance (Win/Linux)
+App.axaml(.cs)        → Theme/Ressourcen, Login→MainWindow-Übergang, ajfsp-Verteilung
 Services/CoreClient   → async-Hülle um WebConnect (baut /xml/*-Abfragen)
-ViewModels/           → LoginViewModel, MainWindowViewModel, ViewModelBase, RelayCommand
-Views/                → LoginWindow, MainWindow (.axaml + code-behind)
+Services/MacUrlScheme → nativer macOS-Apple-Event-Handler (kAEGetURL) für ajfsp://
+Services/SingleInstance, ProtocolHandlerService, PartlistRenderer, LanguageManager
+ViewModels/           → MainWindowViewModel, LoginViewModel, ViewModelBase, RelayCommand
+Views/                → MainWindow, LoginWindow, SplashWindow, RenameDialog
 Converters/           → Avalonia-IValueConverter (Portierungen)
-Assets/Images/        → Bildressourcen (avares://)
+Assets/               → Bilder, apfelmus.ico (.exe-Icon), i18n (Lang.de/en/it.axaml)
 ```
 
-Der gesamte Netzwerk-/Datenkern bleibt in `ApfelmusFramework` und wird unverändert
-mit dem WPF-Client geteilt.
+### Wissenswerte Fallstricke
+
+- **DataGrid-Converter-Spalten:** `DataGridTextColumn.Binding` ist standardmäßig
+  `TwoWay`; zusammen mit einem `IValueConverter` liefert Avalonia 11.2 dem Converter
+  den Ziel-Default (0) statt des Quellwerts. Alle solchen Spalten binden daher mit
+  `Mode=OneWay` (die Tabellen sind ohnehin read-only).
+- **Netzwerk-Kennzahlen** kommen aus `modified.xml?filter=informations` (nicht aus
+  `information.xml` – dort fehlt der `<networkinfo>`-Block).
 
 ## ajfsp://-Protokoll-Verknüpfung
 
-- **Windows:** Checkbox „ajfsp-Links mit Apfelmus verknüpfen" im Einstellungen-Tab
-  (registriert `ajfsp` unter `HKCU\Software\Classes`, kein Admin nötig). Eingehende
-  Links kommen als Kommandozeilen-Argument und werden an den Core weitergereicht.
-- **macOS:** über das `.app`-Bundle. `build-macos-app.sh` erzeugt `Apfelmus.app`
-  (self-contained, osx-arm64) mit `Info.plist` inkl. `ajfsp`-URL-Scheme und einem
-  `.icns`-Icon (das gibt der App auch ein Dock-Icon). Registrierung durch macOS,
-  sobald das Bundle bekannt ist (nach `/Applications` kopieren bzw. `lsregister -f Apfelmus.app`).
-  Der Link kommt als Apple-Event und wird über Avalonias `IActivatableLifetime`
-  entgegengenommen und an den Core weitergereicht.
+Der Browser übergibt geklickte `ajfsp://`-Links an Apfelmus; der Link wird an den Core
+weitergereicht. Registrierung je Plattform:
+
+- **Windows:** Checkbox „ajfsp-Links mit Apfelmus verknüpfen“ (Einstellungen) →
+  `HKCU\Software\Classes\ajfsp`, kein Admin nötig. Link kommt als Argument.
+- **Linux:** dieselbe Checkbox → legt `~/.local/share/applications/apfelmus-ajfsp.desktop`
+  an und meldet den Handler per `xdg-mime` an. Link kommt als Argument (`%u`).
+- **macOS:** über das `.app`-Bundle mit `Info.plist`-URL-Scheme. **Wichtig:** Avalonia
+  11.2 löst das `IActivatableLifetime`-OpenUri-Event auf macOS nicht aus – der Link
+  wird stattdessen über einen nativen **`NSAppleEventManager`-Handler** (`kAEGetURL`,
+  `Services/MacUrlScheme`) abgefangen (leicht verzögert registriert, damit Cocoas
+  eigener Handler nicht überschreibt; mehrere Links werden gesammelt).
 
 ```bash
-# macOS-App-Bundle bauen (statt/zusätzlich zum reinen Ordner-Zip):
+# macOS-App-Bundle bauen (Version aus Directory.Build.props):
 ./Apfelmus.Avalonia/build-macos-app.sh
 # -> Apfelmus.Avalonia/bin/macos-app/Apfelmus.app (+ .zip)
 ```
