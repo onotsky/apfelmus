@@ -19,25 +19,48 @@ namespace Apfelmus.Avalonia.Views
             InitializeComponent();
         }
 
+        // Alle Tabellen, deren Spaltenlayout gespeichert wird.
+        private static readonly string[] GridNames =
+            { "DownloadsGrid", "SourcesGrid", "UploadsGrid", "ServersGrid", "SharesGrid" };
+
         protected override void OnOpened(System.EventArgs e)
         {
             base.OnOpened(e);
             if (_columnsRestored || DataContext is not MainWindowViewModel vm) return;
             _columnsRestored = true;
-            RestoreColumns(this.FindControl<DataGrid>("DownloadsGrid"), vm.DownloadColumnLayout);
-            RestoreColumns(this.FindControl<DataGrid>("UploadsGrid"), vm.UploadColumnLayout);
+            var map = ParseGridLayouts(vm.SavedGridLayouts);
+            foreach (var name in GridNames)
+                if (map.TryGetValue(name, out var layout))
+                    RestoreColumns(this.FindControl<DataGrid>(name), layout);
         }
 
         protected override void OnClosing(WindowClosingEventArgs e)
         {
             if (DataContext is MainWindowViewModel vm)
             {
-                vm.SaveWindowAndColumns(
-                    SerializeColumns(this.FindControl<DataGrid>("DownloadsGrid")),
-                    SerializeColumns(this.FindControl<DataGrid>("UploadsGrid")),
-                    Width, Height, WindowState == WindowState.Maximized);
+                var sb = new System.Text.StringBuilder();
+                foreach (var name in GridNames)
+                {
+                    var g = this.FindControl<DataGrid>(name);
+                    if (g == null) continue;
+                    string layout = SerializeColumns(g);
+                    if (!string.IsNullOrEmpty(layout)) sb.Append(name).Append('=').Append(layout).Append('\n');
+                }
+                vm.SaveWindowAndGrids(sb.ToString(), Width, Height, WindowState == WindowState.Maximized);
             }
             base.OnClosing(e);
+        }
+
+        private static Dictionary<string, string> ParseGridLayouts(string s)
+        {
+            var map = new Dictionary<string, string>();
+            if (string.IsNullOrEmpty(s)) return map;
+            foreach (var line in s.Split('\n'))
+            {
+                int eq = line.IndexOf('=');
+                if (eq > 0) map[line.Substring(0, eq)] = line.Substring(eq + 1);
+            }
+            return map;
         }
 
         // Serialisiert je Spalte "DisplayIndex:Breite" in Definitionsreihenfolge.
@@ -90,6 +113,8 @@ namespace Apfelmus.Avalonia.Views
                 vm.CopyRequested += OnCopyRequested;
                 vm.RenameRequested -= OnRenameRequested;
                 vm.RenameRequested += OnRenameRequested;
+                vm.TargetDirRequested -= OnTargetDirRequested;
+                vm.TargetDirRequested += OnTargetDirRequested;
                 vm.ActivateRequested -= OnActivateRequested;
                 vm.ActivateRequested += OnActivateRequested;
 
@@ -125,6 +150,17 @@ namespace Apfelmus.Avalonia.Views
             if (result != null && DataContext is MainWindowViewModel vm)
             {
                 vm.ExecuteRename(d.Id, result);
+            }
+        }
+
+        private async void OnTargetDirRequested(ApfelmusFramework.Classes.Modified.Download d)
+        {
+            // Der Zielpfad liegt auf dem Core-Rechner -> Texteingabe (kein lokaler Ordner-Dialog).
+            var dlg = new RenameDialog(d.TargetDirectory ?? string.Empty) { Title = "Zielverzeichnis" };
+            var result = await dlg.ShowDialog<string?>(this);
+            if (result != null && DataContext is MainWindowViewModel vm)
+            {
+                vm.ExecuteSetTargetDir(d.Id, result);
             }
         }
 
@@ -170,6 +206,14 @@ namespace Apfelmus.Avalonia.Views
             if (DataContext is MainWindowViewModel vm && SharesGrid?.SelectedItems is { Count: > 0 } sel)
             {
                 vm.CopyShareLinks(sel);
+            }
+        }
+
+        private void CopyShareSources_Click(object? sender, RoutedEventArgs e)
+        {
+            if (DataContext is MainWindowViewModel vm && SharesGrid?.SelectedItems is { Count: > 0 } sel)
+            {
+                vm.CopyShareSources(sel);
             }
         }
 

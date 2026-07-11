@@ -90,11 +90,13 @@ namespace Apfelmus.Avalonia.ViewModels
             CopyDownloadLinkCommand = new RelayCommand(() => { if (SelectedDownload != null) RaiseCopy(BuildAjfsp(SelectedDownload.FileName, SelectedDownload.Hash, SelectedDownload.Size)); return Task.CompletedTask; }, () => SelectedDownload != null);
             CopyDownloadSourceCommand = new RelayCommand(() => { if (SelectedDownload != null) RaiseCopy(BuildSourceLink(SelectedDownload.FileName, SelectedDownload.Hash, SelectedDownload.Size)); return Task.CompletedTask; }, () => SelectedDownload != null);
             RenameCommand = new RelayCommand(() => { if (SelectedDownload != null) RenameRequested?.Invoke(SelectedDownload); return Task.CompletedTask; }, () => SelectedDownload != null);
+            SetTargetDirCommand = new RelayCommand(() => { if (SelectedDownload != null) TargetDirRequested?.Invoke(SelectedDownload); return Task.CompletedTask; }, () => SelectedDownload != null);
 
             // Server
             ConnectServerCommand = new RelayCommand(async () => { if (SelectedServer != null) await _client.ConnectServerAsync(SelectedServer.Id); }, () => SelectedServer != null);
             RemoveServerCommand = new RelayCommand(async () => { if (SelectedServer != null) { await _client.RemoveServerAsync(SelectedServer.Id); await RefreshServersAsync(); } }, () => SelectedServer != null);
             AddOfficialServersCommand = new RelayCommand(() => _client.AddOfficialServersAsync());
+            CopyServerLinkCommand = new RelayCommand(() => { if (SelectedServer != null) RaiseCopy($"ajfsp://server|{SelectedServer.Host}|{SelectedServer.Port}/"); return Task.CompletedTask; }, () => SelectedServer != null);
 
             // Suche
             StartSearchCommand = new RelayCommand(StartSearchAsync, () => !string.IsNullOrWhiteSpace(SearchText));
@@ -109,6 +111,7 @@ namespace Apfelmus.Avalonia.ViewModels
             DelSharePriorityCommand = new RelayCommand(async () => { if (SelectedShare != null) { await _client.SetDownloadPriorityAsync(SelectedShare.Id, 1); } }, () => SelectedShare != null);
             ReleaseInfoShareCommand = new RelayCommand(() => { if (SelectedShare != null) OpenReleaseInfo(SelectedShare.ShortFileName, SelectedShare.CheckSum, SelectedShare.Size.ToString()); return Task.CompletedTask; }, () => SelectedShare != null);
             CopyShareLinkCommand = new RelayCommand(() => { if (SelectedShare != null) RaiseCopy(BuildAjfsp(SelectedShare.ShortFileName, SelectedShare.CheckSum, SelectedShare.Size.ToString())); return Task.CompletedTask; }, () => SelectedShare != null);
+            CopyShareSourceCommand = new RelayCommand(() => { if (SelectedShare != null) RaiseCopy(BuildSourceLink(SelectedShare.ShortFileName, SelectedShare.CheckSum, SelectedShare.Size.ToString())); return Task.CompletedTask; }, () => SelectedShare != null);
             RefreshShareCommand = new RelayCommand(RefreshSharesAsync);
             CheckShareCommand = new RelayCommand(CheckShareAsync);
             ShowAllSharesCommand = new RelayCommand(() =>
@@ -209,12 +212,16 @@ namespace Apfelmus.Avalonia.ViewModels
         public RelayCommand CopyDownloadLinkCommand { get; }
         public RelayCommand CopyDownloadSourceCommand { get; }
         public RelayCommand RenameCommand { get; }
+        public RelayCommand SetTargetDirCommand { get; }
 
         /// <summary>Wird von der View abonniert, um den Umbenennen-Dialog anzuzeigen.</summary>
         public event Action<Download>? RenameRequested;
+        /// <summary>Wird von der View abonniert, um den Zielverzeichnis-Dialog anzuzeigen.</summary>
+        public event Action<Download>? TargetDirRequested;
         public RelayCommand ConnectServerCommand { get; }
         public RelayCommand RemoveServerCommand { get; }
         public RelayCommand AddOfficialServersCommand { get; }
+        public RelayCommand CopyServerLinkCommand { get; }
         public RelayCommand StartSearchCommand { get; }
         public RelayCommand StopSearchCommand { get; }
         public RelayCommand CloseSearchTabCommand { get; }
@@ -225,6 +232,7 @@ namespace Apfelmus.Avalonia.ViewModels
         public RelayCommand DelSharePriorityCommand { get; }
         public RelayCommand ReleaseInfoShareCommand { get; }
         public RelayCommand CopyShareLinkCommand { get; }
+        public RelayCommand CopyShareSourceCommand { get; }
         public RelayCommand RefreshShareCommand { get; }
         public RelayCommand CheckShareCommand { get; }
         public RelayCommand ShowAllSharesCommand { get; }
@@ -371,7 +379,7 @@ namespace Apfelmus.Avalonia.ViewModels
         public Server? SelectedServer
         {
             get => _selectedServer;
-            set { if (SetProperty(ref _selectedServer, value)) { ConnectServerCommand.RaiseCanExecuteChanged(); RemoveServerCommand.RaiseCanExecuteChanged(); } }
+            set { if (SetProperty(ref _selectedServer, value)) { ConnectServerCommand.RaiseCanExecuteChanged(); RemoveServerCommand.RaiseCanExecuteChanged(); CopyServerLinkCommand.RaiseCanExecuteChanged(); } }
         }
         public SearchTabViewModel? SelectedSearchTab
         {
@@ -381,7 +389,7 @@ namespace Apfelmus.Avalonia.ViewModels
         public ShareItem? SelectedShare
         {
             get => _selectedShare;
-            set { if (SetProperty(ref _selectedShare, value)) { SetSharePriorityCommand.RaiseCanExecuteChanged(); DelSharePriorityCommand.RaiseCanExecuteChanged(); ReleaseInfoShareCommand.RaiseCanExecuteChanged(); CopyShareLinkCommand.RaiseCanExecuteChanged(); } }
+            set { if (SetProperty(ref _selectedShare, value)) { SetSharePriorityCommand.RaiseCanExecuteChanged(); DelSharePriorityCommand.RaiseCanExecuteChanged(); ReleaseInfoShareCommand.RaiseCanExecuteChanged(); CopyShareLinkCommand.RaiseCanExecuteChanged(); CopyShareSourceCommand.RaiseCanExecuteChanged(); } }
         }
         public string SearchText { get => _searchText; set { if (SetProperty(ref _searchText, value)) StartSearchCommand.RaiseCanExecuteChanged(); } }
         public string AjLinkText { get => _ajLinkText; set { if (SetProperty(ref _ajLinkText, value)) TransferAjLinkCommand.RaiseCanExecuteChanged(); } }
@@ -408,7 +416,9 @@ namespace Apfelmus.Avalonia.ViewModels
         public int CorePort { get => _corePort; set => SetProperty(ref _corePort, value); }
         public int CoreXmlPort { get => _coreXmlPort; set => SetProperty(ref _coreXmlPort, value); }
         public int CoreMaxConnections { get => _coreMaxConnections; set => SetProperty(ref _coreMaxConnections, value); }
-        public int CoreMaxUpload { get => _coreMaxUpload; set => SetProperty(ref _coreMaxUpload, value); }
+        public int CoreMaxUpload { get => _coreMaxUpload; set { if (SetProperty(ref _coreMaxUpload, value)) OnPropertyChanged(nameof(SpeedSlotMax)); } }
+        /// <summary>Obergrenze fuer den Speed-pro-Slot-Schieberegler = Max-Upload (Fallback 1 MB/s, falls unbegrenzt).</summary>
+        public double SpeedSlotMax => CoreMaxUpload > 0 ? CoreMaxUpload : 1048576;
         public int CoreMaxDownload { get => _coreMaxDownload; set => SetProperty(ref _coreMaxDownload, value); }
         public int CoreSpeedPerSlot { get => _coreSpeedPerSlot; set => SetProperty(ref _coreSpeedPerSlot, value); }
         public int CoreMaxNewConnectionsPerTurn { get => _coreMaxNewConn; set => SetProperty(ref _coreMaxNewConn, value); }
@@ -697,6 +707,16 @@ namespace Apfelmus.Avalonia.ViewModels
             if (sb.Length > 0) RaiseCopy(sb.ToString());
         }
 
+        /// <summary>Kopiert die Quelle-Links (mit eigener IP/Server) aller markierten Freigaben (mehrzeilig).</summary>
+        public void CopyShareSources(System.Collections.IEnumerable selected)
+        {
+            var sb = new System.Text.StringBuilder();
+            foreach (var item in selected)
+                if (item is ShareItem s)
+                    sb.Append(BuildSourceLink(s.ShortFileName, s.CheckSum, s.Size.ToString())).Append('\n');
+            if (sb.Length > 0) RaiseCopy(sb.ToString());
+        }
+
         private async Task RefreshSearchAsync()
         {
             if (SearchTabs.Count == 0) return;
@@ -782,7 +802,7 @@ namespace Apfelmus.Avalonia.ViewModels
             CancelCommand.RaiseCanExecuteChanged(); ApplyPowerDownloadCommand.RaiseCanExecuteChanged();
             SetDownloadPriorityCommand.RaiseCanExecuteChanged(); ReleaseInfoDownloadCommand.RaiseCanExecuteChanged();
             CopyDownloadLinkCommand.RaiseCanExecuteChanged(); CopyDownloadSourceCommand.RaiseCanExecuteChanged();
-            RenameCommand.RaiseCanExecuteChanged();
+            RenameCommand.RaiseCanExecuteChanged(); SetTargetDirCommand.RaiseCanExecuteChanged();
         }
 
         /// <summary>Verarbeitet einen von aussen (Protokoll-Handler/Aktivierung) uebergebenen ajfsp-Link.</summary>
@@ -796,20 +816,18 @@ namespace Apfelmus.Avalonia.ViewModels
             FocusDownloads();
         }
 
-        // ---- Spaltenlayout + Fenstergroesse (von der View gespeichert/gelesen) ----
-        public string DownloadColumnLayout => _config.DownloadColumnLayout ?? string.Empty;
-        public string UploadColumnLayout => _config.UploadColumnLayout ?? string.Empty;
+        // ---- Spaltenlayout (alle Tabellen) + Fenstergroesse (von der View gespeichert/gelesen) ----
+        public string SavedGridLayouts => _config.GridLayouts ?? string.Empty;
         public double SavedWindowWidth => _config.WindowWidth;
         public double SavedWindowHeight => _config.WindowHeight;
         public bool SavedWindowMaximized => _config.WindowMaximized;
 
-        /// <summary>Speichert Spaltenlayout und Fenstergroesse/-zustand in einem Rutsch (beim Schliessen).</summary>
-        public void SaveWindowAndColumns(string download, string upload, double width, double height, bool maximized)
+        /// <summary>Speichert die Spaltenlayouts aller Tabellen und Fenstergroesse/-zustand (beim Schliessen).</summary>
+        public void SaveWindowAndGrids(string gridLayouts, double width, double height, bool maximized)
         {
             try
             {
-                _config.DownloadColumnLayout = download;
-                _config.UploadColumnLayout = upload;
+                _config.GridLayouts = gridLayouts;
                 if (!maximized && width > 200 && height > 150) { _config.WindowWidth = width; _config.WindowHeight = height; }
                 _config.WindowMaximized = maximized;
                 ConfigSerializer.SerializeToFile(_config);
@@ -822,6 +840,13 @@ namespace Apfelmus.Avalonia.ViewModels
         {
             if (!string.IsNullOrWhiteSpace(newName))
                 _ = _client.RenameDownloadAsync(downloadId, newName.Trim());
+        }
+
+        /// <summary>Setzt das Zielverzeichnis eines Downloads (vom Dialog der View aufgerufen).</summary>
+        public void ExecuteSetTargetDir(int downloadId, string dir)
+        {
+            if (!string.IsNullOrWhiteSpace(dir))
+                _ = _client.SetTargetDirAsync(downloadId, dir.Trim());
         }
 
         private string BuildSourceLink(string? name, string? hash, string? size)

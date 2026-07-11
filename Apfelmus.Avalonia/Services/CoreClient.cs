@@ -147,6 +147,10 @@ namespace Apfelmus.Avalonia.Services
         public Task RenameDownloadAsync(int id, string newName)
             => Fire("/function/renamedownload?id=" + id + "&name=" + (newName ?? string.Empty).Replace(" ", "%20") + "&password=" + _config.Password);
 
+        /// <summary>Setzt das Zielverzeichnis eines Downloads (Pfad auf dem Core-Rechner).</summary>
+        public Task SetTargetDirAsync(int id, string dir)
+            => Fire("/function/settargetdir?id=" + id + "&dir=" + Uri.EscapeDataString(dir ?? string.Empty) + "&password=" + _config.Password);
+
         public Task SetDownloadPriorityAsync(int id, int priority)
             => Fire("/function/setpriority?id=" + id + "&priority=" + priority + "&password=" + _config.Password);
 

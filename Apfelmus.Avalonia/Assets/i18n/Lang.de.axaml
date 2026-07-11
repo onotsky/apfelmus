@@ -45,6 +45,9 @@
     <sys:String x:Key="d_releaseinfo">Info-URL</sys:String>
     <sys:String x:Key="d_copylink">Link kopieren</sys:String>
     <sys:String x:Key="d_copysource">Quelle kopieren</sys:String>
+    <sys:String x:Key="sv_serverlink">Serverlink kopieren</sys:String>
+    <sys:String x:Key="d_copysources">Quellen kopieren</sys:String>
+    <sys:String x:Key="d_targetdir">Zielverzeichnis</sys:String>
     <sys:String x:Key="d_copylinks">Links kopieren</sys:String>
     <sys:String x:Key="d_rename">Neuer Dateiname</sys:String>
     <sys:String x:Key="d_renamebtn">Umbenennen</sys:String>
@@ -109,7 +112,7 @@
     <sys:String x:Key="set_design">Design</sys:String>
     <sys:String x:Key="set_guisave">GUI speichern</sys:String>
     <sys:String x:Key="set_showlogin">Login-Fenster beim nächsten Start anzeigen</sys:String>
-    <sys:String x:Key="set_protocol">ajfsp-Links mit Apfelmus verknüpfen (Windows)</sys:String>
+    <sys:String x:Key="set_protocol">ajfsp-Links mit Apfelmus verknüpfen (Windows/Linux)</sys:String>
     <sys:String x:Key="set_core">Core-Einstellungen</sys:String>
     <sys:String x:Key="set_nick">Nickname</sys:String>
     <sys:String x:Key="set_tempdir">Temp-Verzeichnis</sys:String>

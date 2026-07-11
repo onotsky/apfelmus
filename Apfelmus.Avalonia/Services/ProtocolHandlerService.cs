@@ -10,12 +10,58 @@ namespace Apfelmus.Avalonia.Services
     /// </summary>
     public static class ProtocolHandlerService
     {
-        public static bool IsSupported => OperatingSystem.IsWindows();
+        public static bool IsSupported => OperatingSystem.IsWindows() || OperatingSystem.IsLinux();
 
         public static bool Register()
         {
-            if (!OperatingSystem.IsWindows()) return false;
-            return RegisterWindows();
+            if (OperatingSystem.IsWindows()) return RegisterWindows();
+            if (OperatingSystem.IsLinux()) return RegisterLinux();
+            return false;
+        }
+
+        [SupportedOSPlatform("linux")]
+        private static bool RegisterLinux()
+        {
+            try
+            {
+                string exe = Environment.ProcessPath ?? System.Diagnostics.Process.GetCurrentProcess().MainModule!.FileName!;
+                string appsDir = System.IO.Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "applications");
+                System.IO.Directory.CreateDirectory(appsDir);
+                const string desktopName = "apfelmus-ajfsp.desktop";
+                string desktopPath = System.IO.Path.Combine(appsDir, desktopName);
+
+                // .desktop mit URL-Scheme-Handler; %u uebergibt den ajfsp-Link als Argument.
+                string content =
+                    "[Desktop Entry]\n" +
+                    "Type=Application\n" +
+                    "Name=Apfelmus\n" +
+                    "Exec=\"" + exe + "\" %u\n" +
+                    "Terminal=false\n" +
+                    "NoDisplay=true\n" +
+                    "MimeType=x-scheme-handler/ajfsp;\n";
+                System.IO.File.WriteAllText(desktopPath, content);
+
+                Run("xdg-mime", "default " + desktopName + " x-scheme-handler/ajfsp");
+                Run("update-desktop-database", appsDir);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        [SupportedOSPlatform("linux")]
+        private static void Run(string file, string args)
+        {
+            try
+            {
+                var psi = new System.Diagnostics.ProcessStartInfo(file, args)
+                { UseShellExecute = false, CreateNoWindow = true, RedirectStandardError = true, RedirectStandardOutput = true };
+                System.Diagnostics.Process.Start(psi)?.WaitForExit(4000);
+            }
+            catch { /* xdg-utils evtl. nicht vorhanden -> .desktop liegt trotzdem */ }
         }
 
         [SupportedOSPlatform("windows")]

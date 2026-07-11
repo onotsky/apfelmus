@@ -134,6 +134,15 @@ namespace ApfelmusFramework.Classes.Config
             set { uploadColumnLayout = value; }
         }
 
+        private string gridLayouts;
+
+        // Spaltenlayouts ALLER Tabellen in einem Feld: "name=idx:breite|...;name2=..." (je Grid eine Zeile).
+        public string GridLayouts
+        {
+            get { return gridLayouts; }
+            set { gridLayouts = value; }
+        }
+
         private double windowWidth;
         private double windowHeight;
         private bool windowMaximized;

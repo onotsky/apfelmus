@@ -19,6 +19,7 @@
         <KeyBinding Gesture="F4" Command="{Binding CancelCommand}" />
         <KeyBinding Gesture="F5" Command="{Binding CleanFinishedCommand}" />
         <KeyBinding Gesture="F6" Command="{Binding RenameCommand}" />
+        <KeyBinding Gesture="F7" Command="{Binding SetTargetDirCommand}" />
         <KeyBinding Gesture="F8" Command="{Binding CopyDownloadLinkCommand}" />
         <KeyBinding Gesture="F9" Command="{Binding CopyDownloadSourceCommand}" />
     </Window.KeyBindings>
@@ -175,6 +176,7 @@
                                     <MenuItem Header="{DynamicResource d_break}" Command="{Binding BreakCommand}" InputGesture="F3" />
                                     <MenuItem Header="{DynamicResource d_cancel}" Command="{Binding CancelCommand}" InputGesture="F4" />
                                     <MenuItem Header="{DynamicResource d_renamebtn}" Command="{Binding RenameCommand}" InputGesture="F6" />
+                                    <MenuItem Header="{DynamicResource d_targetdir}" Command="{Binding SetTargetDirCommand}" InputGesture="F7" />
                                     <MenuItem Header="{DynamicResource d_clean}" Command="{Binding CleanFinishedCommand}" InputGesture="F5" />
                                     <Separator />
                                     <MenuItem Header="{DynamicResource d_copylink}" Command="{Binding CopyDownloadLinkCommand}" InputGesture="F8" />
@@ -225,7 +227,7 @@
 
                         <DockPanel Grid.Row="2">
                             <TextBlock DockPanel.Dock="Top" Text="{DynamicResource d_sources}" Classes="lbl" Margin="2" />
-                            <DataGrid x:CompileBindings="False" ItemsSource="{Binding DownloadSources}" IsReadOnly="True"
+                            <DataGrid x:Name="SourcesGrid" x:CompileBindings="False" ItemsSource="{Binding DownloadSources}" IsReadOnly="True"
                                       GridLinesVisibility="Horizontal" CanUserResizeColumns="True" CanUserReorderColumns="True">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="{DynamicResource col_nick}" Binding="{Binding NickName, Mode=OneWay}" Width="*" />
@@ -377,8 +379,9 @@
                         <Button Content="{DynamicResource sv_connect}" Command="{Binding ConnectServerCommand}" />
                         <Button Content="{DynamicResource sv_remove}" Command="{Binding RemoveServerCommand}" />
                         <Button Content="{DynamicResource sv_getlist}" Command="{Binding AddOfficialServersCommand}" />
+                        <Button Content="{DynamicResource sv_serverlink}" Command="{Binding CopyServerLinkCommand}" />
                     </StackPanel>
-                    <DataGrid x:CompileBindings="False" ItemsSource="{Binding ServersView}"
+                    <DataGrid x:Name="ServersGrid" x:CompileBindings="False" ItemsSource="{Binding ServersView}"
                               SelectedItem="{Binding SelectedServer}" IsReadOnly="True" CanUserSortColumns="True"
                               GridLinesVisibility="Horizontal" CanUserResizeColumns="True" CanUserReorderColumns="True">
                         <DataGrid.ContextMenu>
@@ -386,6 +389,7 @@
                                 <MenuItem Header="{DynamicResource sv_connect}" Command="{Binding ConnectServerCommand}" />
                                 <MenuItem Header="{DynamicResource sv_getlist}" Command="{Binding AddOfficialServersCommand}" />
                                 <MenuItem Header="{DynamicResource sv_remove}" Command="{Binding RemoveServerCommand}" />
+                                <MenuItem Header="{DynamicResource sv_serverlink}" Command="{Binding CopyServerLinkCommand}" />
                             </ContextMenu>
                         </DataGrid.ContextMenu>
                         <DataGrid.Styles>
@@ -458,6 +462,8 @@
                             <Button Content="{DynamicResource sh_delprio}" Command="{Binding DelSharePriorityCommand}" />
                             <Button Content="{DynamicResource d_copylink}" Command="{Binding CopyShareLinkCommand}" />
                             <Button Content="{DynamicResource d_copylinks}" Click="CopyShareLinks_Click" />
+                            <Button Content="{DynamicResource d_copysource}" Command="{Binding CopyShareSourceCommand}" />
+                            <Button Content="{DynamicResource d_copysources}" Click="CopyShareSources_Click" />
                             <Button Content="{DynamicResource d_releaseinfo}" Command="{Binding ReleaseInfoShareCommand}" />
                         </StackPanel>
                         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" Margin="4,0,4,4">
@@ -475,6 +481,8 @@
                                     <Separator />
                                     <MenuItem Header="{DynamicResource d_copylink}" Command="{Binding CopyShareLinkCommand}" />
                                     <MenuItem Header="{DynamicResource d_copylinks}" Click="CopyShareLinks_Click" />
+                                    <MenuItem Header="{DynamicResource d_copysource}" Command="{Binding CopyShareSourceCommand}" />
+                                    <MenuItem Header="{DynamicResource d_copysources}" Click="CopyShareSources_Click" />
                                     <MenuItem Header="{DynamicResource d_releaseinfo}" Command="{Binding ReleaseInfoShareCommand}" />
                                 </ContextMenu>
                             </DataGrid.ContextMenu>
@@ -546,7 +554,10 @@
                         <TextBlock Grid.Row="7" Grid.Column="0" Text="{DynamicResource set_maxdown}" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,6,0,0" />
                         <TextBox  Grid.Row="7" Grid.Column="1" Width="160" HorizontalAlignment="Left" Margin="0,6,0,0" Text="{Binding CoreMaxDownload, Mode=TwoWay}" />
                         <TextBlock Grid.Row="8" Grid.Column="0" Text="{DynamicResource set_speedslot}" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,6,0,0" />
-                        <TextBox  Grid.Row="8" Grid.Column="1" Width="160" HorizontalAlignment="Left" Margin="0,6,0,0" Text="{Binding CoreSpeedPerSlot, Mode=TwoWay}" />
+                        <StackPanel Grid.Row="8" Grid.Column="1" Orientation="Horizontal" Spacing="10" Margin="0,6,0,0">
+                            <Slider Width="220" Minimum="0" Maximum="{Binding SpeedSlotMax}" Value="{Binding CoreSpeedPerSlot, Mode=TwoWay}" VerticalAlignment="Center" />
+                            <TextBlock VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}"><Run Text="{Binding CoreSpeedPerSlot}" /><Run Text=" B/s" /></TextBlock>
+                        </StackPanel>
                         <TextBlock Grid.Row="9" Grid.Column="0" Text="{DynamicResource set_newconn}" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,6,0,0" />
                         <TextBox  Grid.Row="9" Grid.Column="1" Width="120" HorizontalAlignment="Left" Margin="0,6,0,0" Text="{Binding CoreMaxNewConnectionsPerTurn, Mode=TwoWay}" />
                         <TextBlock Grid.Row="10" Grid.Column="0" Text="{DynamicResource set_sources}" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,6,0,0" />
