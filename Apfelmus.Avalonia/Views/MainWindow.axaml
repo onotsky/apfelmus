@@ -168,7 +168,8 @@
 
                     <Grid RowDefinitions="*,4,*,148">
                         <DataGrid Grid.Row="0" x:Name="DownloadsGrid" x:CompileBindings="False" ItemsSource="{Binding DownloadsView}"
-                                  SelectedItem="{Binding SelectedDownload}" IsReadOnly="True" CanUserSortColumns="True"
+                                  SelectedItem="{Binding SelectedDownload}" IsReadOnly="True" CanUserSortColumns="True" SelectionMode="Extended"
+                                  SelectionChanged="DownloadsGrid_SelectionChanged"
                                   GridLinesVisibility="Horizontal" CanUserResizeColumns="True" CanUserReorderColumns="True">
                             <DataGrid.ContextMenu>
                                 <ContextMenu>

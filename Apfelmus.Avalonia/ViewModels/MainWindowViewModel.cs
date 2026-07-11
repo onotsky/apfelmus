@@ -791,9 +791,19 @@ namespace Apfelmus.Avalonia.ViewModels
             SelectedSearchTab = SearchTabs.LastOrDefault();
         }
 
+        // Von der View bei jeder Auswahländerung gesetzte Mehrfachauswahl der Downloadliste.
+        private List<Download> _selectedDownloads = new();
+        public void SetSelectedDownloads(System.Collections.IList? items)
+            => _selectedDownloads = items?.OfType<Download>().ToList() ?? new List<Download>();
+
+        // Fuehrt eine Aktion fuer ALLE markierten Downloads aus (fallback: der fokussierte),
+        // damit z.B. "Abbrechen" ueber die Mehrfachauswahl wirkt und nicht nur auf eine Zeile.
         private async Task WithDownload(Func<int, Task> action)
         {
-            if (SelectedDownload != null) await action(SelectedDownload.Id);
+            var ids = _selectedDownloads.Count > 0
+                ? _selectedDownloads.Select(d => d.Id).ToList()
+                : (SelectedDownload != null ? new List<int> { SelectedDownload.Id } : new List<int>());
+            foreach (var id in ids) await action(id);
         }
 
         private void RaiseDownloadCmds()
