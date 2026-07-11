@@ -378,8 +378,8 @@
                         <Button Content="{DynamicResource sv_remove}" Command="{Binding RemoveServerCommand}" />
                         <Button Content="{DynamicResource sv_getlist}" Command="{Binding AddOfficialServersCommand}" />
                     </StackPanel>
-                    <DataGrid x:CompileBindings="False" ItemsSource="{Binding Servers}"
-                              SelectedItem="{Binding SelectedServer}" IsReadOnly="True"
+                    <DataGrid x:CompileBindings="False" ItemsSource="{Binding ServersView}"
+                              SelectedItem="{Binding SelectedServer}" IsReadOnly="True" CanUserSortColumns="True"
                               GridLinesVisibility="Horizontal" CanUserResizeColumns="True" CanUserReorderColumns="True">
                         <DataGrid.ContextMenu>
                             <ContextMenu>

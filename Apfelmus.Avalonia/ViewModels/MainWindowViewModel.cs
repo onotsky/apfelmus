@@ -38,10 +38,16 @@ namespace Apfelmus.Avalonia.ViewModels
 
             Downloads = new ObservableCollection<Download>();
             DownloadsView = new DataGridCollectionView(Downloads); // ermoeglicht Spalten-Sortierung
+            // Standardmaessig alphabetisch nach Dateiname (A-Z); Klick auf Spaltenkopf ersetzt das.
+            DownloadsView.SortDescriptions.Add(
+                DataGridSortDescription.FromPath(nameof(Download.FileName), System.ComponentModel.ListSortDirection.Ascending));
             DownloadSources = new ObservableCollection<User>();
             ActiveUploads = new ObservableCollection<Upload>();
             QueuedUploads = new ObservableCollection<Upload>();
             Servers = new ObservableCollection<Server>();
+            ServersView = new DataGridCollectionView(Servers);
+            ServersView.SortDescriptions.Add(
+                DataGridSortDescription.FromPath(nameof(Server.Name), System.ComponentModel.ListSortDirection.Ascending));
             SearchTabs = new ObservableCollection<SearchTabViewModel>();
             Shares = new ObservableCollection<ShareItem>();
             FilteredShares = new ObservableCollection<ShareItem>();
@@ -160,6 +166,8 @@ namespace Apfelmus.Avalonia.ViewModels
         public ObservableCollection<Upload> ActiveUploads { get; }
         public ObservableCollection<Upload> QueuedUploads { get; }
         public ObservableCollection<Server> Servers { get; }
+        /// <summary>Sortierbare Sicht auf die Server (Standard A-Z nach Name).</summary>
+        public DataGridCollectionView ServersView { get; }
         public ObservableCollection<SearchTabViewModel> SearchTabs { get; }
         public ObservableCollection<ShareItem> Shares { get; }
         public ObservableCollection<int> PowerValues { get; }
@@ -298,9 +306,11 @@ namespace Apfelmus.Avalonia.ViewModels
                 FilteredShares.Add(s);
             }
 
-            // Gruppierte Sicht neu aufbauen (Gruppierung nach Ordner = Share.Path).
+            // Gruppierte Sicht neu aufbauen (Gruppierung nach Ordner = Share.Path), Dateien A-Z sortiert.
             var view = new DataGridCollectionView(FilteredShares);
             view.GroupDescriptions.Add(new DataGridPathGroupDescription(nameof(ShareItem.Path)));
+            view.SortDescriptions.Add(
+                DataGridSortDescription.FromPath(nameof(ShareItem.ShortFileName), System.ComponentModel.ListSortDirection.Ascending));
             SharesView = view;
         }
 
@@ -540,7 +550,8 @@ namespace Apfelmus.Avalonia.ViewModels
         {
             DownloadSources.Clear();
             if (SelectedDownload == null) { PartlistImage = null; return; }
-            foreach (var u in _allUsers.Where(u => u.DownloadId == SelectedDownload.Id))
+            foreach (var u in _allUsers.Where(u => u.DownloadId == SelectedDownload.Id)
+                                        .OrderBy(u => u.NickName, StringComparer.OrdinalIgnoreCase))
             {
                 ComputeUserDerived(u);
                 DownloadSources.Add(u);
@@ -608,10 +619,12 @@ namespace Apfelmus.Avalonia.ViewModels
                 if (share != null) u.FileName = share.ShortFileName;
                 if (u.UploadTo > u.UploadFrom)
                     u.Percentages = Math.Round((double)(u.ActualUploadPosition - u.UploadFrom) / (u.UploadTo - u.UploadFrom) * 100.0, 2) + " %";
-
-                if (u.Status == 1) ActiveUploads.Add(u);
-                else QueuedUploads.Add(u);
             }
+            // Standard alphabetisch nach Dateiname (A-Z).
+            foreach (var u in r.Upload.Where(x => x.Status == 1).OrderBy(x => x.FileName, StringComparer.OrdinalIgnoreCase))
+                ActiveUploads.Add(u);
+            foreach (var u in r.Upload.Where(x => x.Status != 1).OrderBy(x => x.FileName, StringComparer.OrdinalIgnoreCase))
+                QueuedUploads.Add(u);
         }
 
         private async Task RefreshServersAsync()
@@ -697,9 +710,19 @@ namespace Apfelmus.Avalonia.ViewModels
                 if (r.SearchEntry != null)
                     foreach (var e in r.SearchEntry)
                         if (e.SearchId == tab.Id && !tab.Results.Any(x => x.Id == e.Id))
-                            tab.Results.Add(e);
+                            InsertSorted(tab.Results, e);
             }
             StopSearchCommand.RaiseCanExecuteChanged();
+        }
+
+        /// <summary>Fuegt einen Suchtreffer alphabetisch nach Dateiname ein (A-Z), da Treffer laufend eintreffen.</summary>
+        private static void InsertSorted(ObservableCollection<SearchEntry> list, SearchEntry e)
+        {
+            string key = e.FileName?.Name ?? string.Empty;
+            int i = 0;
+            while (i < list.Count && string.Compare(list[i].FileName?.Name ?? string.Empty, key, StringComparison.OrdinalIgnoreCase) < 0)
+                i++;
+            list.Insert(i, e);
         }
 
         // ---- Commands impl ----
