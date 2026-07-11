@@ -16,7 +16,7 @@
     (windows7.0) kommt dadurch ebenfalls automatisch -> kein CA1416-Workaround noetig.
   -->
   <PropertyGroup>
-    <Version>5.3.3</Version>
+    <Version>5.3.4</Version>
     <Company>ZSoft</Company>
     <Product>Apfelmus</Product>
     <Authors>daredevil</Authors>

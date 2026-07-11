@@ -187,11 +187,11 @@
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
-                                <DataGridTextColumn Header="{DynamicResource col_status}" Binding="{Binding Status, Converter={StaticResource DownloadStatusConverter}}" Width="110" />
-                                <DataGridTextColumn Header="{DynamicResource col_size}" Binding="{Binding Size, Converter={StaticResource FileSizeConverter}}" Width="90" />
-                                <DataGridTextColumn Header="{DynamicResource col_loaded}" Binding="{Binding DownloadedFilesize, Converter={StaticResource FileSizeConverter}}" Width="90" />
-                                <DataGridTextColumn Header="{DynamicResource col_speed}" Binding="{Binding Speed, Converter={StaticResource FileSizeConverter}}" Width="90" />
-                                <DataGridTextColumn Header="{DynamicResource col_time}" Binding="{Binding TimeToEnd, Converter={StaticResource TimeConverter}}" Width="90" />
+                                <DataGridTextColumn Header="{DynamicResource col_status}" Binding="{Binding Status, Converter={StaticResource DownloadStatusConverter}, Mode=OneWay}" Width="110" />
+                                <DataGridTextColumn Header="{DynamicResource col_size}" Binding="{Binding Size, Converter={StaticResource FileSizeConverter}, Mode=OneWay}" Width="90" />
+                                <DataGridTextColumn Header="{DynamicResource col_loaded}" Binding="{Binding DownloadedFilesize, Converter={StaticResource FileSizeConverter}, Mode=OneWay}" Width="90" />
+                                <DataGridTextColumn Header="{DynamicResource col_speed}" Binding="{Binding Speed, Converter={StaticResource FileSizeConverter}, Mode=OneWay}" Width="90" />
+                                <DataGridTextColumn Header="{DynamicResource col_time}" Binding="{Binding TimeToEnd, Converter={StaticResource TimeConverter}, Mode=OneWay}" Width="90" />
                                 <DataGridTemplateColumn Header="{DynamicResource col_percent}" Width="100">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
@@ -205,8 +205,8 @@
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
-                                <DataGridTextColumn Header="{DynamicResource col_rest}" Binding="{Binding DownloadRest, Converter={StaticResource FileSizeConverter}}" Width="90" />
-                                <DataGridTextColumn Header="{DynamicResource col_power}" Binding="{Binding PowerDownload, Converter={StaticResource PowerDownloadConverter}}" Width="70" />
+                                <DataGridTextColumn Header="{DynamicResource col_rest}" Binding="{Binding DownloadRest, Converter={StaticResource FileSizeConverter}, Mode=OneWay}" Width="90" />
+                                <DataGridTextColumn Header="{DynamicResource col_power}" Binding="{Binding PowerDownload, Converter={StaticResource PowerDownloadConverter}, Mode=OneWay}" Width="70" />
                             </DataGrid.Columns>
                         </DataGrid>
 
@@ -217,11 +217,11 @@
                             <DataGrid x:CompileBindings="False" ItemsSource="{Binding DownloadSources}" IsReadOnly="True"
                                       GridLinesVisibility="Horizontal" CanUserResizeColumns="True" CanUserReorderColumns="True">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="{DynamicResource col_nick}" Binding="{Binding NickName}" Width="*" />
-                                    <DataGridTextColumn Header="{DynamicResource col_status}" Binding="{Binding Status, Converter={StaticResource UserStatusConverter}}" Width="120" />
-                                    <DataGridTextColumn Header="{DynamicResource col_speed}" Binding="{Binding Speed, Converter={StaticResource FileSizeConverter}}" Width="90" />
-                                    <DataGridTextColumn Header="{DynamicResource col_version}" Binding="{Binding Version}" Width="120" />
-                                    <DataGridTextColumn Header="{DynamicResource col_power}" Binding="{Binding PowerDownload, Converter={StaticResource PowerDownloadConverter}}" Width="70" />
+                                    <DataGridTextColumn Header="{DynamicResource col_nick}" Binding="{Binding NickName, Mode=OneWay}" Width="*" />
+                                    <DataGridTextColumn Header="{DynamicResource col_status}" Binding="{Binding Status, Converter={StaticResource UserStatusConverter}, Mode=OneWay}" Width="120" />
+                                    <DataGridTextColumn Header="{DynamicResource col_speed}" Binding="{Binding Speed, Converter={StaticResource FileSizeConverter}, Mode=OneWay}" Width="90" />
+                                    <DataGridTextColumn Header="{DynamicResource col_version}" Binding="{Binding Version, Mode=OneWay}" Width="120" />
+                                    <DataGridTextColumn Header="{DynamicResource col_power}" Binding="{Binding PowerDownload, Converter={StaticResource PowerDownloadConverter}, Mode=OneWay}" Width="70" />
                                 </DataGrid.Columns>
                             </DataGrid>
                         </DockPanel>
@@ -263,11 +263,11 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTextColumn Header="{DynamicResource col_nick}" Binding="{Binding Nick}" Width="140" />
-                            <DataGridTextColumn Header="{DynamicResource col_speed}" Binding="{Binding Speed, Converter={StaticResource FileSizeConverter}}" Width="90" />
-                            <DataGridTextColumn Header="{DynamicResource col_percent}" Binding="{Binding Percentages}" Width="70" />
-                            <DataGridTextColumn Header="{DynamicResource col_prio}" Binding="{Binding Priority}" Width="80" />
-                            <DataGridTextColumn Header="{DynamicResource col_version}" Binding="{Binding Version}" Width="140" />
+                            <DataGridTextColumn Header="{DynamicResource col_nick}" Binding="{Binding Nick, Mode=OneWay}" Width="140" />
+                            <DataGridTextColumn Header="{DynamicResource col_speed}" Binding="{Binding Speed, Converter={StaticResource FileSizeConverter}, Mode=OneWay}" Width="90" />
+                            <DataGridTextColumn Header="{DynamicResource col_percent}" Binding="{Binding Percentages, Mode=OneWay}" Width="70" />
+                            <DataGridTextColumn Header="{DynamicResource col_prio}" Binding="{Binding Priority, Mode=OneWay}" Width="80" />
+                            <DataGridTextColumn Header="{DynamicResource col_version}" Binding="{Binding Version, Mode=OneWay}" Width="140" />
                         </DataGrid.Columns>
                     </DataGrid>
 
@@ -287,10 +287,10 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTextColumn Header="{DynamicResource col_nick}" Binding="{Binding Nick}" Width="140" />
-                            <DataGridTextColumn Header="{DynamicResource col_prio}" Binding="{Binding Priority}" Width="80" />
-                            <DataGridTextColumn Header="{DynamicResource col_lastseen}" Binding="{Binding LastConnection, Converter={StaticResource SecondsToDateConverter}}" Width="150" />
-                            <DataGridTextColumn Header="{DynamicResource col_version}" Binding="{Binding Version}" Width="140" />
+                            <DataGridTextColumn Header="{DynamicResource col_nick}" Binding="{Binding Nick, Mode=OneWay}" Width="140" />
+                            <DataGridTextColumn Header="{DynamicResource col_prio}" Binding="{Binding Priority, Mode=OneWay}" Width="80" />
+                            <DataGridTextColumn Header="{DynamicResource col_lastseen}" Binding="{Binding LastConnection, Converter={StaticResource SecondsToDateConverter}, Mode=OneWay}" Width="150" />
+                            <DataGridTextColumn Header="{DynamicResource col_version}" Binding="{Binding Version, Mode=OneWay}" Width="140" />
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>
@@ -338,8 +338,8 @@
                                                     </DataTemplate>
                                                 </DataGridTemplateColumn.CellTemplate>
                                             </DataGridTemplateColumn>
-                                            <DataGridTextColumn Header="{DynamicResource col_size}" Binding="{Binding Size, Converter={StaticResource FileSizeConverter}}" Width="100" />
-                                            <DataGridTextColumn Header="{DynamicResource col_checksum}" Binding="{Binding Checksum}" Width="260" />
+                                            <DataGridTextColumn Header="{DynamicResource col_size}" Binding="{Binding Size, Converter={StaticResource FileSizeConverter}, Mode=OneWay}" Width="100" />
+                                            <DataGridTextColumn Header="{DynamicResource col_checksum}" Binding="{Binding Checksum, Mode=OneWay}" Width="260" />
                                         </DataGrid.Columns>
                                     </DataGrid>
                                 </DockPanel>
@@ -373,11 +373,11 @@
                             </Style>
                         </DataGrid.Styles>
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="{DynamicResource col_name}" Binding="{Binding Name}" Width="*" />
-                            <DataGridTextColumn Header="{DynamicResource col_host}" Binding="{Binding Host}" Width="220" />
-                            <DataGridTextColumn Header="{DynamicResource col_port}" Binding="{Binding Port}" Width="80" />
-                            <DataGridTextColumn Header="{DynamicResource col_lastseen}" Binding="{Binding LastSeen, Converter={StaticResource SecondsToDateConverter}}" Width="150" />
-                            <DataGridTextColumn Header="{DynamicResource col_tries}" Binding="{Binding ConnectionTry}" Width="90" />
+                            <DataGridTextColumn Header="{DynamicResource col_name}" Binding="{Binding Name, Mode=OneWay}" Width="*" />
+                            <DataGridTextColumn Header="{DynamicResource col_host}" Binding="{Binding Host, Mode=OneWay}" Width="220" />
+                            <DataGridTextColumn Header="{DynamicResource col_port}" Binding="{Binding Port, Mode=OneWay}" Width="80" />
+                            <DataGridTextColumn Header="{DynamicResource col_lastseen}" Binding="{Binding LastSeen, Converter={StaticResource SecondsToDateConverter}, Mode=OneWay}" Width="150" />
+                            <DataGridTextColumn Header="{DynamicResource col_tries}" Binding="{Binding ConnectionTry, Mode=OneWay}" Width="90" />
                         </DataGrid.Columns>
                     </DataGrid>
                 </DockPanel>
@@ -468,11 +468,11 @@
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
-                                <DataGridTextColumn Header="{DynamicResource col_size}" Binding="{Binding Size, Converter={StaticResource FileSizeConverter}}" Width="100" />
-                                <DataGridTextColumn Header="{DynamicResource col_prio}" Binding="{Binding Priority}" Width="80" />
-                                <DataGridTextColumn Header="{DynamicResource col_lastasked}" Binding="{Binding LastAsked, Converter={StaticResource SecondsToDateConverter}}" Width="150" />
-                                <DataGridTextColumn Header="{DynamicResource col_asks}" Binding="{Binding AskCount}" Width="90" />
-                                <DataGridTextColumn Header="{DynamicResource col_hits}" Binding="{Binding SearchCount}" Width="100" />
+                                <DataGridTextColumn Header="{DynamicResource col_size}" Binding="{Binding Size, Converter={StaticResource FileSizeConverter}, Mode=OneWay}" Width="100" />
+                                <DataGridTextColumn Header="{DynamicResource col_prio}" Binding="{Binding Priority, Mode=OneWay}" Width="80" />
+                                <DataGridTextColumn Header="{DynamicResource col_lastasked}" Binding="{Binding LastAsked, Converter={StaticResource SecondsToDateConverter}, Mode=OneWay}" Width="150" />
+                                <DataGridTextColumn Header="{DynamicResource col_asks}" Binding="{Binding AskCount, Mode=OneWay}" Width="90" />
+                                <DataGridTextColumn Header="{DynamicResource col_hits}" Binding="{Binding SearchCount, Mode=OneWay}" Width="100" />
                             </DataGrid.Columns>
                         </DataGrid>
                     </DockPanel>
