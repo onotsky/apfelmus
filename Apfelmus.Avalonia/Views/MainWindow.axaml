@@ -442,6 +442,7 @@
                                             <Image Source="{StaticResource FolderIcon}" IsVisible="{Binding ShowPlainIcon}" />
                                             <Image Source="{StaticResource FolderIconShared}" IsVisible="{Binding ShowSharedIcon}" />
                                             <Image Source="{StaticResource FolderIconAncestor}" IsVisible="{Binding ShowAncestorIcon}" />
+                                            <Image Source="{StaticResource FolderIconTemp}" IsVisible="{Binding ShowTempIcon}" />
                                         </Panel>
                                         <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimaryBrush}"
                                                    FontWeight="{Binding IsSharedContent, Converter={StaticResource BoolToFontWeightConverter}}" />

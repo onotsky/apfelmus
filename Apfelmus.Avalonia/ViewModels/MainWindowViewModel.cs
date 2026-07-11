@@ -157,6 +157,9 @@ namespace Apfelmus.Avalonia.ViewModels
             if (SharedFolders.Count == 0) await LoadCoreSettingsAsync();
         }
 
+        /// <summary>Normalisierter Pfad des Core-Temp-Verzeichnisses (fuer die blaue Baum-Markierung).</summary>
+        public string TempDirNormalized => DirNodeViewModel.NormalizePath(CoreTempDir);
+
         /// <summary>Bittet die View, das Fenster in den Vordergrund zu holen (z.B. bei Link-Uebergabe).</summary>
         public event Action? ActivateRequested;
 
@@ -973,6 +976,7 @@ namespace Apfelmus.Avalonia.ViewModels
         {
             await LoadCoreSettingsAsync(); // aktuelle Freigaben holen (fuer die Markierung im Baum)
             var shared = new HashSet<string>(CurrentShares().Select(x => DirNodeViewModel.NormalizePath(x.path)));
+            string temp = TempDirNormalized;
 
             var aj = await _client.GetDirectoryAsync(null);
             ShareTree.Clear();
@@ -982,7 +986,7 @@ namespace Apfelmus.Avalonia.ViewModels
             {
                 if (string.IsNullOrEmpty(d.Path))
                     d.Path = $"{d.Name}{sep}";
-                ShareTree.Add(new DirNodeViewModel(d, _client, shared));
+                ShareTree.Add(new DirNodeViewModel(d, _client, shared, prune: false, tempPath: temp));
             }
         }
 

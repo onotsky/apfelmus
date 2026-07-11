@@ -23,6 +23,8 @@ namespace Apfelmus.Avalonia.Views
         private readonly CoreClient? _client;
         private readonly List<string> _sharedFolders;
         private readonly HashSet<string> _sharedSet;
+        private readonly string _tempPath;       // Roh-Pfad des Temp-Verzeichnisses (fuer den Extra-Wurzelknoten)
+        private readonly string _tempNormalized;  // normalisiert (fuer die blaue Markierung)
         private readonly ObservableCollection<DirNodeViewModel> _dirTree = new();
 
         public TargetDirDialog()
@@ -30,9 +32,11 @@ namespace Apfelmus.Avalonia.Views
             InitializeComponent();
             _sharedFolders = new List<string>();
             _sharedSet = new HashSet<string>();
+            _tempPath = string.Empty;
+            _tempNormalized = string.Empty;
         }
 
-        public TargetDirDialog(CoreClient client, IEnumerable<string> sharedFolders) : this()
+        public TargetDirDialog(CoreClient client, IEnumerable<string> sharedFolders, string? tempPath = null) : this()
         {
             _client = client;
             _sharedFolders = sharedFolders?
@@ -41,6 +45,8 @@ namespace Apfelmus.Avalonia.Views
                 .OrderBy(p => p)
                 .ToList() ?? new List<string>();
             _sharedSet = new HashSet<string>(_sharedFolders.Select(DirNodeViewModel.NormalizePath));
+            _tempPath = tempPath?.Trim() ?? string.Empty;
+            _tempNormalized = DirNodeViewModel.NormalizePath(_tempPath);
             DirTreeView.ItemsSource = _dirTree;
             _ = LoadRootsAsync();
         }
@@ -55,7 +61,13 @@ namespace Apfelmus.Avalonia.Views
                 foreach (var share in _sharedFolders)
                 {
                     var d = new Dir { Name = share, Path = share };
-                    _dirTree.Add(new DirNodeViewModel(d, _client, _sharedSet, prune: false));
+                    _dirTree.Add(new DirNodeViewModel(d, _client, _sharedSet, prune: false, tempPath: _tempNormalized));
+                }
+                // Temp-Verzeichnis zusaetzlich (blau) anbieten, sofern gesetzt und nicht ohnehin unter einer Freigabe.
+                if (_tempNormalized.Length > 0 && !IsUnderShare(_tempNormalized))
+                {
+                    var t = new Dir { Name = _tempPath, Path = _tempPath };
+                    _dirTree.Add(new DirNodeViewModel(t, _client, _sharedSet, prune: false, tempPath: _tempNormalized));
                 }
                 return;
             }
@@ -67,9 +79,13 @@ namespace Apfelmus.Avalonia.Views
             foreach (var d in aj.Dir.OrderBy(x => x.Name))
             {
                 if (string.IsNullOrEmpty(d.Path)) d.Path = $"{d.Name}{sep}";
-                _dirTree.Add(new DirNodeViewModel(d, _client, _sharedSet, prune: false));
+                _dirTree.Add(new DirNodeViewModel(d, _client, _sharedSet, prune: false, tempPath: _tempNormalized));
             }
         }
+
+        // Liegt der Pfad auf oder unter einer der Freigaben (dann ist er im Baum schon erreichbar)?
+        private bool IsUnderShare(string np)
+            => _sharedSet.Any(s => np == s || np.StartsWith(s + "/", System.StringComparison.Ordinal));
 
         private void Ok_Click(object? sender, RoutedEventArgs e)
         {

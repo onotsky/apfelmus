@@ -214,7 +214,7 @@ namespace Apfelmus.Avalonia.Views
             // Freigegebene Ordner direkt zur Auswahl anbieten (aufklappbar) + optionalem neuen Unterordner.
             await vm.EnsureSharedFoldersAsync();
             var shared = vm.SharedFolders.Select(f => f.Path).ToList();
-            var dlg = new TargetDirDialog(vm.CoreClient, shared);
+            var dlg = new TargetDirDialog(vm.CoreClient, shared, vm.CoreTempDir);
             var result = await dlg.ShowDialog<string?>(this);
             if (!string.IsNullOrWhiteSpace(result))
             {

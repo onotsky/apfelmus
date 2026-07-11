@@ -53,6 +53,10 @@
             <DrawingImage x:Key="FolderIconAncestor">
                 <GeometryDrawing Brush="#7FB394" Geometry="M2,5 H8 L10,7 H21 V19 H2 Z" />
             </DrawingImage>
+            <!-- Temp-Verzeichnis des Cores: Blau, klar von den Freigaben abgesetzt -->
+            <DrawingImage x:Key="FolderIconTemp">
+                <GeometryDrawing Brush="#5B9BD5" Geometry="M2,5 H8 L10,7 H21 V19 H2 Z" />
+            </DrawingImage>
         </ResourceDictionary>
     </Application.Resources>
 
