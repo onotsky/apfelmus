@@ -7,30 +7,40 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Apfelmus.Avalonia.Services;
 using Apfelmus.Avalonia.ViewModels;
+using ApfelmusFramework.Classes.Directory;
 
 namespace Apfelmus.Avalonia.Views
 {
     /// <summary>
-    /// Zielverzeichnis eines Downloads wählen: der Core-Verzeichnisbaum, aber gefiltert auf
-    /// freigabe-relevante Zweige - freigegebene Ordner (gruen) und Elternordner, die Freigaben
-    /// enthalten (gedaempftes Gruen), damit man auch zu verschachtelten Freigaben navigieren kann.
+    /// Zielverzeichnis eines Downloads wählen: die freigegebenen Ordner werden direkt als (gruene)
+    /// Wurzelknoten angezeigt und lassen sich aufklappen, um in echte Unterordner zu navigieren.
+    /// So sind die Freigaben garantiert sichtbar (unabhaengig vom Pfadformat des Cores). Sind keine
+    /// Ordner freigegeben, wird ersatzweise der komplette Verzeichnisbaum zur Auswahl angeboten.
     /// Plus optionalem neuem Unterordner. Rückgabe = gewählter Core-Pfad.
     /// </summary>
     public partial class TargetDirDialog : Window
     {
         private readonly CoreClient? _client;
-        private readonly HashSet<string>? _sharedPaths;
+        private readonly List<string> _sharedFolders;
+        private readonly HashSet<string> _sharedSet;
         private readonly ObservableCollection<DirNodeViewModel> _dirTree = new();
 
         public TargetDirDialog()
         {
             InitializeComponent();
+            _sharedFolders = new List<string>();
+            _sharedSet = new HashSet<string>();
         }
 
-        public TargetDirDialog(CoreClient client, HashSet<string> sharedPaths) : this()
+        public TargetDirDialog(CoreClient client, IEnumerable<string> sharedFolders) : this()
         {
             _client = client;
-            _sharedPaths = sharedPaths;
+            _sharedFolders = sharedFolders?
+                .Where(p => !string.IsNullOrWhiteSpace(p))
+                .Distinct()
+                .OrderBy(p => p)
+                .ToList() ?? new List<string>();
+            _sharedSet = new HashSet<string>(_sharedFolders.Select(DirNodeViewModel.NormalizePath));
             DirTreeView.ItemsSource = _dirTree;
             _ = LoadRootsAsync();
         }
@@ -38,15 +48,26 @@ namespace Apfelmus.Avalonia.Views
         private async Task LoadRootsAsync()
         {
             if (_client == null) return;
+
+            // Bevorzugt: die freigegebenen Ordner direkt als gruene, aufklappbare Wurzeln zeigen.
+            if (_sharedFolders.Count > 0)
+            {
+                foreach (var share in _sharedFolders)
+                {
+                    var d = new Dir { Name = share, Path = share };
+                    _dirTree.Add(new DirNodeViewModel(d, _client, _sharedSet, prune: false));
+                }
+                return;
+            }
+
+            // Fallback (keine Freigaben konfiguriert): kompletten Verzeichnisbaum zur Auswahl anbieten.
             var aj = await _client.GetDirectoryAsync(null);
             if (aj?.Dir == null) return;
             string sep = aj.FileSystem?.Seperator ?? "/";
             foreach (var d in aj.Dir.OrderBy(x => x.Name))
             {
                 if (string.IsNullOrEmpty(d.Path)) d.Path = $"{d.Name}{sep}";
-                var node = new DirNodeViewModel(d, _client, _sharedPaths, prune: true);
-                if (!node.IsRelevant) continue; // nur Zweige mit Freigaben
-                _dirTree.Add(node);
+                _dirTree.Add(new DirNodeViewModel(d, _client, _sharedSet, prune: false));
             }
         }
 
@@ -54,7 +75,15 @@ namespace Apfelmus.Avalonia.Views
         {
             string basePath = (DirTreeView.SelectedItem as DirNodeViewModel)?.Path ?? string.Empty;
             string sub = NewFolderBox.Text?.Trim() ?? string.Empty;
-            string result = string.IsNullOrEmpty(sub) ? basePath : basePath + sub; // basePath endet auf Trenner
+
+            string result = basePath;
+            if (!string.IsNullOrEmpty(sub))
+            {
+                // Trenner des Zielsystems aus dem Pfad ableiten und sicher genau einmal einfuegen.
+                char sep = basePath.Contains('\\') ? '\\' : '/';
+                if (basePath.Length > 0 && basePath[basePath.Length - 1] != sep) basePath += sep;
+                result = basePath + sub;
+            }
             Close(string.IsNullOrWhiteSpace(result) ? null : result);
         }
 

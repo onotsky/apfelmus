@@ -151,6 +151,12 @@ namespace Apfelmus.Avalonia.ViewModels
         /// <summary>Fuer Dialoge, die den Core-Verzeichnisbaum brauchen (z.B. Zielverzeichnis waehlen).</summary>
         public CoreClient CoreClient => _client;
 
+        /// <summary>Stellt sicher, dass die Freigabeliste aktuell geladen ist (fuer den Zielverzeichnis-Dialog).</summary>
+        public async Task EnsureSharedFoldersAsync()
+        {
+            if (SharedFolders.Count == 0) await LoadCoreSettingsAsync();
+        }
+
         /// <summary>Bittet die View, das Fenster in den Vordergrund zu holen (z.B. bei Link-Uebergabe).</summary>
         public event Action? ActivateRequested;
 

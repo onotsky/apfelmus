@@ -22,6 +22,18 @@ namespace Apfelmus.Avalonia.Views
             InitializeComponent();
             // Doppelklick auf einen Spaltentrenner -> Spalte an den Inhalt anpassen (wie Excel/WPF).
             AddHandler(Gestures.DoubleTappedEvent, OnGridSeparatorDoubleTapped, RoutingStrategies.Bubble);
+            ApplyPlatformTitleBar();
+        }
+
+        // Auf macOS die nativen Fensterknoepfe (Ampeln links) nutzen; die eigenen Buttons dann
+        // ausblenden und links Platz fuer die Ampeln lassen. Auf Windows/Linux bleibt die eigene
+        // Titelleiste (NoChrome + eigene —/▢/✕-Buttons rechts) wie in der XAML definiert.
+        private void ApplyPlatformTitleBar()
+        {
+            if (!System.OperatingSystem.IsMacOS()) return;
+            ExtendClientAreaChromeHints = global::Avalonia.Platform.ExtendClientAreaChromeHints.PreferSystemChrome;
+            if (this.FindControl<StackPanel>("TitleButtons") is { } btns) btns.IsVisible = false;
+            if (this.FindControl<StackPanel>("TitleLeft") is { } left) left.Margin = new Thickness(78, 0, 0, 0);
         }
 
         private static readonly PropertyInfo? OwningColumnProp =
@@ -199,9 +211,9 @@ namespace Apfelmus.Avalonia.Views
         private async void OnTargetDirRequested(ApfelmusFramework.Classes.Modified.Download d)
         {
             if (DataContext is not MainWindowViewModel vm) return;
-            // Nur freigabe-relevante Zweige zur Auswahl + optionalem neuen Unterordner.
-            var shared = new System.Collections.Generic.HashSet<string>(
-                vm.SharedFolders.Select(f => DirNodeViewModel.NormalizePath(f.Path)));
+            // Freigegebene Ordner direkt zur Auswahl anbieten (aufklappbar) + optionalem neuen Unterordner.
+            await vm.EnsureSharedFoldersAsync();
+            var shared = vm.SharedFolders.Select(f => f.Path).ToList();
             var dlg = new TargetDirDialog(vm.CoreClient, shared);
             var result = await dlg.ShowDialog<string?>(this);
             if (!string.IsNullOrWhiteSpace(result))

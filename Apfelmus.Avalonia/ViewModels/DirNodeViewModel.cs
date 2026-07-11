@@ -98,13 +98,16 @@ namespace Apfelmus.Avalonia.ViewModels
             if (aj?.Dir == null) return;
 
             string sep = aj.FileSystem?.Seperator ?? "/";
+            // Elternpfad ohne Rand-Trenner, damit weder doppelte noch fehlende Trenner entstehen
+            // (Freigabe-Basispfade kommen z.T. mit, z.T. ohne abschliessenden Trenner vom Core).
+            string parent = Path.TrimEnd('/', '\\');
             foreach (var d in aj.Dir.OrderBy(x => x.Name))
             {
                 if (string.IsNullOrEmpty(d.Path))
                 {
                     d.Path = sep == "/"
-                        ? $"{Path}{d.Name}{sep}"
-                        : $"{Path}{sep}{d.Name}";
+                        ? $"{parent}{sep}{d.Name}{sep}"
+                        : $"{parent}{sep}{d.Name}";
                 }
                 var node = new DirNodeViewModel(d, _client, _sharedPaths, _prune);
                 if (_prune && !node.IsRelevant) continue; // im Dialog nur freigabe-relevante Zweige
