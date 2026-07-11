@@ -133,5 +133,28 @@ namespace ApfelmusFramework.Classes.Config
             get { return uploadColumnLayout; }
             set { uploadColumnLayout = value; }
         }
+
+        private double windowWidth;
+        private double windowHeight;
+        private bool windowMaximized;
+
+        // Zuletzt genutzte Fenstergroesse/-zustand (0 = noch nicht gesetzt -> Standardgroesse).
+        public double WindowWidth
+        {
+            get { return windowWidth; }
+            set { windowWidth = value; }
+        }
+
+        public double WindowHeight
+        {
+            get { return windowHeight; }
+            set { windowHeight = value; }
+        }
+
+        public bool WindowMaximized
+        {
+            get { return windowMaximized; }
+            set { windowMaximized = value; }
+        }
     }
 }

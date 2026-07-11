@@ -16,11 +16,18 @@ namespace Apfelmus.Avalonia.Services
     /// FromPosition) nach Verfuegbarkeit/Quellenzahl. Aktive Uebertragungen (Quellen) werden
     /// orange (geladen) und gelb (Position) ueberlagert. Das Bild wird von der Image-Control gestreckt.
     /// </summary>
+    /// <summary>Ergebnis des Partlisten-Renderings: Bild + Zell-Typraster (fuer den Hover-Tooltip).</summary>
+    public sealed record PartlistResult(WriteableBitmap Bitmap, int[] Cells, int Columns, int Rows);
+
     public static class PartlistRenderer
     {
         private const int MaxGradientSources = 10;
 
-        public static WriteableBitmap? Render(long fileSize, List<Part>? parts, IEnumerable<User>? activeSources,
+        // Sondertypen im Zellraster (Cells) zusaetzlich zu part.type (>=1 = Quellenzahl, -1 = fertig, <=0 = fehlt):
+        public const int CellLoaded = -2;   // orange (aktive Quelle, bereits geladener Bereich)
+        public const int CellActive = -3;   // gelb (aktuelle Position der Quelle)
+
+        public static PartlistResult? Render(long fileSize, List<Part>? parts, IEnumerable<User>? activeSources,
             int columnsPerRow, int rows)
         {
             if (columnsPerRow <= 0 || rows <= 0 || fileSize <= 0 || parts == null || parts.Count == 0)
@@ -28,6 +35,7 @@ namespace Apfelmus.Avalonia.Services
 
             int totalColumns = rows * columnsPerRow;
             int[] strip = new int[totalColumns];
+            int[] cells = new int[totalColumns]; // Typ je Zelle (fuer Tooltip)
 
             int ColumnForByte(long bytePosition)
             {
@@ -44,7 +52,7 @@ namespace Apfelmus.Avalonia.Services
                 int fromColumn = ColumnForByte(from);
                 int toColumn = ColumnForByte(to);
                 int color = ColorForType(parts[i].type);
-                for (int c = fromColumn; c < toColumn; c++) strip[c] = color;
+                for (int c = fromColumn; c < toColumn; c++) { strip[c] = color; cells[c] = parts[i].type; }
             }
 
             if (activeSources != null)
@@ -55,8 +63,8 @@ namespace Apfelmus.Avalonia.Services
                 {
                     int fromColumn = ColumnForByte(u.DownloadFrom);
                     int posColumn = ColumnForByte(u.ActualDownloadPosition);
-                    for (int c = fromColumn; c < posColumn; c++) strip[c] = orange;
-                    if (posColumn < totalColumns) strip[posColumn] = yellow;
+                    for (int c = fromColumn; c < posColumn; c++) { strip[c] = orange; cells[c] = CellLoaded; }
+                    if (posColumn < totalColumns) { strip[posColumn] = yellow; cells[posColumn] = CellActive; }
                 }
             }
 
@@ -72,7 +80,7 @@ namespace Apfelmus.Avalonia.Services
                     Marshal.Copy(strip, row * columnsPerRow, dest, columnsPerRow);
                 }
             }
-            return bitmap;
+            return new PartlistResult(bitmap, cells, columnsPerRow, rows);
         }
 
         private static int ColorForType(int type)

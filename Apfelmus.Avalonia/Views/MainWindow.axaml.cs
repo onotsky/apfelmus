@@ -11,6 +11,7 @@ namespace Apfelmus.Avalonia.Views
     public partial class MainWindow : Window
     {
         private bool _columnsRestored;
+        private bool _sizeRestored;
 
         public MainWindow()
         {
@@ -31,9 +32,10 @@ namespace Apfelmus.Avalonia.Views
         {
             if (DataContext is MainWindowViewModel vm)
             {
-                vm.SaveColumnLayouts(
+                vm.SaveWindowAndColumns(
                     SerializeColumns(this.FindControl<DataGrid>("DownloadsGrid")),
-                    SerializeColumns(this.FindControl<DataGrid>("UploadsGrid")));
+                    SerializeColumns(this.FindControl<DataGrid>("UploadsGrid")),
+                    Width, Height, WindowState == WindowState.Maximized);
             }
             base.OnClosing(e);
         }
@@ -88,7 +90,32 @@ namespace Apfelmus.Avalonia.Views
                 vm.CopyRequested += OnCopyRequested;
                 vm.RenameRequested -= OnRenameRequested;
                 vm.RenameRequested += OnRenameRequested;
+                vm.ActivateRequested -= OnActivateRequested;
+                vm.ActivateRequested += OnActivateRequested;
+
+                // Fenstergroesse wie zuletzt geschlossen (DataContext wird VOR dem Anzeigen gesetzt).
+                if (!_sizeRestored)
+                {
+                    _sizeRestored = true;
+                    if (vm.SavedWindowWidth > 200 && vm.SavedWindowHeight > 150)
+                    {
+                        Width = vm.SavedWindowWidth;
+                        Height = vm.SavedWindowHeight;
+                    }
+                    if (vm.SavedWindowMaximized) WindowState = WindowState.Maximized;
+                }
             }
+        }
+
+        // Bei Link-Uebergabe: Fenster nach vorne holen (und aus dem Minimieren zurueckholen).
+        private void OnActivateRequested()
+        {
+            global::Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+            {
+                if (WindowState == WindowState.Minimized) WindowState = WindowState.Normal;
+                Show();
+                Activate();
+            });
         }
 
         private async void OnRenameRequested(ApfelmusFramework.Classes.Modified.Download d)
@@ -108,6 +135,31 @@ namespace Apfelmus.Avalonia.Views
             {
                 await clipboard.SetTextAsync(text);
             }
+        }
+
+        // ---- Partlisten-Hover-Tooltip (Typ unter dem Cursor, wie WPF) ----
+        private void Partlist_PointerMoved(object? sender, PointerEventArgs e)
+        {
+            if (sender is Control c && DataContext is MainWindowViewModel vm)
+            {
+                var pos = e.GetPosition(c);
+                double w = c.Bounds.Width, h = c.Bounds.Height;
+                string? text = (w > 0 && h > 0) ? vm.GetPartlistTooltip(pos.X / w, pos.Y / h) : null;
+                if (!string.IsNullOrEmpty(text))
+                {
+                    ToolTip.SetTip(c, text);
+                    ToolTip.SetIsOpen(c, true);
+                }
+                else
+                {
+                    ToolTip.SetIsOpen(c, false);
+                }
+            }
+        }
+
+        private void Partlist_PointerExited(object? sender, PointerEventArgs e)
+        {
+            if (sender is Control c) ToolTip.SetIsOpen(c, false);
         }
 
         // ---- Mein Share: Mehrfachauswahl ----

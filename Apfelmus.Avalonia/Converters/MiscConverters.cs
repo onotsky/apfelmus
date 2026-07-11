@@ -96,17 +96,29 @@ namespace Apfelmus.Avalonia.Converters
     /// <summary>Status einer Download-Quelle (User) -> lesbarer Text.</summary>
     public sealed class UserStatusConverter : IValueConverter
     {
+        // Quellen-Status (andere Codes als der Download-Status!), laut Core-API-PDF:
+        // 2 = versuche zu verbinden, 5 = in Warteschlange, 7 = Uebertragung, 14 = Queue voll (Gegenseite).
         private static readonly Dictionary<int, string> Map = new()
         {
-            [0] = "wartend",
+            [0] = "neu",
             [1] = "verbinde",
-            [2] = "überträgt",
+            [2] = "verbinde",
             [3] = "Warteschlange",
             [4] = "nicht erreichbar",
+            [5] = "Warteschlange",
+            [6] = "verbunden",
+            [7] = "überträgt",
+            [8] = "fertig",
+            [11] = "Fehler",
+            [12] = "fertig",
+            [13] = "Fehler",
+            [14] = "Queue voll",
+            [15] = "abbrechen",
+            [16] = "pausiert",
         };
 
         public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
-            => value is int c && Map.TryGetValue(c, out var t) ? t : (value?.ToString() ?? string.Empty);
+            => value is int c ? (Map.TryGetValue(c, out var t) ? t : "unbekannt") : (value?.ToString() ?? string.Empty);
 
         public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
             => throw new NotSupportedException();

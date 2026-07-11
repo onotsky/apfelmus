@@ -138,6 +138,20 @@ namespace Apfelmus.Avalonia.ViewModels
         /// <summary>Wird von der View gesetzt/abonniert, um Text in die Zwischenablage zu legen.</summary>
         public event Action<string>? CopyRequested;
 
+        /// <summary>Bittet die View, das Fenster in den Vordergrund zu holen (z.B. bei Link-Uebergabe).</summary>
+        public event Action? ActivateRequested;
+
+        private int _selectedTabIndex;
+        /// <summary>Aktiver Tab (0=Start, 1=Downloads, ...). Zweiweg an das TabControl gebunden.</summary>
+        public int SelectedTabIndex { get => _selectedTabIndex; set => SetProperty(ref _selectedTabIndex, value); }
+
+        /// <summary>Wechselt auf den Downloads-Tab und holt das Fenster nach vorne (bei Link-Uebergabe).</summary>
+        private void FocusDownloads()
+        {
+            SelectedTabIndex = 1; // Downloads
+            ActivateRequested?.Invoke();
+        }
+
         // ---- Collections ----
         public ObservableCollection<Download> Downloads { get; }
         /// <summary>Sortierbare Sicht auf die Downloads (Klick auf Spaltenkopf sortiert, bleibt ueber Poll-Updates erhalten).</summary>
@@ -485,9 +499,32 @@ namespace Apfelmus.Avalonia.ViewModels
                 d.DownloadRest = (size - ready).ToString();
                 d.Percentages = size > 0 ? Math.Round(ready / (double)size * 100.0, 2) + " %" : "0 %";
             }
+
+            // Restzeit = verbleibende Bytes / aktuelle Geschwindigkeit (0 = unbekannt -> "-"), wie WPF.
+            long restBytes = ParseLong(d.DownloadRest);
+            d.TimeToEnd = d.Speed > 0 ? (int)(restBytes / d.Speed) : 0;
         }
 
         private static long ParseLong(string? s) => long.TryParse(s, out var v) ? v : 0;
+
+        /// <summary>
+        /// Berechnet die abgeleiteten Werte einer Quelle (User) analog zum WPF-Client: Groesse/Geladen/
+        /// Rest ergeben sich aus dem zugeteilten Segment [DownloadFrom, DownloadTo] und der aktuellen
+        /// Position; Prozent nur bei aktiver Uebertragung (Status 7); Restzeit = Rest / Speed.
+        /// </summary>
+        private static void ComputeUserDerived(User u)
+        {
+            long size = u.DownloadTo - u.DownloadFrom;
+            long loaded = u.ActualDownloadPosition - u.DownloadFrom;
+            long rest = u.DownloadTo - u.ActualDownloadPosition;
+            u.FileSize = size > 0 ? size : 0;
+            u.ActualFileSize = loaded > 0 ? loaded : 0;
+            u.FileSizeToGet = rest > 0 ? rest : 0;
+            u.Percentages = (u.Status == 7 && size > 0)
+                ? Math.Round(loaded / (double)size * 100.0, 2) + " %"
+                : "0 %";
+            u.TimeToEnd = u.Speed != 0 ? (int)(u.FileSizeToGet / u.Speed) : 0;
+        }
 
         private async Task RefreshUsersAsync()
         {
@@ -504,7 +541,10 @@ namespace Apfelmus.Avalonia.ViewModels
             DownloadSources.Clear();
             if (SelectedDownload == null) { PartlistImage = null; return; }
             foreach (var u in _allUsers.Where(u => u.DownloadId == SelectedDownload.Id))
+            {
+                ComputeUserDerived(u);
                 DownloadSources.Add(u);
+            }
             _ = BuildPartlistAsync();
         }
 
@@ -512,19 +552,46 @@ namespace Apfelmus.Avalonia.ViewModels
         private async Task BuildPartlistAsync()
         {
             var sel = SelectedDownload;
-            if (sel == null) { PartlistImage = null; return; }
+            if (sel == null) { PartlistImage = null; _partlistCells = null; return; }
 
             var pl = await _client.GetDownloadPartlistAsync(sel.Id);
             // Auswahl koennte sich waehrend des Ladens geaendert haben.
             if (SelectedDownload != sel) return;
-            if (pl?.FileInformation == null || pl.Parts == null) { PartlistImage = null; return; }
+            if (pl?.FileInformation == null || pl.Parts == null) { PartlistImage = null; _partlistCells = null; return; }
 
             var sources = DownloadSources.Where(u => u.Status == 2 || u.ActualDownloadPosition > u.DownloadFrom).ToList();
             // "Kurze Seite" verdoppelt (Anzeigebereich 148px); Zeilenzahl ergibt sich aus der einstellbaren
             // Part-Groesse (groesser = dickere, dafuer weniger Zeilen - analog WPF-PartlistRowHeight).
             const int shortSide = 148;
             int rows = Math.Max(1, shortSide / Math.Max(1, _partlistSize));
-            PartlistImage = PartlistRenderer.Render(pl.FileInformation.Filesize, pl.Parts, sources, 240, rows);
+            var result = PartlistRenderer.Render(pl.FileInformation.Filesize, pl.Parts, sources, 240, rows);
+            if (result == null) { PartlistImage = null; _partlistCells = null; return; }
+            PartlistImage = result.Bitmap;
+            _partlistCells = result.Cells; _partlistCols = result.Columns; _partlistRowsCount = result.Rows;
+        }
+
+        // ---- Partlisten-Hover-Tooltip ----
+        private int[]? _partlistCells;
+        private int _partlistCols, _partlistRowsCount;
+
+        /// <summary>Liefert den Tooltip-Text fuer die Partlisten-Position (fracX/fracY = 0..1) oder null.</summary>
+        public string? GetPartlistTooltip(double fracX, double fracY)
+        {
+            var cells = _partlistCells;
+            if (cells == null || _partlistCols <= 0 || _partlistRowsCount <= 0) return null;
+            int col = Math.Clamp((int)(fracX * _partlistCols), 0, _partlistCols - 1);
+            int row = Math.Clamp((int)(fracY * _partlistRowsCount), 0, _partlistRowsCount - 1);
+            int idx = row * _partlistCols + col;
+            if (idx < 0 || idx >= cells.Length) return null;
+            int cell = cells[idx];
+            return cell switch
+            {
+                PartlistRenderer.CellActive => LanguageManager.Get("pl_active"),
+                PartlistRenderer.CellLoaded => LanguageManager.Get("pl_loaded"),
+                -1 => LanguageManager.Get("pl_finished"),
+                <= 0 => LanguageManager.Get("pl_unavail"),
+                _ => LanguageManager.Get("pl_avail") + " (" + cell + ")",
+            };
         }
 
         private async Task RefreshUploadsAsync()
@@ -638,8 +705,9 @@ namespace Apfelmus.Avalonia.ViewModels
         // ---- Commands impl ----
         private async Task TransferAjLinkAsync()
         {
-            await _client.ProcessLinkAsync(Uri.EscapeDataString(AjLinkText.Trim()));
+            await _client.ProcessLinkAsync(Uri.EscapeDataString(Uri.UnescapeDataString(AjLinkText.Trim())));
             AjLinkText = string.Empty;
+            FocusDownloads();
         }
 
         private async Task StartSearchAsync()
@@ -702,19 +770,25 @@ namespace Apfelmus.Avalonia.ViewModels
             // Erst dekodieren, dann einheitlich EINMAL kodieren - sonst wird %7C zu %257C (Doppelkodierung).
             string raw = Uri.UnescapeDataString(link.Trim());
             _ = _client.ProcessLinkAsync(Uri.EscapeDataString(raw));
+            FocusDownloads();
         }
 
-        // ---- Spaltenlayout (von der View gespeichert/gelesen) ----
+        // ---- Spaltenlayout + Fenstergroesse (von der View gespeichert/gelesen) ----
         public string DownloadColumnLayout => _config.DownloadColumnLayout ?? string.Empty;
         public string UploadColumnLayout => _config.UploadColumnLayout ?? string.Empty;
+        public double SavedWindowWidth => _config.WindowWidth;
+        public double SavedWindowHeight => _config.WindowHeight;
+        public bool SavedWindowMaximized => _config.WindowMaximized;
 
-        /// <summary>Speichert das Spaltenlayout (Reihenfolge/Breite) der Download- und Upload-Tabelle.</summary>
-        public void SaveColumnLayouts(string download, string upload)
+        /// <summary>Speichert Spaltenlayout und Fenstergroesse/-zustand in einem Rutsch (beim Schliessen).</summary>
+        public void SaveWindowAndColumns(string download, string upload, double width, double height, bool maximized)
         {
             try
             {
                 _config.DownloadColumnLayout = download;
                 _config.UploadColumnLayout = upload;
+                if (!maximized && width > 200 && height > 150) { _config.WindowWidth = width; _config.WindowHeight = height; }
+                _config.WindowMaximized = maximized;
                 ConfigSerializer.SerializeToFile(_config);
             }
             catch { }

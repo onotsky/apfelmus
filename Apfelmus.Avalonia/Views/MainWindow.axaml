@@ -83,7 +83,7 @@
             </StackPanel>
         </Border>
 
-        <TabControl Margin="6">
+        <TabControl Margin="6" SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}">
             <!-- ===================== START ===================== -->
             <TabItem Header="{DynamicResource t_start}">
                 <ScrollViewer>
@@ -229,10 +229,15 @@
                                       GridLinesVisibility="Horizontal" CanUserResizeColumns="True" CanUserReorderColumns="True">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="{DynamicResource col_nick}" Binding="{Binding NickName, Mode=OneWay}" Width="*" />
-                                    <DataGridTextColumn Header="{DynamicResource col_status}" Binding="{Binding Status, Converter={StaticResource UserStatusConverter}, Mode=OneWay}" Width="120" />
+                                    <DataGridTextColumn Header="{DynamicResource col_status}" Binding="{Binding Status, Converter={StaticResource UserStatusConverter}, Mode=OneWay}" Width="110" />
+                                    <DataGridTextColumn Header="{DynamicResource col_size}" Binding="{Binding FileSize, Converter={StaticResource FileSizeConverter}, Mode=OneWay}" Width="90" />
+                                    <DataGridTextColumn Header="{DynamicResource col_loaded}" Binding="{Binding ActualFileSize, Converter={StaticResource FileSizeConverter}, Mode=OneWay}" Width="90" />
                                     <DataGridTextColumn Header="{DynamicResource col_speed}" Binding="{Binding Speed, Converter={StaticResource FileSizeConverter}, Mode=OneWay}" Width="90" />
-                                    <DataGridTextColumn Header="{DynamicResource col_version}" Binding="{Binding Version, Mode=OneWay}" Width="120" />
+                                    <DataGridTextColumn Header="{DynamicResource col_time}" Binding="{Binding TimeToEnd, Converter={StaticResource TimeConverter}, Mode=OneWay}" Width="90" />
+                                    <DataGridTextColumn Header="{DynamicResource col_percent}" Binding="{Binding Percentages, Mode=OneWay}" Width="70" />
+                                    <DataGridTextColumn Header="{DynamicResource col_rest}" Binding="{Binding FileSizeToGet, Converter={StaticResource FileSizeConverter}, Mode=OneWay}" Width="90" />
                                     <DataGridTextColumn Header="{DynamicResource col_power}" Binding="{Binding PowerDownload, Converter={StaticResource PowerDownloadConverter}, Mode=OneWay}" Width="70" />
+                                    <DataGridTextColumn Header="{DynamicResource col_version}" Binding="{Binding Version, Mode=OneWay}" Width="110" />
                                 </DataGrid.Columns>
                             </DataGrid>
                         </DockPanel>
@@ -254,7 +259,8 @@
                                 </StackPanel>
                             </StackPanel>
                             <Border BorderBrush="{DynamicResource TextSecondaryBrush}" BorderThickness="1">
-                                <Image Source="{Binding PartlistImage}" Stretch="Fill" />
+                                <Image Source="{Binding PartlistImage}" Stretch="Fill"
+                                       PointerMoved="Partlist_PointerMoved" PointerExited="Partlist_PointerExited" />
                             </Border>
                         </DockPanel>
                     </Grid>
@@ -460,7 +466,7 @@
                             <Button Content="{DynamicResource sh_showall}" Command="{Binding ShowAllSharesCommand}" />
                         </StackPanel>
                         <DataGrid x:CompileBindings="False" x:Name="SharesGrid" ItemsSource="{Binding SharesView}"
-                                  SelectedItem="{Binding SelectedShare}" IsReadOnly="True" SelectionMode="Extended"
+                                  SelectedItem="{Binding SelectedShare}" IsReadOnly="True" SelectionMode="Extended" CanUserSortColumns="True"
                                   GridLinesVisibility="Horizontal" CanUserResizeColumns="True" CanUserReorderColumns="True">
                             <DataGrid.ContextMenu>
                                 <ContextMenu>
@@ -473,7 +479,7 @@
                                 </ContextMenu>
                             </DataGrid.ContextMenu>
                             <DataGrid.Columns>
-                                <DataGridTemplateColumn Header="{DynamicResource col_file}" Width="*">
+                                <DataGridTemplateColumn Header="{DynamicResource col_file}" Width="*" SortMemberPath="ShortFileName">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
