@@ -109,7 +109,7 @@
                                     <TextBlock Grid.Row="1" Grid.Column="0" Text="{DynamicResource c_files}" Classes="lbl" />
                                     <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Files}" Classes="val" />
                                     <TextBlock Grid.Row="2" Grid.Column="0" Text="{DynamicResource c_totalsize}" Classes="lbl" />
-                                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding FileSize, Converter={StaticResource FileSizeConverter}}" Classes="val" />
+                                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding FileSize, Converter={StaticResource NetworkSizeConverter}}" Classes="val" />
                                     <TextBlock Grid.Row="3" Grid.Column="0" Text="{DynamicResource c_connections}" Classes="lbl" />
                                     <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding OpenConnections}" Classes="val" />
                                     <TextBlock Grid.Row="4" Grid.Column="0" Text="{DynamicResource c_uploadqueue}" Classes="lbl" />
@@ -165,20 +165,20 @@
                         <Button Content="{DynamicResource d_setprio}" Command="{Binding SetDownloadPriorityCommand}" />
                     </StackPanel>
 
-                    <Grid RowDefinitions="*,4,160,148">
-                        <DataGrid Grid.Row="0" x:CompileBindings="False" ItemsSource="{Binding Downloads}"
-                                  SelectedItem="{Binding SelectedDownload}" IsReadOnly="True"
+                    <Grid RowDefinitions="*,4,*,148">
+                        <DataGrid Grid.Row="0" x:Name="DownloadsGrid" x:CompileBindings="False" ItemsSource="{Binding DownloadsView}"
+                                  SelectedItem="{Binding SelectedDownload}" IsReadOnly="True" CanUserSortColumns="True"
                                   GridLinesVisibility="Horizontal" CanUserResizeColumns="True" CanUserReorderColumns="True">
                             <DataGrid.ContextMenu>
                                 <ContextMenu>
-                                    <MenuItem Header="{DynamicResource d_continue}" Command="{Binding ContinueCommand}" />
-                                    <MenuItem Header="{DynamicResource d_break}" Command="{Binding BreakCommand}" />
-                                    <MenuItem Header="{DynamicResource d_cancel}" Command="{Binding CancelCommand}" />
-                                    <MenuItem Header="{DynamicResource d_renamebtn}" Command="{Binding RenameCommand}" />
-                                    <MenuItem Header="{DynamicResource d_clean}" Command="{Binding CleanFinishedCommand}" />
+                                    <MenuItem Header="{DynamicResource d_continue}" Command="{Binding ContinueCommand}" InputGesture="F2" />
+                                    <MenuItem Header="{DynamicResource d_break}" Command="{Binding BreakCommand}" InputGesture="F3" />
+                                    <MenuItem Header="{DynamicResource d_cancel}" Command="{Binding CancelCommand}" InputGesture="F4" />
+                                    <MenuItem Header="{DynamicResource d_renamebtn}" Command="{Binding RenameCommand}" InputGesture="F6" />
+                                    <MenuItem Header="{DynamicResource d_clean}" Command="{Binding CleanFinishedCommand}" InputGesture="F5" />
                                     <Separator />
-                                    <MenuItem Header="{DynamicResource d_copylink}" Command="{Binding CopyDownloadLinkCommand}" />
-                                    <MenuItem Header="{DynamicResource d_copysource}" Command="{Binding CopyDownloadSourceCommand}" />
+                                    <MenuItem Header="{DynamicResource d_copylink}" Command="{Binding CopyDownloadLinkCommand}" InputGesture="F8" />
+                                    <MenuItem Header="{DynamicResource d_copysource}" Command="{Binding CopyDownloadSourceCommand}" InputGesture="F9" />
                                     <MenuItem Header="{DynamicResource d_releaseinfo}" Command="{Binding ReleaseInfoDownloadCommand}" />
                                 </ContextMenu>
                             </DataGrid.ContextMenu>
@@ -188,7 +188,7 @@
                                 </Style>
                             </DataGrid.Styles>
                             <DataGrid.Columns>
-                                <DataGridTemplateColumn Header="{DynamicResource col_file}" Width="*">
+                                <DataGridTemplateColumn Header="{DynamicResource col_file}" Width="*" SortMemberPath="FileName">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
@@ -265,7 +265,7 @@
             <TabItem Header="{DynamicResource t_uploads}">
                 <Grid RowDefinitions="Auto,*,4,Auto,*" Margin="4">
                     <TextBlock Grid.Row="0" Text="{DynamicResource u_active}" Classes="lbl" Margin="2" />
-                    <DataGrid Grid.Row="1" x:CompileBindings="False" ItemsSource="{Binding ActiveUploads}" IsReadOnly="True"
+                    <DataGrid Grid.Row="1" x:Name="UploadsGrid" x:CompileBindings="False" ItemsSource="{Binding ActiveUploads}" IsReadOnly="True"
                               GridLinesVisibility="Horizontal" CanUserResizeColumns="True" CanUserReorderColumns="True">
                         <DataGrid.Columns>
                             <DataGridTemplateColumn Header="{DynamicResource col_file}" Width="*">

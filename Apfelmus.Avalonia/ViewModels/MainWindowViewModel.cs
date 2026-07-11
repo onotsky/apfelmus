@@ -37,6 +37,7 @@ namespace Apfelmus.Avalonia.ViewModels
             _registerProtocol = config.ProtocolHandler;
 
             Downloads = new ObservableCollection<Download>();
+            DownloadsView = new DataGridCollectionView(Downloads); // ermoeglicht Spalten-Sortierung
             DownloadSources = new ObservableCollection<User>();
             ActiveUploads = new ObservableCollection<Upload>();
             QueuedUploads = new ObservableCollection<Upload>();
@@ -139,6 +140,8 @@ namespace Apfelmus.Avalonia.ViewModels
 
         // ---- Collections ----
         public ObservableCollection<Download> Downloads { get; }
+        /// <summary>Sortierbare Sicht auf die Downloads (Klick auf Spaltenkopf sortiert, bleibt ueber Poll-Updates erhalten).</summary>
+        public DataGridCollectionView DownloadsView { get; }
         public ObservableCollection<User> DownloadSources { get; }
         public ObservableCollection<Upload> ActiveUploads { get; }
         public ObservableCollection<Upload> QueuedUploads { get; }
@@ -699,6 +702,22 @@ namespace Apfelmus.Avalonia.ViewModels
             // Erst dekodieren, dann einheitlich EINMAL kodieren - sonst wird %7C zu %257C (Doppelkodierung).
             string raw = Uri.UnescapeDataString(link.Trim());
             _ = _client.ProcessLinkAsync(Uri.EscapeDataString(raw));
+        }
+
+        // ---- Spaltenlayout (von der View gespeichert/gelesen) ----
+        public string DownloadColumnLayout => _config.DownloadColumnLayout ?? string.Empty;
+        public string UploadColumnLayout => _config.UploadColumnLayout ?? string.Empty;
+
+        /// <summary>Speichert das Spaltenlayout (Reihenfolge/Breite) der Download- und Upload-Tabelle.</summary>
+        public void SaveColumnLayouts(string download, string upload)
+        {
+            try
+            {
+                _config.DownloadColumnLayout = download;
+                _config.UploadColumnLayout = upload;
+                ConfigSerializer.SerializeToFile(_config);
+            }
+            catch { }
         }
 
         /// <summary>Fuehrt das Umbenennen aus (vom Dialog der View aufgerufen).</summary>

@@ -12,7 +12,9 @@ namespace Apfelmus.Avalonia
     public partial class App : Application
     {
         private MainWindowViewModel? _mainVm;
-        private string? _pendingLink;
+        // Mehrere Links koennen vor dem Hauptfenster eintreffen (z.B. Kaltstart mit mehreren
+        // ajfsp-Links) - daher SAMMELN statt ueberschreiben.
+        private readonly System.Collections.Generic.List<string> _pendingLinks = new();
 
         public override void Initialize()
         {
@@ -30,16 +32,20 @@ namespace Apfelmus.Avalonia
 
             // macOS: Avalonia 11.2 loest das OpenUri-Event nicht aus - deshalb faengt ein nativer
             // NSAppleEventManager-Handler den ajfsp-Link direkt ueber das Apple-Event ab.
-            // WICHTIG: erst NACH Cocoas eigener finishLaunching-Registrierung setzen (sonst wird
-            // unser Handler ueberschrieben) -> per Timer leicht verzoegert registrieren.
+            // WICHTIG: erst NACH Cocoas eigener finishLaunching-Registrierung setzen (sonst wird unser
+            // Handler ueberschrieben). Fuer den Kaltstart moeglichst FRUEH greifen -> mehrfach
+            // (idempotent) registrieren: sofort per Post und dann gestaffelt.
             if (OperatingSystem.IsMacOS())
             {
-                global::Avalonia.Threading.DispatcherTimer.RunOnce(() =>
+                void RegisterMac()
                 {
                     if (OperatingSystem.IsMacOS())
                         Services.MacUrlScheme.Register(url =>
                             global::Avalonia.Threading.Dispatcher.UIThread.Post(() => HandleIncomingLink(url)));
-                }, TimeSpan.FromMilliseconds(1200));
+                }
+                global::Avalonia.Threading.Dispatcher.UIThread.Post(RegisterMac);
+                foreach (int ms in new[] { 200, 600, 1200 })
+                    global::Avalonia.Threading.DispatcherTimer.RunOnce(RegisterMac, TimeSpan.FromMilliseconds(ms));
             }
 
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
@@ -57,12 +63,16 @@ namespace Apfelmus.Avalonia
                     splash.Show();
                     global::Avalonia.Threading.DispatcherTimer.RunOnce(() =>
                     {
-                        var vm = new MainWindowViewModel(config, _pendingLink ?? argvLink);
-                        _pendingLink = null;
+                        var vm = new MainWindowViewModel(config);
                         _mainVm = vm;
                         var main = new MainWindow { DataContext = vm };
                         main.Show();
                         splash.Close();
+
+                        // Alle bis hierher gesammelten Links verarbeiten (Kommandozeile + gesammelte Aktivierungen).
+                        if (!string.IsNullOrWhiteSpace(argvLink)) vm.ProcessExternalLink(argvLink!);
+                        foreach (var l in _pendingLinks) vm.ProcessExternalLink(l);
+                        _pendingLinks.Clear();
                     }, System.TimeSpan.FromSeconds(1.6));
                 }
 
@@ -107,7 +117,7 @@ namespace Apfelmus.Avalonia
             if (_mainVm != null)
                 _mainVm.ProcessExternalLink(link!);
             else
-                _pendingLink = link; // vor dem Hauptfenster -> beim Start verarbeiten
+                _pendingLinks.Add(link!); // vor dem Hauptfenster -> beim Start alle verarbeiten
         }
     }
 }

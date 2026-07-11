@@ -38,6 +38,7 @@
             <conv:ServerRowBrushConverter x:Key="ServerRowBrushConverter" />
             <conv:ExtensionToIconConverter x:Key="FileIconConverter" />
             <conv:PercentTextConverter x:Key="PercentTextConverter" />
+            <conv:NetworkSizeConverter x:Key="NetworkSizeConverter" />
         </ResourceDictionary>
     </Application.Resources>
 

@@ -36,27 +36,37 @@ namespace Apfelmus.Avalonia.Services
         private static HandleUrlDelegate? _handlerDelegate;
         private static Action<string>? _onUrl;
 
-        /// <summary>Registriert den Apple-Event-Handler. Muss auf dem Main-Thread laufen (nach NSApp-Init).</summary>
+        private static IntPtr _handler;   // einmalig erzeugte Handler-Instanz
+
+        /// <summary>
+        /// Registriert den Apple-Event-Handler. Idempotent: die ObjC-Klasse wird nur EINMAL erzeugt
+        /// (erneutes objc_allocateClassPair mit gleichem Namen liefert nil -> Absturz), das
+        /// setEventHandler darf aber mehrfach laufen (um Cocoas eigenen Handler zu ueberschreiben).
+        /// Muss auf dem Main-Thread laufen (nach NSApp-Init).
+        /// </summary>
         public static void Register(Action<string> onUrl)
         {
             _onUrl = onUrl;
             try
             {
-                IntPtr nsObject = objc_getClass("NSObject");
-                IntPtr cls = objc_allocateClassPair(nsObject, "ApfelmusUrlHandler", IntPtr.Zero);
+                if (_handler == IntPtr.Zero)
+                {
+                    IntPtr nsObject = objc_getClass("NSObject");
+                    IntPtr cls = objc_allocateClassPair(nsObject, "ApfelmusUrlHandler", IntPtr.Zero);
+                    if (cls == IntPtr.Zero) return; // Klasse existiert schon o.ae. -> nicht erneut anlegen
 
-                _handlerDelegate = HandleUrl;
-                IntPtr imp = Marshal.GetFunctionPointerForDelegate(_handlerDelegate);
-                // Signatur: v@:@@  (void; self, _cmd, event, replyEvent)
-                class_addMethod(cls, sel_registerName("handleGetURLEvent:withReplyEvent:"), imp, "v@:@@");
-                objc_registerClassPair(cls);
+                    _handlerDelegate = HandleUrl;
+                    IntPtr imp = Marshal.GetFunctionPointerForDelegate(_handlerDelegate);
+                    // Signatur: v@:@@  (void; self, _cmd, event, replyEvent)
+                    class_addMethod(cls, sel_registerName("handleGetURLEvent:withReplyEvent:"), imp, "v@:@@");
+                    objc_registerClassPair(cls);
+                    _handler = Send(Send(cls, sel_registerName("alloc")), sel_registerName("init"));
+                }
 
-                IntPtr handler = Send(Send(cls, sel_registerName("alloc")), sel_registerName("init"));
-
-                IntPtr aemClass = objc_getClass("NSAppleEventManager");
-                IntPtr aem = Send(aemClass, sel_registerName("sharedAppleEventManager"));
+                if (_handler == IntPtr.Zero) return;
+                IntPtr aem = Send(objc_getClass("NSAppleEventManager"), sel_registerName("sharedAppleEventManager"));
                 Send_reg(aem, sel_registerName("setEventHandler:andSelector:forEventClass:andEventID:"),
-                    handler, sel_registerName("handleGetURLEvent:withReplyEvent:"), kInternetEventClass, kAEGetURL);
+                    _handler, sel_registerName("handleGetURLEvent:withReplyEvent:"), kInternetEventClass, kAEGetURL);
             }
             catch
             {

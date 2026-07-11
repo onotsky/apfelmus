@@ -116,5 +116,22 @@ namespace ApfelmusFramework.Classes.Config
             get { return partlistRowHeight; }
             set { partlistRowHeight = value; }
         }
+
+        private string downloadColumnLayout;
+        private string uploadColumnLayout;
+
+        // Gespeichertes Spaltenlayout (Reihenfolge/Breite) der Download- bzw. Upload-Tabelle,
+        // Format "displayIndex:breite|..." in Definitionsreihenfolge der Spalten. Leer = Standard.
+        public string DownloadColumnLayout
+        {
+            get { return downloadColumnLayout; }
+            set { downloadColumnLayout = value; }
+        }
+
+        public string UploadColumnLayout
+        {
+            get { return uploadColumnLayout; }
+            set { uploadColumnLayout = value; }
+        }
     }
 }
