@@ -40,10 +40,14 @@
             <conv:PercentTextConverter x:Key="PercentTextConverter" />
             <conv:NetworkSizeConverter x:Key="NetworkSizeConverter" />
             <conv:ConnectedDotConverter x:Key="ConnectedDotConverter" />
+            <conv:BoolToFontWeightConverter x:Key="BoolToFontWeightConverter" />
 
-            <!-- Ordner-Icon (Mein Share: Baum + freigegebene Ordner) -->
+            <!-- Ordner-Icon (Mein Share: Baum + freigegebene Ordner); gruene Variante = freigegeben -->
             <DrawingImage x:Key="FolderIcon">
                 <GeometryDrawing Brush="#E0B24C" Geometry="M2,5 H8 L10,7 H21 V19 H2 Z" />
+            </DrawingImage>
+            <DrawingImage x:Key="FolderIconShared">
+                <GeometryDrawing Brush="#4CAF7D" Geometry="M2,5 H8 L10,7 H21 V19 H2 Z" />
             </DrawingImage>
         </ResourceDictionary>
     </Application.Resources>

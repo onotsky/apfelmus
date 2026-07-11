@@ -16,18 +16,28 @@ namespace Apfelmus.Avalonia.ViewModels
     {
         private readonly CoreClient? _client;
         private readonly bool _isPlaceholder;
+        private readonly System.Collections.Generic.HashSet<string>? _sharedPaths;
         private bool _loaded;
         private bool _isExpanded;
 
         /// <summary>Echter Verzeichnisknoten (bekommt einen Platzhalter, um aufklappbar zu sein).</summary>
-        public DirNodeViewModel(Dir dir, CoreClient client)
+        public DirNodeViewModel(Dir dir, CoreClient client, System.Collections.Generic.HashSet<string>? sharedPaths = null)
         {
             _client = client;
+            _sharedPaths = sharedPaths;
             Name = dir.Name ?? string.Empty;
             Path = dir.Path ?? string.Empty;
             Type = dir.Type;
+            IsShared = sharedPaths != null && sharedPaths.Contains(NormalizePath(Path));
             Children = new ObservableCollection<DirNodeViewModel> { new DirNodeViewModel() };
         }
+
+        /// <summary>Ob dieser Ordner aktuell freigegeben ist (Markierung im Baum).</summary>
+        public bool IsShared { get; }
+
+        /// <summary>Vergleichsform eines Ordnerpfads (ohne Rand-Trenner, Slash-normalisiert, kleingeschrieben).</summary>
+        public static string NormalizePath(string? p)
+            => (p ?? string.Empty).Replace('\\', '/').Trim('/').ToLowerInvariant();
 
         /// <summary>Platzhalter-Knoten (KEINE Kinder - verhindert die Endlos-Rekursion).</summary>
         private DirNodeViewModel()
@@ -73,7 +83,7 @@ namespace Apfelmus.Avalonia.ViewModels
                         ? $"{Path}{d.Name}{sep}"
                         : $"{Path}{sep}{d.Name}";
                 }
-                Children.Add(new DirNodeViewModel(d, _client));
+                Children.Add(new DirNodeViewModel(d, _client, _sharedPaths));
             }
         }
     }

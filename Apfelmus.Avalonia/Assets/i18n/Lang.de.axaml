@@ -48,6 +48,8 @@
     <sys:String x:Key="sv_serverlink">Serverlink kopieren</sys:String>
     <sys:String x:Key="d_copysources">Quellen kopieren</sys:String>
     <sys:String x:Key="d_targetdir">Zielverzeichnis</sys:String>
+    <sys:String x:Key="td_pick">Ordner wählen:</sys:String>
+    <sys:String x:Key="td_newfolder">Neuer Unterordner:</sys:String>
     <sys:String x:Key="d_copylinks">Links kopieren</sys:String>
     <sys:String x:Key="d_rename">Neuer Dateiname</sys:String>
     <sys:String x:Key="d_renamebtn">Umbenennen</sys:String>
@@ -104,6 +106,7 @@
     <sys:String x:Key="sh_refresh">Anzeige erneuern</sys:String>
     <sys:String x:Key="sh_check">Shareprüfung starten</sys:String>
     <sys:String x:Key="sh_shared">Freigegebene Ordner</sys:String>
+    <sys:String x:Key="sh_sharedhint">Freigegebene Ordner sind grün markiert.</sys:String>
     <sys:String x:Key="sh_filter">Filter:</sys:String>
     <sys:String x:Key="sh_showall">Alle anzeigen</sys:String>
 

@@ -134,6 +134,7 @@ namespace Apfelmus.Avalonia.ViewModels
             _ = PollAsync();
             _ = LoadCoreSettingsAsync();
             _ = RefreshSharesAsync();   // Freigaben einmalig laden (danach nur manuell, siehe PollAsync).
+            _ = LoadShareTreeAsync();   // Verzeichnisbaum laden (freigegebene Ordner sind darin markiert).
 
             // Gespeicherte Sprache anwenden.
             LanguageManager.Apply(LanguageManager.Normalize(config.LanguageFile));
@@ -146,6 +147,9 @@ namespace Apfelmus.Avalonia.ViewModels
 
         /// <summary>Wird von der View gesetzt/abonniert, um Text in die Zwischenablage zu legen.</summary>
         public event Action<string>? CopyRequested;
+
+        /// <summary>Fuer Dialoge, die den Core-Verzeichnisbaum brauchen (z.B. Zielverzeichnis waehlen).</summary>
+        public CoreClient CoreClient => _client;
 
         /// <summary>Bittet die View, das Fenster in den Vordergrund zu holen (z.B. bei Link-Uebergabe).</summary>
         public event Action? ActivateRequested;
@@ -961,6 +965,9 @@ namespace Apfelmus.Avalonia.ViewModels
 
         private async Task LoadShareTreeAsync()
         {
+            await LoadCoreSettingsAsync(); // aktuelle Freigaben holen (fuer die Markierung im Baum)
+            var shared = new HashSet<string>(CurrentShares().Select(x => DirNodeViewModel.NormalizePath(x.path)));
+
             var aj = await _client.GetDirectoryAsync(null);
             ShareTree.Clear();
             if (aj?.Dir == null) return;
@@ -968,8 +975,8 @@ namespace Apfelmus.Avalonia.ViewModels
             foreach (var d in aj.Dir.OrderBy(x => x.Name))
             {
                 if (string.IsNullOrEmpty(d.Path))
-                    d.Path = sep == "/" ? $"{d.Name}{sep}" : $"{d.Name}{sep}";
-                ShareTree.Add(new DirNodeViewModel(d, _client));
+                    d.Path = $"{d.Name}{sep}";
+                ShareTree.Add(new DirNodeViewModel(d, _client, shared));
             }
         }
 

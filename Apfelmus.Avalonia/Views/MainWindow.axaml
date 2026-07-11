@@ -426,21 +426,8 @@
                             <Button Content="{DynamicResource sh_sharesub}" Command="{Binding ShareFolderCommand}" />
                         </StackPanel>
                         <TextBlock DockPanel.Dock="Top" Text="{DynamicResource sh_dirs}" Classes="lbl" Margin="2,0,0,2" />
-                        <!-- Bereits freigegebene Ordner (aus den Core-Einstellungen) -->
-                        <DockPanel DockPanel.Dock="Bottom" Height="160" Margin="0,4,0,0">
-                            <TextBlock DockPanel.Dock="Top" Text="{DynamicResource sh_shared}" Classes="lbl" Margin="2,0,0,2" />
-                            <Button DockPanel.Dock="Bottom" Content="{DynamicResource sh_unshare}" Command="{Binding RemoveSharedFolderCommand}" Margin="2" HorizontalAlignment="Left" />
-                            <ListBox x:CompileBindings="False" ItemsSource="{Binding SharedFolders}" SelectedItem="{Binding SelectedSharedFolder}">
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <StackPanel Orientation="Horizontal" Spacing="5">
-                                            <Image Source="{StaticResource FolderIcon}" Width="15" Height="15" VerticalAlignment="Center" />
-                                            <TextBlock Text="{Binding Display}" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimaryBrush}" />
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </ListBox.ItemTemplate>
-                            </ListBox>
-                        </DockPanel>
+                        <TextBlock DockPanel.Dock="Bottom" Text="{DynamicResource sh_sharedhint}" Classes="lbl" Margin="2,4,2,0" FontSize="11" TextWrapping="Wrap" />
+                        <!-- Freigegebene Ordner sind im Baum gruen/fett markiert (eigene Liste entfaellt). -->
                         <TreeView x:CompileBindings="False" ItemsSource="{Binding ShareTree}" SelectedItem="{Binding SelectedShareNode}">
                             <TreeView.Styles>
                                 <Style Selector="TreeViewItem">
@@ -450,8 +437,12 @@
                             <TreeView.ItemTemplate>
                                 <TreeDataTemplate ItemsSource="{Binding Children}">
                                     <StackPanel Orientation="Horizontal" Spacing="5">
-                                        <Image Source="{StaticResource FolderIcon}" Width="15" Height="15" VerticalAlignment="Center" />
-                                        <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimaryBrush}" />
+                                        <Panel Width="15" Height="15" VerticalAlignment="Center">
+                                            <Image Source="{StaticResource FolderIcon}" IsVisible="{Binding !IsShared}" />
+                                            <Image Source="{StaticResource FolderIconShared}" IsVisible="{Binding IsShared}" />
+                                        </Panel>
+                                        <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimaryBrush}"
+                                                   FontWeight="{Binding IsShared, Converter={StaticResource BoolToFontWeightConverter}}" />
                                     </StackPanel>
                                 </TreeDataTemplate>
                             </TreeView.ItemTemplate>
@@ -516,7 +507,9 @@
             <!-- ===================== EINSTELLUNGEN ===================== -->
             <TabItem Header="{DynamicResource t_settings}">
                 <ScrollViewer>
-                <StackPanel Margin="16" Spacing="12" MaxWidth="680" HorizontalAlignment="Left">
+                <StackPanel Margin="16" Spacing="14" MaxWidth="700" HorizontalAlignment="Left">
+                  <Border Classes="card" Margin="0">
+                   <StackPanel Spacing="10">
                     <TextBlock Text="{DynamicResource c_gui}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" />
                     <Grid ColumnDefinitions="220,*" RowDefinitions="Auto,Auto,Auto">
                         <TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource set_refresh}" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" />
@@ -537,9 +530,11 @@
                         <Button Content="{DynamicResource set_guisave}" Command="{Binding SaveSettingsCommand}" Background="{DynamicResource AccentBrush}" Foreground="White" />
                         <TextBlock Text="{Binding SettingsStatus}" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" />
                     </StackPanel>
+                   </StackPanel>
+                  </Border>
 
-                    <Border Height="1" Background="{DynamicResource SurfaceBrush}" Margin="0,8" />
-
+                  <Border Classes="card" Margin="0">
+                   <StackPanel Spacing="10">
                     <TextBlock Text="{DynamicResource set_core}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" />
                     <Grid ColumnDefinitions="220,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
                         <TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource set_nick}" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" />
@@ -574,14 +569,18 @@
                         <Button Content="{DynamicResource set_coresave}" Command="{Binding SaveCoreSettingsCommand}" Background="{DynamicResource AccentBrush}" Foreground="White" />
                         <TextBlock Text="{Binding CoreSettingsStatus}" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" />
                     </StackPanel>
+                   </StackPanel>
+                  </Border>
 
-                    <Border Height="1" Background="{DynamicResource SurfaceBrush}" Margin="0,8" />
-
+                  <Border Classes="card" Margin="0">
+                   <StackPanel Spacing="10">
                     <TextBlock Text="{DynamicResource set_pwchange}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" />
                     <StackPanel Orientation="Horizontal" Spacing="10">
                         <TextBox Width="220" PasswordChar="•" Watermark="{DynamicResource set_newpw}" Text="{Binding NewPassword, Mode=TwoWay}" />
                         <Button Content="{DynamicResource set_pwset}" Command="{Binding ChangePasswordCommand}" />
                     </StackPanel>
+                   </StackPanel>
+                  </Border>
                 </StackPanel>
                 </ScrollViewer>
             </TabItem>

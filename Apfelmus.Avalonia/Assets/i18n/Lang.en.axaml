@@ -48,6 +48,8 @@
     <sys:String x:Key="sv_serverlink">Copy server link</sys:String>
     <sys:String x:Key="d_copysources">Copy sources</sys:String>
     <sys:String x:Key="d_targetdir">Target directory</sys:String>
+    <sys:String x:Key="td_pick">Choose folder:</sys:String>
+    <sys:String x:Key="td_newfolder">New subfolder:</sys:String>
     <sys:String x:Key="d_copylinks">Copy links</sys:String>
     <sys:String x:Key="d_rename">New file name</sys:String>
     <sys:String x:Key="d_renamebtn">Rename</sys:String>
@@ -104,6 +106,7 @@
     <sys:String x:Key="sh_refresh">Refresh view</sys:String>
     <sys:String x:Key="sh_check">Start share check</sys:String>
     <sys:String x:Key="sh_shared">Shared folders</sys:String>
+    <sys:String x:Key="sh_sharedhint">Shared folders are marked green.</sys:String>
     <sys:String x:Key="sh_filter">Filter:</sys:String>
     <sys:String x:Key="sh_showall">Show all</sys:String>
 

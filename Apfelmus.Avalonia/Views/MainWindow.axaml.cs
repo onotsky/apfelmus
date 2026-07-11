@@ -198,12 +198,13 @@ namespace Apfelmus.Avalonia.Views
 
         private async void OnTargetDirRequested(ApfelmusFramework.Classes.Modified.Download d)
         {
-            // Der Zielpfad liegt auf dem Core-Rechner -> Texteingabe (kein lokaler Ordner-Dialog).
-            var dlg = new RenameDialog(d.TargetDirectory ?? string.Empty) { Title = "Zielverzeichnis" };
+            if (DataContext is not MainWindowViewModel vm) return;
+            // Verzeichnisbaum des Cores zum Auswaehlen + optionalem neuen Unterordner.
+            var dlg = new TargetDirDialog(vm.CoreClient);
             var result = await dlg.ShowDialog<string?>(this);
-            if (result != null && DataContext is MainWindowViewModel vm)
+            if (!string.IsNullOrWhiteSpace(result))
             {
-                vm.ExecuteSetTargetDir(d.Id, result);
+                vm.ExecuteSetTargetDir(d.Id, result!);
             }
         }
 
