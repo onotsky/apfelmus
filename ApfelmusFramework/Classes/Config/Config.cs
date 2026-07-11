@@ -99,7 +99,7 @@ namespace ApfelmusFramework.Classes.Config
         private string releaseInfoHost;
 
         // Host fuer "Suche nach mehr Informationen" (Kontextmenue). %s wird durch den ajfsp-Link
-        // ersetzt. Leer/nicht gesetzt (alte Config) -> ReleaseInfo.DefaultHost (apple-deluxe.co).
+        // ersetzt. Leer/nicht gesetzt -> ReleaseInfo.DefaultHost.
         public string ReleaseInfoHost
         {
             get { return releaseInfoHost; }

@@ -49,6 +49,10 @@
             <DrawingImage x:Key="FolderIconShared">
                 <GeometryDrawing Brush="#4CAF7D" Geometry="M2,5 H8 L10,7 H21 V19 H2 Z" />
             </DrawingImage>
+            <!-- Enthaelt Freigaben (indirekt): gedaempftes Gruen -->
+            <DrawingImage x:Key="FolderIconAncestor">
+                <GeometryDrawing Brush="#7FB394" Geometry="M2,5 H8 L10,7 H21 V19 H2 Z" />
+            </DrawingImage>
         </ResourceDictionary>
     </Application.Resources>
 

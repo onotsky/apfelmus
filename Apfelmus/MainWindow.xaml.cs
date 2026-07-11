@@ -3025,7 +3025,7 @@ namespace Apfelmus
 
         /// <summary>
         /// Oeffnet fuer den gewaehlten Download die "Suche nach mehr Informationen"-Seite im Browser:
-        /// baut den ajfsp-Link und uebergibt ihn an den konfigurierten Host (Default apple-deluxe.co).
+        /// baut den ajfsp-Link und uebergibt ihn an den konfigurierten Host.
         /// Analog zur offiziellen Java-GUI; die Infos werden extern angezeigt, nicht inline.
         /// </summary>
         private void ReleaseInfoDownload_Click(object sender, RoutedEventArgs e)

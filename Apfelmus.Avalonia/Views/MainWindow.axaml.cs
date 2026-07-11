@@ -199,8 +199,10 @@ namespace Apfelmus.Avalonia.Views
         private async void OnTargetDirRequested(ApfelmusFramework.Classes.Modified.Download d)
         {
             if (DataContext is not MainWindowViewModel vm) return;
-            // Verzeichnisbaum des Cores zum Auswaehlen + optionalem neuen Unterordner.
-            var dlg = new TargetDirDialog(vm.CoreClient);
+            // Nur freigabe-relevante Zweige zur Auswahl + optionalem neuen Unterordner.
+            var shared = new System.Collections.Generic.HashSet<string>(
+                vm.SharedFolders.Select(f => DirNodeViewModel.NormalizePath(f.Path)));
+            var dlg = new TargetDirDialog(vm.CoreClient, shared);
             var result = await dlg.ShowDialog<string?>(this);
             if (!string.IsNullOrWhiteSpace(result))
             {

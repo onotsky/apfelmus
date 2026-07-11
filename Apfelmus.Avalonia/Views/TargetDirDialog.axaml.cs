@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,12 +11,15 @@ using Apfelmus.Avalonia.ViewModels;
 namespace Apfelmus.Avalonia.Views
 {
     /// <summary>
-    /// Zielverzeichnis eines Downloads wählen: Verzeichnisbaum des Cores (lazy geladen) zum Auswählen
-    /// eines vorhandenen Ordners, plus optionalem neuem Unterordner. Rückgabe = gewählter Core-Pfad.
+    /// Zielverzeichnis eines Downloads wählen: der Core-Verzeichnisbaum, aber gefiltert auf
+    /// freigabe-relevante Zweige - freigegebene Ordner (gruen) und Elternordner, die Freigaben
+    /// enthalten (gedaempftes Gruen), damit man auch zu verschachtelten Freigaben navigieren kann.
+    /// Plus optionalem neuem Unterordner. Rückgabe = gewählter Core-Pfad.
     /// </summary>
     public partial class TargetDirDialog : Window
     {
         private readonly CoreClient? _client;
+        private readonly HashSet<string>? _sharedPaths;
         private readonly ObservableCollection<DirNodeViewModel> _dirTree = new();
 
         public TargetDirDialog()
@@ -23,9 +27,10 @@ namespace Apfelmus.Avalonia.Views
             InitializeComponent();
         }
 
-        public TargetDirDialog(CoreClient client) : this()
+        public TargetDirDialog(CoreClient client, HashSet<string> sharedPaths) : this()
         {
             _client = client;
+            _sharedPaths = sharedPaths;
             DirTreeView.ItemsSource = _dirTree;
             _ = LoadRootsAsync();
         }
@@ -39,7 +44,9 @@ namespace Apfelmus.Avalonia.Views
             foreach (var d in aj.Dir.OrderBy(x => x.Name))
             {
                 if (string.IsNullOrEmpty(d.Path)) d.Path = $"{d.Name}{sep}";
-                _dirTree.Add(new DirNodeViewModel(d, _client));
+                var node = new DirNodeViewModel(d, _client, _sharedPaths, prune: true);
+                if (!node.IsRelevant) continue; // nur Zweige mit Freigaben
+                _dirTree.Add(node);
             }
         }
 
