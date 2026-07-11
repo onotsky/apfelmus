@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 
 namespace Apfelmus.Avalonia.Views
@@ -8,6 +9,14 @@ namespace Apfelmus.Avalonia.Views
         public RenameDialog()
         {
             InitializeComponent();
+        }
+
+        // Enter = OK, Escape = Abbrechen.
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter) { Close(NameBox.Text); e.Handled = true; }
+            else if (e.Key == Key.Escape) { Close(null); e.Handled = true; }
+            base.OnKeyDown(e);
         }
 
         public RenameDialog(string initial) : this()

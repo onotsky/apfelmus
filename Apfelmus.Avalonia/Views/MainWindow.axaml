@@ -69,6 +69,11 @@
         <!-- ===== Statusleiste (unten) ===== -->
         <Border DockPanel.Dock="Bottom" Background="{DynamicResource SurfaceBrush}" Padding="8,4">
             <StackPanel Orientation="Horizontal" Spacing="18">
+                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                    <Ellipse Width="9" Height="9" VerticalAlignment="Center"
+                             Fill="{Binding IsConnected, Converter={StaticResource ConnectedDotConverter}}" />
+                    <TextBlock Text="{Binding ServerName}" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimaryBrush}" />
+                </StackPanel>
                 <TextBlock Foreground="{DynamicResource TextSecondaryBrush}">
                     <Run Text="Credits: " /><Run Text="{Binding Credits, Converter={StaticResource FileSizeConverter}}" />
                 </TextBlock>
@@ -153,10 +158,6 @@
                         <Button Content="{DynamicResource d_break}" Command="{Binding BreakCommand}" />
                         <Button Content="{DynamicResource d_cancel}" Command="{Binding CancelCommand}" />
                         <Button Content="{DynamicResource d_clean}" Command="{Binding CleanFinishedCommand}" />
-                        <Button Content="{DynamicResource d_releaseinfo}" Command="{Binding ReleaseInfoDownloadCommand}" />
-                        <Button Content="{DynamicResource d_copylink}" Command="{Binding CopyDownloadLinkCommand}" />
-                        <Button Content="{DynamicResource d_copysource}" Command="{Binding CopyDownloadSourceCommand}" />
-                        <Button Content="{DynamicResource d_renamebtn}" Command="{Binding RenameCommand}" />
                         <Border Width="1" Background="{DynamicResource TextSecondaryBrush}" Margin="4,0" />
                         <TextBlock Text="{DynamicResource d_power}" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" />
                         <ComboBox x:CompileBindings="False" Width="70" ItemsSource="{Binding PowerValues}" SelectedItem="{Binding SelectedPowerValue}" />
@@ -166,7 +167,7 @@
                         <Button Content="{DynamicResource d_setprio}" Command="{Binding SetDownloadPriorityCommand}" />
                     </StackPanel>
 
-                    <Grid RowDefinitions="*,4,*,148">
+                    <Grid RowDefinitions="*,4,250">
                         <DataGrid Grid.Row="0" x:Name="DownloadsGrid" x:CompileBindings="False" ItemsSource="{Binding DownloadsView}"
                                   SelectedItem="{Binding SelectedDownload}" IsReadOnly="True" CanUserSortColumns="True" SelectionMode="Extended"
                                   SelectionChanged="DownloadsGrid_SelectionChanged"
@@ -226,8 +227,8 @@
 
                         <GridSplitter Grid.Row="1" ResizeDirection="Rows" HorizontalAlignment="Stretch" Background="{DynamicResource SurfaceBrush}" />
 
-                        <DockPanel Grid.Row="2">
-                            <TextBlock DockPanel.Dock="Top" Text="{DynamicResource d_sources}" Classes="lbl" Margin="2" />
+                        <TabControl Grid.Row="2" Margin="0,4,0,0">
+                          <TabItem Header="{DynamicResource tab_sources}">
                             <DataGrid x:Name="SourcesGrid" x:CompileBindings="False" ItemsSource="{Binding DownloadSources}" IsReadOnly="True"
                                       GridLinesVisibility="Horizontal" CanUserResizeColumns="True" CanUserReorderColumns="True">
                                 <DataGrid.Columns>
@@ -243,10 +244,10 @@
                                     <DataGridTextColumn Header="{DynamicResource col_version}" Binding="{Binding Version, Mode=OneWay}" Width="110" />
                                 </DataGrid.Columns>
                             </DataGrid>
-                        </DockPanel>
-
-                        <!-- Partlisten-Verfuegbarkeitsbalken des gewaehlten Downloads -->
-                        <DockPanel Grid.Row="3" Margin="2,4,2,2">
+                          </TabItem>
+                          <TabItem Header="{DynamicResource pl_title}">
+                            <!-- Partlisten-Verfuegbarkeitsbalken des gewaehlten Downloads -->
+                            <DockPanel Margin="2,4,2,2">
                             <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="12" Margin="0,0,0,3">
                                 <TextBlock Text="{DynamicResource pl_title}" Classes="lbl" VerticalAlignment="Center" />
                                 <StackPanel Orientation="Horizontal" Spacing="3" VerticalAlignment="Center">
@@ -265,7 +266,9 @@
                                 <Image Source="{Binding PartlistImage}" Stretch="Fill"
                                        PointerMoved="Partlist_PointerMoved" PointerExited="Partlist_PointerExited" />
                             </Border>
-                        </DockPanel>
+                            </DockPanel>
+                          </TabItem>
+                        </TabControl>
                     </Grid>
                 </DockPanel>
             </TabItem>
@@ -430,7 +433,10 @@
                             <ListBox x:CompileBindings="False" ItemsSource="{Binding SharedFolders}" SelectedItem="{Binding SelectedSharedFolder}">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="{Binding Display}" Foreground="{DynamicResource TextPrimaryBrush}" />
+                                        <StackPanel Orientation="Horizontal" Spacing="5">
+                                            <Image Source="{StaticResource FolderIcon}" Width="15" Height="15" VerticalAlignment="Center" />
+                                            <TextBlock Text="{Binding Display}" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimaryBrush}" />
+                                        </StackPanel>
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
                             </ListBox>
@@ -443,7 +449,10 @@
                             </TreeView.Styles>
                             <TreeView.ItemTemplate>
                                 <TreeDataTemplate ItemsSource="{Binding Children}">
-                                    <TextBlock Text="{Binding Name}" Foreground="{DynamicResource TextPrimaryBrush}" />
+                                    <StackPanel Orientation="Horizontal" Spacing="5">
+                                        <Image Source="{StaticResource FolderIcon}" Width="15" Height="15" VerticalAlignment="Center" />
+                                        <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimaryBrush}" />
+                                    </StackPanel>
                                 </TreeDataTemplate>
                             </TreeView.ItemTemplate>
                         </TreeView>
@@ -461,11 +470,6 @@
                             <ComboBox x:CompileBindings="False" Width="70" ItemsSource="{Binding PriorityValues}" SelectedItem="{Binding SelectedPriority}" />
                             <Button Content="{DynamicResource sh_setprio}" Command="{Binding SetSharePriorityCommand}" />
                             <Button Content="{DynamicResource sh_delprio}" Command="{Binding DelSharePriorityCommand}" />
-                            <Button Content="{DynamicResource d_copylink}" Command="{Binding CopyShareLinkCommand}" />
-                            <Button Content="{DynamicResource d_copylinks}" Click="CopyShareLinks_Click" />
-                            <Button Content="{DynamicResource d_copysource}" Command="{Binding CopyShareSourceCommand}" />
-                            <Button Content="{DynamicResource d_copysources}" Click="CopyShareSources_Click" />
-                            <Button Content="{DynamicResource d_releaseinfo}" Command="{Binding ReleaseInfoShareCommand}" />
                         </StackPanel>
                         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" Margin="4,0,4,4">
                             <TextBlock Text="{DynamicResource sh_filter}" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" />

@@ -58,6 +58,7 @@
     <sys:String x:Key="d_priority">Priorità</sys:String>
     <sys:String x:Key="d_setprio">Imposta</sys:String>
     <sys:String x:Key="d_sources">Fonti del download selezionato</sys:String>
+    <sys:String x:Key="tab_sources">Fonti</sys:String>
 
     <sys:String x:Key="col_file">File</sys:String>
     <sys:String x:Key="col_status">Stato</sys:String>

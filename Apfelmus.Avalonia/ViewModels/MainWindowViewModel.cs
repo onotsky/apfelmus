@@ -326,9 +326,15 @@ namespace Apfelmus.Avalonia.ViewModels
         private string _connectionStatus = "…";
         private int _connState; // 0=Verbinde, 1=Verbunden, 2=keine Verbindung
 
+        /// <summary>True, sobald eine Verbindung zum Core besteht (fuer den Statusleisten-Indikator).</summary>
+        public bool IsConnected => _connState == 1;
+
         /// <summary>Setzt den Verbindungs-Statustext lokalisiert (fuer Live-Sprachwechsel).</summary>
         private void UpdateConnectionStatusText()
-            => ConnectionStatus = LanguageManager.Get(_connState switch { 1 => "st_connected", 2 => "st_noconn", _ => "st_connecting" });
+        {
+            ConnectionStatus = LanguageManager.Get(_connState switch { 1 => "st_connected", 2 => "st_noconn", _ => "st_connecting" });
+            OnPropertyChanged(nameof(IsConnected));
+        }
         private string _guiVersion;
         private string _coreVersion = "-";
         private int _users, _files, _openConnections, _uploadQueue;
