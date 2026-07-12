@@ -319,6 +319,20 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
+                            <!-- Wasserstand: Fuellstand der Datei bei der Gegenstelle (Loaded 0..1). -->
+                            <DataGridTemplateColumn Header="{DynamicResource col_waterlevel}" Width="100">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Panel Margin="2,3" ClipToBounds="True">
+                                            <ProgressBar Minimum="0" Maximum="1" Height="14" MinWidth="0"
+                                                         Value="{Binding Loaded}" />
+                                            <TextBlock Text="{Binding WPercentages}" FontSize="10"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                       Foreground="{DynamicResource TextPrimaryBrush}" />
+                                        </Panel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                             <DataGridTextColumn Header="{DynamicResource col_prio}" Binding="{Binding Priority, Mode=OneWay}" Width="80" />
                             <DataGridTextColumn Header="{DynamicResource col_version}" Binding="{Binding Version, Mode=OneWay}" Width="140" />
                         </DataGrid.Columns>

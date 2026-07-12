@@ -726,6 +726,8 @@ namespace Apfelmus.Avalonia.ViewModels
                 if (share != null) u.FileName = share.ShortFileName;
                 if (u.UploadTo > u.UploadFrom)
                     u.Percentages = Math.Round((double)(u.ActualUploadPosition - u.UploadFrom) / (u.UploadTo - u.UploadFrom) * 100.0, 2) + " %";
+                // Wasserstand: wie voll die Datei bei der Gegenstelle schon ist (Loaded 0..1 -> Prozent).
+                u.WPercentages = Math.Round(u.Loaded * 100.0, 2) + " %";
             }
             // Standard alphabetisch nach Dateiname (A-Z).
             foreach (var u in r.Upload.Where(x => x.Status == 1).OrderBy(x => x.FileName, StringComparer.OrdinalIgnoreCase))

@@ -75,6 +75,7 @@
     <sys:String x:Key="col_speed">Velocità/s</sys:String>
     <sys:String x:Key="col_time">Tempo rimasto</sys:String>
     <sys:String x:Key="col_percent">%</sys:String>
+    <sys:String x:Key="col_waterlevel">Livello dell'acqua</sys:String>
     <sys:String x:Key="col_rest">Resto</sys:String>
     <sys:String x:Key="col_power">Power</sys:String>
     <sys:String x:Key="col_nick">Nick</sys:String>
