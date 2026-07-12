@@ -558,8 +558,8 @@
                         <TextBox  Grid.Row="7" Grid.Column="1" Width="160" HorizontalAlignment="Left" Margin="0,6,0,0" Text="{Binding CoreMaxDownloadKb, Mode=TwoWay}" />
                         <TextBlock Grid.Row="8" Grid.Column="0" Text="{DynamicResource set_speedslot}" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,6,0,0" />
                         <StackPanel Grid.Row="8" Grid.Column="1" Orientation="Horizontal" Spacing="10" Margin="0,6,0,0">
-                            <Slider Width="220" Minimum="0" Maximum="{Binding SpeedSlotMax}" Value="{Binding CoreSpeedPerSlot, Mode=TwoWay}" VerticalAlignment="Center" />
-                            <TextBlock VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}"><Run Text="{Binding CoreSpeedPerSlot}" /><Run Text=" B/s" /></TextBlock>
+                            <Slider Width="220" Minimum="{Binding SpeedSlotMin}" Maximum="{Binding SpeedSlotMax}" Value="{Binding CoreSpeedPerSlot, Mode=TwoWay}" VerticalAlignment="Center" />
+                            <TextBlock VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}"><Run Text="{Binding CoreSpeedPerSlot}" /><Run Text=" kByte/s" /></TextBlock>
                         </StackPanel>
                         <TextBlock Grid.Row="9" Grid.Column="0" Text="{DynamicResource set_newconn}" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,6,0,0" />
                         <TextBox  Grid.Row="9" Grid.Column="1" Width="120" HorizontalAlignment="Left" Margin="0,6,0,0" Text="{Binding CoreMaxNewConnectionsPerTurn, Mode=TwoWay}" />

@@ -435,9 +435,16 @@ namespace Apfelmus.Avalonia.ViewModels
         public int CorePort { get => _corePort; set => SetProperty(ref _corePort, value); }
         public int CoreXmlPort { get => _coreXmlPort; set => SetProperty(ref _coreXmlPort, value); }
         public int CoreMaxConnections { get => _coreMaxConnections; set => SetProperty(ref _coreMaxConnections, value); }
-        public int CoreMaxUpload { get => _coreMaxUpload; set { if (SetProperty(ref _coreMaxUpload, value)) { OnPropertyChanged(nameof(SpeedSlotMax)); OnPropertyChanged(nameof(CoreMaxUploadKb)); } } }
-        /// <summary>Obergrenze fuer den Speed-pro-Slot-Schieberegler = Max-Upload (Fallback 1 MB/s, falls unbegrenzt).</summary>
-        public double SpeedSlotMax => CoreMaxUpload > 0 ? CoreMaxUpload : 1048576;
+        public int CoreMaxUpload { get => _coreMaxUpload; set { if (SetProperty(ref _coreMaxUpload, value)) { OnPropertyChanged(nameof(SpeedSlotMin)); OnPropertyChanged(nameof(SpeedSlotMax)); OnPropertyChanged(nameof(CoreMaxUploadKb)); } } }
+
+        // Grenzen des "Speed pro Slot"-Reglers wie im WPF-Client: nichtlineare Kennlinie auf kByte/s
+        // (Min = (MaxUpload/1024)^0,2, Max = (MaxUpload/1024)^0,6), damit hohe Bandbreiten den Regler
+        // nicht linear sprengen. Fallback 1 MB/s, falls Upload unbegrenzt (0).
+        private double EffectiveMaxUpload => CoreMaxUpload > 0 ? CoreMaxUpload : 1048576;
+        /// <summary>Unterer Richtwert fuer den Speed-pro-Slot-Regler (wie WPF MinSpeedPerSlot).</summary>
+        public double SpeedSlotMin => System.Math.Round(System.Math.Pow(EffectiveMaxUpload / 1024.0, 0.2));
+        /// <summary>Oberer Richtwert fuer den Speed-pro-Slot-Regler (wie WPF MaxSpeedPerSlot).</summary>
+        public double SpeedSlotMax => System.Math.Round(System.Math.Pow(EffectiveMaxUpload / 1024.0, 0.6));
         public int CoreMaxDownload { get => _coreMaxDownload; set { if (SetProperty(ref _coreMaxDownload, value)) OnPropertyChanged(nameof(CoreMaxDownloadKb)); } }
 
         // Der Core speichert Max-Up/Download in Bytes/s; die Einstellungen zeigen/erfassen sie in
