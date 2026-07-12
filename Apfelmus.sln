@@ -3,10 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apfelmus", "Apfelmus\Apfelmus.csproj", "{26B85267-1BA6-488E-BA9E-D98CD2D077D9}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloseableTab", "WpfCustomControlLibrary1\CloseableTab.csproj", "{FDC870CA-5CE9-4ED4-9278-CDEF46599969}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApfelmusFramework", "ApfelmusFramework\ApfelmusFramework.csproj", "{DA17CBED-2033-40EA-8982-F8A092FAC033}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigMigrator", "ConfigMigrator\ConfigMigrator.csproj", "{F8C0E486-5298-49CF-AE7F-A618297C84F9}"
@@ -19,14 +15,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{26B85267-1BA6-488E-BA9E-D98CD2D077D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{26B85267-1BA6-488E-BA9E-D98CD2D077D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{26B85267-1BA6-488E-BA9E-D98CD2D077D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{26B85267-1BA6-488E-BA9E-D98CD2D077D9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FDC870CA-5CE9-4ED4-9278-CDEF46599969}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FDC870CA-5CE9-4ED4-9278-CDEF46599969}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FDC870CA-5CE9-4ED4-9278-CDEF46599969}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FDC870CA-5CE9-4ED4-9278-CDEF46599969}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DA17CBED-2033-40EA-8982-F8A092FAC033}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DA17CBED-2033-40EA-8982-F8A092FAC033}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DA17CBED-2033-40EA-8982-F8A092FAC033}.Release|Any CPU.ActiveCfg = Release|Any CPU
