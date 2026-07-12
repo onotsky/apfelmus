@@ -286,7 +286,10 @@
 
             <!-- ===================== UPLOADS ===================== -->
             <TabItem Header="{DynamicResource t_uploads}">
-                <Grid RowDefinitions="Auto,*,4,Auto,*" Margin="4">
+                <!-- Zwei sternhohe Bereiche mit Splitter dazwischen; der Splitter darf NICHT direkt an
+                     einer Auto-Zeile (Label) liegen, sonst laesst er sich nur in eine Richtung ziehen. -->
+                <Grid RowDefinitions="*,4,*" Margin="4">
+                  <Grid Grid.Row="0" RowDefinitions="Auto,*">
                     <TextBlock Grid.Row="0" Text="{DynamicResource u_active}" Classes="lbl" Margin="2" />
                     <DataGrid Grid.Row="1" x:Name="UploadsGrid" x:CompileBindings="False" ItemsSource="{Binding ActiveUploads}" IsReadOnly="True"
                               GridLinesVisibility="Horizontal" CanUserResizeColumns="True" CanUserReorderColumns="True">
@@ -308,11 +311,13 @@
                             <DataGridTextColumn Header="{DynamicResource col_version}" Binding="{Binding Version, Mode=OneWay}" Width="140" />
                         </DataGrid.Columns>
                     </DataGrid>
+                  </Grid>
 
-                    <GridSplitter Grid.Row="2" ResizeDirection="Rows" HorizontalAlignment="Stretch" Background="{DynamicResource SurfaceBrush}" />
+                  <GridSplitter Grid.Row="1" ResizeDirection="Rows" HorizontalAlignment="Stretch" Background="{DynamicResource SurfaceBrush}" />
 
-                    <TextBlock Grid.Row="3" Text="{DynamicResource u_queue}" Classes="lbl" Margin="2" />
-                    <DataGrid Grid.Row="4" x:CompileBindings="False" ItemsSource="{Binding QueuedUploads}" IsReadOnly="True"
+                  <Grid Grid.Row="2" RowDefinitions="Auto,*">
+                    <TextBlock Grid.Row="0" Text="{DynamicResource u_queue}" Classes="lbl" Margin="2" />
+                    <DataGrid Grid.Row="1" x:CompileBindings="False" ItemsSource="{Binding QueuedUploads}" IsReadOnly="True"
                               GridLinesVisibility="Horizontal" CanUserResizeColumns="True" CanUserReorderColumns="True">
                         <DataGrid.Columns>
                             <DataGridTemplateColumn Header="{DynamicResource col_file}" Width="*">
@@ -331,6 +336,7 @@
                             <DataGridTextColumn Header="{DynamicResource col_version}" Binding="{Binding Version, Mode=OneWay}" Width="140" />
                         </DataGrid.Columns>
                     </DataGrid>
+                  </Grid>
                 </Grid>
             </TabItem>
 
