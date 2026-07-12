@@ -54,6 +54,9 @@
             <MenuItem Header="{DynamicResource m_core}">
                 <MenuItem Header="{DynamicResource m_coreexit}" Command="{Binding CoreExitCommand}" />
             </MenuItem>
+            <MenuItem Header="{DynamicResource m_help}">
+                <MenuItem Header="{DynamicResource m_checkupdate}" Command="{Binding CheckForUpdatesCommand}" />
+            </MenuItem>
         </Menu>
 
         <!-- ===== AJLink-Transfer ===== -->
@@ -87,6 +90,13 @@
                 <TextBlock Foreground="{DynamicResource TextSecondaryBrush}">
                     <Run Text="Traffic: " /><Run Text="{Binding SessionDownload, Converter={StaticResource FileSizeConverter}}" /><Run Text=" in / " /><Run Text="{Binding SessionUpload, Converter={StaticResource FileSizeConverter}}" /><Run Text=" out" />
                 </TextBlock>
+                <!-- Ergebnis der manuellen Update-Pruefung (z.B. "Sie haben die neueste Version.") -->
+                <TextBlock Text="{Binding UpdateStatus}" IsVisible="{Binding HasUpdateStatus}"
+                           VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" />
+                <!-- Update-Hinweis: nur sichtbar, wenn eine neuere Version verfuegbar ist -> oeffnet die Release-Seite -->
+                <Button Content="{Binding UpdateHint}" Command="{Binding OpenLatestReleaseCommand}"
+                        IsVisible="{Binding UpdateAvailable}" Background="{DynamicResource AccentBrush}"
+                        Foreground="White" Padding="8,2" VerticalAlignment="Center" Cursor="Hand" />
             </StackPanel>
         </Border>
 

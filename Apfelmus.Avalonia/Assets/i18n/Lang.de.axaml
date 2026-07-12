@@ -10,6 +10,12 @@
     <sys:String x:Key="m_italian">Italiano</sys:String>
     <sys:String x:Key="m_core">Core</sys:String>
     <sys:String x:Key="m_coreexit">Core beenden</sys:String>
+    <sys:String x:Key="m_help">Hilfe</sys:String>
+    <sys:String x:Key="m_checkupdate">Nach Updates suchen</sys:String>
+    <sys:String x:Key="upd_checking">Suche nach Updates …</sys:String>
+    <sys:String x:Key="upd_available">Update {0} verfügbar</sys:String>
+    <sys:String x:Key="upd_current">Sie haben die neueste Version.</sys:String>
+    <sys:String x:Key="upd_failed">Update-Prüfung fehlgeschlagen (keine Verbindung?).</sys:String>
 
     <sys:String x:Key="ajlink">AJLink:</sys:String>
     <sys:String x:Key="transfer">Übertragen</sys:String>

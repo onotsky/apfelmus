@@ -69,6 +69,8 @@ namespace Apfelmus.Avalonia.ViewModels
             // AJLink / Menue
             TransferAjLinkCommand = new RelayCommand(TransferAjLinkAsync, () => !string.IsNullOrWhiteSpace(AjLinkText));
             CoreExitCommand = new RelayCommand(() => _client.ExitCoreAsync());
+            CheckForUpdatesCommand = new RelayCommand(() => CheckForUpdatesAsync(manual: true));
+            OpenLatestReleaseCommand = new RelayCommand(() => { OpenLatestRelease(); return Task.CompletedTask; });
             ApplyDarkThemeCommand = new RelayCommand(() => ApplyTheme(ThemeNames.Dark));
             ApplyLightThemeCommand = new RelayCommand(() => ApplyTheme(ThemeNames.Light));
             GermanCommand = new RelayCommand(() => ApplyLanguage("de"));
@@ -135,6 +137,7 @@ namespace Apfelmus.Avalonia.ViewModels
             _ = LoadCoreSettingsAsync();
             _ = RefreshSharesAsync();   // Freigaben einmalig laden (danach nur manuell, siehe PollAsync).
             _ = LoadShareTreeAsync();   // Verzeichnisbaum laden (freigegebene Ordner sind darin markiert).
+            _ = CheckForUpdatesAsync(manual: false);   // stiller Update-Check gegen die GitHub-Releases.
 
             // Gespeicherte Sprache anwenden.
             LanguageManager.Apply(LanguageManager.Normalize(config.LanguageFile));
@@ -206,6 +209,8 @@ namespace Apfelmus.Avalonia.ViewModels
         // ---- Commands ----
         public RelayCommand TransferAjLinkCommand { get; }
         public RelayCommand CoreExitCommand { get; }
+        public RelayCommand CheckForUpdatesCommand { get; }
+        public RelayCommand OpenLatestReleaseCommand { get; }
         public RelayCommand ApplyDarkThemeCommand { get; }
         public RelayCommand ApplyLightThemeCommand { get; }
         public RelayCommand GermanCommand { get; }
@@ -356,6 +361,59 @@ namespace Apfelmus.Avalonia.ViewModels
 
         public string ConnectionStatus { get => _connectionStatus; private set => SetProperty(ref _connectionStatus, value); }
         public string GuiVersion { get => _guiVersion; private set => SetProperty(ref _guiVersion, value); }
+
+        // ---- Update-Pruefung (GitHub-Releases) ----
+        private bool _updateAvailable;
+        private string _updateHint = string.Empty;
+        private string _updateStatus = string.Empty;
+        private string _latestReleaseUrl = string.Empty;
+
+        /// <summary>True, wenn ein neueres Release verfuegbar ist (steuert den Hinweis in der Statusleiste).</summary>
+        public bool UpdateAvailable { get => _updateAvailable; private set => SetProperty(ref _updateAvailable, value); }
+        /// <summary>Klickbarer Hinweistext, z.B. "Update 5.3.21 verfuegbar".</summary>
+        public string UpdateHint { get => _updateHint; private set => SetProperty(ref _updateHint, value); }
+        /// <summary>Ergebnistext der manuellen Pruefung (in der Statusleiste angezeigt).</summary>
+        public string UpdateStatus { get => _updateStatus; private set { if (SetProperty(ref _updateStatus, value)) OnPropertyChanged(nameof(HasUpdateStatus)); } }
+        /// <summary>Blendet den Ergebnistext nur ein, wenn er gesetzt ist.</summary>
+        public bool HasUpdateStatus => !string.IsNullOrEmpty(_updateStatus);
+
+        /// <summary>
+        /// Prueft gegen die GitHub-Releases, ob eine neuere Version vorliegt. <paramref name="manual"/>
+        /// = ueber den Menuepunkt ausgeloest (zeigt auch bei "aktuell"/Fehler eine Rueckmeldung);
+        /// beim stillen Start-Check bleibt es ohne Update-Fund unauffaellig.
+        /// </summary>
+        private async Task CheckForUpdatesAsync(bool manual)
+        {
+            if (manual) UpdateStatus = LanguageManager.Get("upd_checking");
+            var res = await UpdateChecker.CheckAsync(GuiVersion);
+            if (res == null)
+            {
+                if (manual) UpdateStatus = LanguageManager.Get("upd_failed");
+                return;
+            }
+            if (res.IsNewer)
+            {
+                _latestReleaseUrl = res.HtmlUrl;
+                UpdateHint = string.Format(LanguageManager.Get("upd_available"), res.LatestVersion);
+                UpdateAvailable = true;
+                if (manual) UpdateStatus = UpdateHint;
+            }
+            else
+            {
+                UpdateAvailable = false;
+                if (manual) UpdateStatus = LanguageManager.Get("upd_current");
+            }
+        }
+
+        /// <summary>Oeffnet die Release-Seite im Standardbrowser (Klick auf den Hinweis/Button).</summary>
+        private void OpenLatestRelease()
+        {
+            string url = string.IsNullOrWhiteSpace(_latestReleaseUrl)
+                ? "https://github.com/onotsky/apfelmus/releases/latest"
+                : _latestReleaseUrl;
+            try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo { FileName = url, UseShellExecute = true }); }
+            catch { /* kein Browser verfuegbar -> ignorieren */ }
+        }
         public string CoreVersion { get => _coreVersion; private set => SetProperty(ref _coreVersion, value); }
         public int Users { get => _users; private set => SetProperty(ref _users, value); }
         public int Files { get => _files; private set => SetProperty(ref _files, value); }
