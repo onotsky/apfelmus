@@ -6,6 +6,15 @@ Mehrsprachig (Deutsch/Englisch/Italienisch, zur Laufzeit umschaltbar), zwei Farb
 
 > **Hinweis:** Bis 5.2.x war Apfelmus ein reiner **WPF**-Client (nur Windows). Ab 5.3 ist die Avalonia-Variante die Hauptanwendung. Der alte WPF-Client ist im Branch [`wpf-legacy`](../../tree/wpf-legacy) archiviert.
 
+## Screenshots
+
+Umschaltbares Hell-/Dunkel-Design (Anthrazit + Grün) – zur Laufzeit über **Design** im Menü:
+
+<p>
+  <img src="docs/screenshot-dark.png" width="49%" alt="Apfelmus – Dunkles Design" />
+  <img src="docs/screenshot-light.png" width="49%" alt="Apfelmus – Helles Design" />
+</p>
+
 ## Funktionsbereiche
 
 - **Start** – GUI-/Core-Version, Netzwerkstatus (Nutzer, Dateien, Gesamtgröße, offene Verbindungen, Upload-Queue, Firewall, eigene IP) und der verbundene Server
