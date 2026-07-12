@@ -93,6 +93,8 @@ Geklickte `ajfsp://`-Links (z. B. `ajfsp://file|Name|Hash|Größe/`) werden an d
 
 > **macOS-Hinweis:** Die Linkübernahme funktioniert nur mit dem gebauten **`.app`-Bundle**, nicht beim Start via `dotnet run` (dann existiert kein Bundle mit registriertem URL-Scheme).
 
+> **Windows-Browser-Hinweis:** Das Anklicken von `ajfsp://`-Links funktioniert unter Windows nur mit **Chromium-basierten Browsern** (Chrome, Edge, Brave, Opera …), die den in der Registry registrierten Handler zuverlässig starten. **Firefox** behandelt unbekannte externe Protokolle restriktiver und startet den Handler i. d. R. **nicht** – dort den Link stattdessen kopieren und in das **AJLink-Feld** einfügen.
+
 ## Bauen & Starten
 
 Voraussetzung: .NET-SDK (`net10.0`). Es muss ein appleJuice-**Core** laufen, gegen den sich die GUI verbindet (Standard: `localhost:9851`).
