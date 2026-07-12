@@ -15,7 +15,6 @@ namespace Apfelmus.Avalonia.Views
     {
         private bool _restoreHooked;
         private bool _sizeRestored;
-        private Dictionary<string, string> _savedColumns = new();
         private Dictionary<string, string> _savedSplitters = new();
 
         public MainWindow()
@@ -76,10 +75,6 @@ namespace Apfelmus.Avalonia.Views
             return best;
         }
 
-        // Alle Tabellen, deren Spaltenlayout gespeichert wird.
-        private static readonly string[] GridNames =
-            { "DownloadsGrid", "SourcesGrid", "UploadsGrid", "ServersGrid", "SharesGrid" };
-
         // Splitter-Grids: (Grid-Name, ist Zeilen-Splitter?, Index der zu merkenden Zeile/Spalte).
         private static readonly (string name, bool row, int index)[] SplitGrids =
         {
@@ -93,22 +88,12 @@ namespace Apfelmus.Avalonia.Views
             base.OnOpened(e);
             if (_restoreHooked || DataContext is not MainWindowViewModel vm) return;
             _restoreHooked = true;
-            _savedColumns = ParseGridLayouts(vm.SavedGridLayouts);
             _savedSplitters = ParseGridLayouts(vm.SavedSplitterSizes);
 
-            // Tabs laden verzoegert -> Spalten/Splitter erst wiederherstellen, wenn das jeweilige
-            // Grid tatsaechlich realisiert ist (sonst laeuft der Restore ins Leere bzw. wird ueberschrieben).
-            foreach (var name in GridNames)
-                HookColumnRestore(name);
+            // Spaltenbreiten sind Auto (fit-to-content) -> nichts wiederherzustellen. Nur die
+            // Splitter-Positionen merken; verzoegert, sobald das jeweilige Grid realisiert ist.
             foreach (var (name, row, idx) in SplitGrids)
                 HookSplitterRestore(name, row, idx);
-        }
-
-        private void HookColumnRestore(string name)
-        {
-            var grid = this.FindControl<DataGrid>(name);
-            if (grid == null || !_savedColumns.TryGetValue(name, out var layout)) return;
-            WhenRealized(grid, () => RestoreColumns(grid, layout));
         }
 
         private void HookSplitterRestore(string name, bool row, int idx)
@@ -141,20 +126,10 @@ namespace Apfelmus.Avalonia.Views
             base.OnClosing(e);
         }
 
-        // Merkt Spalten- und Splitter-Layout. Nur realisierte Grids ueberschreiben die gespeicherten
-        // Werte; nicht-realisierte behalten ihren bisherigen Stand (sonst gingen Layouts nicht besuchter
-        // Tabs verloren).
+        // Merkt die Splitter-Positionen (Spaltenbreiten sind Auto -> nicht persistiert). Nur realisierte
+        // Grids ueberschreiben die gespeicherten Werte; nicht-realisierte behalten ihren Stand.
         private void PersistLayouts(MainWindowViewModel vm)
         {
-            var cols = ParseGridLayouts(vm.SavedGridLayouts);
-            foreach (var name in GridNames)
-            {
-                var g = this.FindControl<DataGrid>(name);
-                if (g == null || !g.IsLoaded) continue;
-                string layout = SerializeColumns(g);
-                if (!string.IsNullOrEmpty(layout)) cols[name] = layout;
-            }
-
             var spl = ParseGridLayouts(vm.SavedSplitterSizes);
             foreach (var (name, row, idx) in SplitGrids)
             {
@@ -165,7 +140,7 @@ namespace Apfelmus.Avalonia.Views
                 if (v > 10) spl[name] = v.ToString("0.#", CultureInfo.InvariantCulture);
             }
 
-            vm.SaveWindowAndGrids(Join(cols), Join(spl), Width, Height, WindowState == WindowState.Maximized);
+            vm.SaveWindowAndGrids(string.Empty, Join(spl), Width, Height, WindowState == WindowState.Maximized);
         }
 
         private static string Join(Dictionary<string, string> map)
@@ -193,48 +168,6 @@ namespace Apfelmus.Avalonia.Views
                 if (eq > 0) map[line.Substring(0, eq)] = line.Substring(eq + 1);
             }
             return map;
-        }
-
-        // Serialisiert je Spalte "DisplayIndex:Breite" in Definitionsreihenfolge.
-        private static string SerializeColumns(DataGrid? grid)
-        {
-            if (grid == null) return string.Empty;
-            var parts = new List<string>();
-            foreach (var c in grid.Columns)
-            {
-                double w = c.ActualWidth > 0 ? c.ActualWidth : (c.Width.IsAbsolute ? c.Width.Value : 0);
-                parts.Add(string.Format(CultureInfo.InvariantCulture, "{0}:{1:0.#}", c.DisplayIndex, w));
-            }
-            return string.Join("|", parts);
-        }
-
-        // Stellt Breite (auch der Stern-/Auto-Fill-Spalte -> als feste Breite) und Reihenfolge wieder
-        // her; bei geaenderter Spaltenzahl ignoriert. Ohne die Sternspalte fuellte "Datei" beim Neustart
-        // stets den ganzen Platz und die gemerkte Breite ging verloren.
-        private static void RestoreColumns(DataGrid? grid, string? layout)
-        {
-            if (grid == null || string.IsNullOrWhiteSpace(layout)) return;
-            try
-            {
-                var parts = layout.Split('|');
-                if (parts.Length != grid.Columns.Count) return;
-                var order = new List<(DataGridColumn col, int idx)>();
-                for (int i = 0; i < parts.Length; i++)
-                {
-                    var kv = parts[i].Split(':');
-                    if (kv.Length != 2
-                        || !int.TryParse(kv[0], out int di)
-                        || !double.TryParse(kv[1], NumberStyles.Any, CultureInfo.InvariantCulture, out double w))
-                        return;
-                    var col = grid.Columns[i];
-                    if (w > 10) col.Width = new DataGridLength(w);
-                    order.Add((col, di));
-                }
-                // DisplayIndex in Zielreihenfolge setzen (vermeidet Kollisionen).
-                foreach (var (col, idx) in order.OrderBy(x => x.idx))
-                    if (idx >= 0 && idx < grid.Columns.Count) col.DisplayIndex = idx;
-            }
-            catch { }
         }
 
         protected override void OnDataContextChanged(System.EventArgs e)
