@@ -16,7 +16,7 @@ Mehrsprachig (Deutsch/Englisch/Italienisch, zur Laufzeit umschaltbar), zwei Farb
 - **Mein Share** – Verzeichnisbaum zum Freigeben/Entfernen von Ordnern, Freitextfilter, Prioritäten, Link(s)/Quelle(n) kopieren
 - **Einstellungen** – GUI-Optionen sowie die kompletten Core-Einstellungen (Nick, Verzeichnisse, Ports, Limits, Speed pro Slot, Autoconnect) und Passwortänderung
 
-Geklickte `ajfsp://`-Links werden an Apfelmus übergeben (Windows/Linux über die Einstellungen, macOS über das `.app`-Bundle). Details siehe [`Apfelmus.Avalonia/README.md`](Apfelmus.Avalonia/README.md).
+Geklickte `ajfsp://`-Links aus dem Browser werden an Apfelmus (und damit an den Core) übergeben; die App holt sich dabei in den Vordergrund und wechselt auf den Downloads-Tab. Wie die Verknüpfung je Plattform registriert wird, steht unter [ajfsp://-Linkübernahme](#ajfsp-linkübernahme).
 
 ## Projektstruktur
 
@@ -56,9 +56,9 @@ chmod +x apfelmus/Apfelmus.Avalonia
 ./apfelmus/Apfelmus.Avalonia
 ```
 
-### macOS (Apple Silicon) – `Apfelmus.Avalonia-<version>-osx-arm64-app.zip`
+### macOS – `Apfelmus.Avalonia-<version>-osx-arm64-app.zip` (Apple Silicon) bzw. `-osx-x64-app.zip` (Intel)
 
-Dieses ZIP **enthält bereits das fertige `Apfelmus.app`-Bundle – es muss nichts gebaut werden.**
+Passendes ZIP wählen: **`osx-arm64`** für Apple Silicon (M1/M2/M3…), **`osx-x64`** für Intel-Macs. Das ZIP **enthält bereits das fertige `Apfelmus.app`-Bundle – es muss nichts gebaut werden.**
 
 1. ZIP entpacken (Doppelklick im Finder genügt) → man erhält `Apfelmus.app`.
 2. `Apfelmus.app` nach **Programme** (`/Applications`) ziehen.
@@ -72,6 +72,18 @@ Dieses ZIP **enthält bereits das fertige `Apfelmus.app`-Bundle – es muss nich
 
 Danach startet die App normal per Doppelklick; die `ajfsp://`-Verknüpfung wird dabei registriert. (Falls trotzdem „beschädigt“ gemeldet wird: Schritt 3 mit `xattr` ausführen.)
 
+## ajfsp://-Linkübernahme
+
+Geklickte `ajfsp://`-Links (z. B. `ajfsp://file|Name|Hash|Größe/`) werden an die laufende Instanz übergeben, die sich in den Vordergrund holt und auf **Downloads** wechselt. Ein Link lässt sich außerdem jederzeit direkt in das **AJLink-Feld** in der Kopfzeile einfügen (alle Plattformen). Die Protokoll-Verknüpfung wird je nach Plattform unterschiedlich registriert:
+
+| Plattform | Registrierung | Mehrfach-Links |
+|---|---|---|
+| **Windows** | Checkbox „ajfsp-Verknüpfung“ in den **Einstellungen** → Eintrag unter `HKCU\Software\Classes` | Single-Instance (Lock-Datei + Named Pipe): weitere Links landen in der bereits laufenden App, **keine** neuen Fenster |
+| **Linux** | Checkbox in den **Einstellungen** → `.desktop`-Datei + `xdg-mime` als Handler für `x-scheme-handler/ajfsp` | Single-Instance wie Windows |
+| **macOS** | Über das `.app`-Bundle: `ajfsp`-Scheme steht in der `Info.plist` (`CFBundleURLSchemes`), aktiv sobald die App in `/Applications` liegt (bzw. nach `lsregister`) | Ein nativer `NSAppleEventManager`-Handler nimmt den Link entgegen (Avalonia 11.2 löst das Ereignis unter macOS nicht selbst aus) |
+
+> **macOS-Hinweis:** Die Linkübernahme funktioniert nur mit dem gebauten **`.app`-Bundle**, nicht beim Start via `dotnet run` (dann existiert kein Bundle mit registriertem URL-Scheme).
+
 ## Bauen & Starten
 
 Voraussetzung: .NET-SDK (`net10.0`). Es muss ein appleJuice-**Core** laufen, gegen den sich die GUI verbindet (Standard: `localhost:9851`).
@@ -83,8 +95,9 @@ dotnet run --project Apfelmus.Avalonia
 
 ```bash
 # macOS-App-Bundle bauen (Version aus Directory.Build.props):
-./Apfelmus.Avalonia/build-macos-app.sh
-# -> Apfelmus.Avalonia/bin/macos-app/Apfelmus.app (+ .zip)
+./Apfelmus.Avalonia/build-macos-app.sh            # Apple Silicon (osx-arm64, Standard)
+./Apfelmus.Avalonia/build-macos-app.sh osx-x64    # Intel
+# -> Apfelmus.Avalonia/bin/macos-app/<rid>/Apfelmus.app (+ .zip)
 ```
 
 Das Skript signiert das Bundle ad-hoc über alle Bestandteile (`codesign --deep`), damit macOS es nicht als „beschädigt“ ablehnt. Fertige Downloads gibt es unter [Releases](../../releases) – zur Nutzung siehe oben.

@@ -12,8 +12,9 @@ PROJ="$HERE/Apfelmus.Avalonia.csproj"
 # Version zentral aus Directory.Build.props ziehen (nicht mehr hartkodiert -> nie veraltet).
 VER="$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' "$HERE/../Directory.Build.props" | head -1)"
 VER="${VER:-0.0.0}"
-RID="osx-arm64"
-OUT="$HERE/bin/macos-app"
+# Zielarchitektur als 1. Argument: osx-arm64 (Apple Silicon, Standard) oder osx-x64 (Intel).
+RID="${1:-osx-arm64}"
+OUT="$HERE/bin/macos-app/$RID"
 APP="$OUT/Apfelmus.app"
 PNG="$HERE/Assets/Images/Apple-icon.png"
 EXE="Apfelmus.Avalonia"
@@ -82,7 +83,7 @@ echo "== Codesign (ad-hoc, komplettes Bundle) =="
 codesign --force --deep --sign - "$APP" && echo "  signiert (ad-hoc)" || echo "  WARNUNG: codesign fehlgeschlagen"
 
 echo "== Zip =="
-ZIP="$OUT/Apfelmus.Avalonia-${VER}-osx-arm64-app.zip"
+ZIP="$OUT/Apfelmus.Avalonia-${VER}-${RID}-app.zip"
 ( cd "$OUT" && ditto -c -k --keepParent "Apfelmus.app" "$ZIP" )
 
 echo "Fertig:"
