@@ -925,16 +925,18 @@ namespace Apfelmus.Avalonia.ViewModels
 
         // ---- Spaltenlayout (alle Tabellen) + Fenstergroesse (von der View gespeichert/gelesen) ----
         public string SavedGridLayouts => _config.GridLayouts ?? string.Empty;
+        public string SavedSplitterSizes => _config.SplitterSizes ?? string.Empty;
         public double SavedWindowWidth => _config.WindowWidth;
         public double SavedWindowHeight => _config.WindowHeight;
         public bool SavedWindowMaximized => _config.WindowMaximized;
 
-        /// <summary>Speichert die Spaltenlayouts aller Tabellen und Fenstergroesse/-zustand (beim Schliessen).</summary>
-        public void SaveWindowAndGrids(string gridLayouts, double width, double height, bool maximized)
+        /// <summary>Speichert Spaltenlayouts, Splitter-Positionen und Fenstergroesse/-zustand (beim Schliessen).</summary>
+        public void SaveWindowAndGrids(string gridLayouts, string splitterSizes, double width, double height, bool maximized)
         {
             try
             {
                 _config.GridLayouts = gridLayouts;
+                _config.SplitterSizes = splitterSizes;
                 if (!maximized && width > 200 && height > 150) { _config.WindowWidth = width; _config.WindowHeight = height; }
                 _config.WindowMaximized = maximized;
                 ConfigSerializer.SerializeToFile(_config);

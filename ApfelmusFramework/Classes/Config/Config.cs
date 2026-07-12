@@ -143,6 +143,15 @@ namespace ApfelmusFramework.Classes.Config
             set { gridLayouts = value; }
         }
 
+        private string splitterSizes;
+
+        // Positionen der GridSplitter (Downloads/Uploads/Mein Share) als "name=pixel|name2=pixel".
+        public string SplitterSizes
+        {
+            get { return splitterSizes; }
+            set { splitterSizes = value; }
+        }
+
         private double windowWidth;
         private double windowHeight;
         private bool windowMaximized;

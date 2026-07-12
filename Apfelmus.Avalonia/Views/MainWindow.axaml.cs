@@ -13,8 +13,10 @@ namespace Apfelmus.Avalonia.Views
 {
     public partial class MainWindow : Window
     {
-        private bool _columnsRestored;
+        private bool _restoreHooked;
         private bool _sizeRestored;
+        private Dictionary<string, string> _savedColumns = new();
+        private Dictionary<string, string> _savedSplitters = new();
 
         public MainWindow()
         {
@@ -78,32 +80,107 @@ namespace Apfelmus.Avalonia.Views
         private static readonly string[] GridNames =
             { "DownloadsGrid", "SourcesGrid", "UploadsGrid", "ServersGrid", "SharesGrid" };
 
+        // Splitter-Grids: (Grid-Name, ist Zeilen-Splitter?, Index der zu merkenden Zeile/Spalte).
+        private static readonly (string name, bool row, int index)[] SplitGrids =
+        {
+            ("DownloadsSplitGrid", true, 2),   // untere Detailzeile (Quellen/Partliste)
+            ("UploadsSplitGrid",  true, 2),    // untere Zeile (Warteschlange)
+            ("SharesSplitGrid",   false, 0),   // linke Spalte (Verzeichnisbaum)
+        };
+
         protected override void OnOpened(System.EventArgs e)
         {
             base.OnOpened(e);
-            if (_columnsRestored || DataContext is not MainWindowViewModel vm) return;
-            _columnsRestored = true;
-            var map = ParseGridLayouts(vm.SavedGridLayouts);
+            if (_restoreHooked || DataContext is not MainWindowViewModel vm) return;
+            _restoreHooked = true;
+            _savedColumns = ParseGridLayouts(vm.SavedGridLayouts);
+            _savedSplitters = ParseGridLayouts(vm.SavedSplitterSizes);
+
+            // Tabs laden verzoegert -> Spalten/Splitter erst wiederherstellen, wenn das jeweilige
+            // Grid tatsaechlich realisiert ist (sonst laeuft der Restore ins Leere bzw. wird ueberschrieben).
             foreach (var name in GridNames)
-                if (map.TryGetValue(name, out var layout))
-                    RestoreColumns(this.FindControl<DataGrid>(name), layout);
+                HookColumnRestore(name);
+            foreach (var (name, row, idx) in SplitGrids)
+                HookSplitterRestore(name, row, idx);
+        }
+
+        private void HookColumnRestore(string name)
+        {
+            var grid = this.FindControl<DataGrid>(name);
+            if (grid == null || !_savedColumns.TryGetValue(name, out var layout)) return;
+            WhenRealized(grid, () => RestoreColumns(grid, layout));
+        }
+
+        private void HookSplitterRestore(string name, bool row, int idx)
+        {
+            var grid = this.FindControl<Grid>(name);
+            if (grid == null || !_savedSplitters.TryGetValue(name, out var s)
+                || !double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out double px) || px <= 10)
+                return;
+            WhenRealized(grid, () =>
+            {
+                if (row) { if (idx < grid.RowDefinitions.Count) grid.RowDefinitions[idx].Height = new GridLength(px); }
+                else { if (idx < grid.ColumnDefinitions.Count) grid.ColumnDefinitions[idx].Width = new GridLength(px); }
+            });
+        }
+
+        // Fuehrt die Aktion aus, sobald das Control realisiert ist (jetzt, falls schon geladen, sonst
+        // beim ersten Loaded) - und deferred, damit sie nach dem ersten Layout-Durchlauf greift.
+        private static void WhenRealized(Control c, System.Action action)
+        {
+            void Defer() => global::Avalonia.Threading.Dispatcher.UIThread.Post(
+                action, global::Avalonia.Threading.DispatcherPriority.Loaded);
+            if (c.IsLoaded) { Defer(); return; }
+            void Handler(object? s, RoutedEventArgs e) { c.Loaded -= Handler; Defer(); }
+            c.Loaded += Handler;
         }
 
         protected override void OnClosing(WindowClosingEventArgs e)
         {
-            if (DataContext is MainWindowViewModel vm)
-            {
-                var sb = new System.Text.StringBuilder();
-                foreach (var name in GridNames)
-                {
-                    var g = this.FindControl<DataGrid>(name);
-                    if (g == null) continue;
-                    string layout = SerializeColumns(g);
-                    if (!string.IsNullOrEmpty(layout)) sb.Append(name).Append('=').Append(layout).Append('\n');
-                }
-                vm.SaveWindowAndGrids(sb.ToString(), Width, Height, WindowState == WindowState.Maximized);
-            }
+            if (DataContext is MainWindowViewModel vm) PersistLayouts(vm);
             base.OnClosing(e);
+        }
+
+        // Merkt Spalten- und Splitter-Layout. Nur realisierte Grids ueberschreiben die gespeicherten
+        // Werte; nicht-realisierte behalten ihren bisherigen Stand (sonst gingen Layouts nicht besuchter
+        // Tabs verloren).
+        private void PersistLayouts(MainWindowViewModel vm)
+        {
+            var cols = ParseGridLayouts(vm.SavedGridLayouts);
+            foreach (var name in GridNames)
+            {
+                var g = this.FindControl<DataGrid>(name);
+                if (g == null || !g.IsLoaded) continue;
+                string layout = SerializeColumns(g);
+                if (!string.IsNullOrEmpty(layout)) cols[name] = layout;
+            }
+
+            var spl = ParseGridLayouts(vm.SavedSplitterSizes);
+            foreach (var (name, row, idx) in SplitGrids)
+            {
+                var g = this.FindControl<Grid>(name);
+                if (g == null || !g.IsLoaded) continue;
+                double v = row ? (idx < g.RowDefinitions.Count ? g.RowDefinitions[idx].ActualHeight : 0)
+                               : (idx < g.ColumnDefinitions.Count ? g.ColumnDefinitions[idx].ActualWidth : 0);
+                if (v > 10) spl[name] = v.ToString("0.#", CultureInfo.InvariantCulture);
+            }
+
+            vm.SaveWindowAndGrids(Join(cols), Join(spl), Width, Height, WindowState == WindowState.Maximized);
+        }
+
+        private static string Join(Dictionary<string, string> map)
+        {
+            var sb = new System.Text.StringBuilder();
+            foreach (var kv in map)
+                if (!string.IsNullOrEmpty(kv.Value)) sb.Append(kv.Key).Append('=').Append(kv.Value).Append('\n');
+            return sb.ToString();
+        }
+
+        // Beim Verlassen eines Tabs das Layout sichern, solange die Grids noch realisiert sind.
+        private void MainTabs_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+        {
+            if (e.Source is TabControl && DataContext is MainWindowViewModel vm)
+                PersistLayouts(vm);
         }
 
         private static Dictionary<string, string> ParseGridLayouts(string s)
@@ -131,7 +208,9 @@ namespace Apfelmus.Avalonia.Views
             return string.Join("|", parts);
         }
 
-        // Stellt Breite (ausser Sternspalten) und Reihenfolge wieder her; bei geaenderter Spaltenzahl ignoriert.
+        // Stellt Breite (auch der Stern-/Auto-Fill-Spalte -> als feste Breite) und Reihenfolge wieder
+        // her; bei geaenderter Spaltenzahl ignoriert. Ohne die Sternspalte fuellte "Datei" beim Neustart
+        // stets den ganzen Platz und die gemerkte Breite ging verloren.
         private static void RestoreColumns(DataGrid? grid, string? layout)
         {
             if (grid == null || string.IsNullOrWhiteSpace(layout)) return;
@@ -148,7 +227,7 @@ namespace Apfelmus.Avalonia.Views
                         || !double.TryParse(kv[1], NumberStyles.Any, CultureInfo.InvariantCulture, out double w))
                         return;
                     var col = grid.Columns[i];
-                    if (!col.Width.IsStar && w > 10) col.Width = new DataGridLength(w);
+                    if (w > 10) col.Width = new DataGridLength(w);
                     order.Add((col, di));
                 }
                 // DisplayIndex in Zielreihenfolge setzen (vermeidet Kollisionen).

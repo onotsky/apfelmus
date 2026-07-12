@@ -100,7 +100,7 @@
             </StackPanel>
         </Border>
 
-        <TabControl Margin="6" SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}">
+        <TabControl Margin="6" SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}" SelectionChanged="MainTabs_SelectionChanged">
             <!-- ===================== START ===================== -->
             <TabItem Header="{DynamicResource t_start}">
                 <ScrollViewer>
@@ -178,7 +178,7 @@
                         <Button Content="{DynamicResource d_setprio}" Command="{Binding SetDownloadPriorityCommand}" />
                     </StackPanel>
 
-                    <Grid RowDefinitions="*,4,250">
+                    <Grid x:Name="DownloadsSplitGrid" RowDefinitions="*,4,250">
                         <DataGrid Grid.Row="0" x:Name="DownloadsGrid" x:CompileBindings="False" ItemsSource="{Binding DownloadsView}"
                                   SelectedItem="{Binding SelectedDownload}" IsReadOnly="True" CanUserSortColumns="True" SelectionMode="Extended"
                                   SelectionChanged="DownloadsGrid_SelectionChanged"
@@ -221,8 +221,8 @@
                                 <DataGridTemplateColumn Header="{DynamicResource col_percent}" Width="100">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <Panel Margin="2,3">
-                                                <ProgressBar Minimum="0" Maximum="100" Height="14"
+                                            <Panel Margin="2,3" ClipToBounds="True">
+                                                <ProgressBar Minimum="0" Maximum="100" Height="14" MinWidth="0"
                                                              Value="{Binding Percentages, Converter={StaticResource PercentTextConverter}}" />
                                                 <TextBlock Text="{Binding Percentages}" FontSize="10"
                                                            HorizontalAlignment="Center" VerticalAlignment="Center"
@@ -288,7 +288,7 @@
             <TabItem Header="{DynamicResource t_uploads}">
                 <!-- Zwei sternhohe Bereiche mit Splitter dazwischen; der Splitter darf NICHT direkt an
                      einer Auto-Zeile (Label) liegen, sonst laesst er sich nur in eine Richtung ziehen. -->
-                <Grid RowDefinitions="*,4,*" Margin="4">
+                <Grid x:Name="UploadsSplitGrid" RowDefinitions="*,4,*" Margin="4">
                   <Grid Grid.Row="0" RowDefinitions="Auto,*">
                     <TextBlock Grid.Row="0" Text="{DynamicResource u_active}" Classes="lbl" Margin="2" />
                     <DataGrid Grid.Row="1" x:Name="UploadsGrid" x:CompileBindings="False" ItemsSource="{Binding ActiveUploads}" IsReadOnly="True"
@@ -306,7 +306,19 @@
                             </DataGridTemplateColumn>
                             <DataGridTextColumn Header="{DynamicResource col_nick}" Binding="{Binding Nick, Mode=OneWay}" Width="140" />
                             <DataGridTextColumn Header="{DynamicResource col_speed}" Binding="{Binding Speed, Converter={StaticResource FileSizeConverter}, Mode=OneWay}" Width="90" />
-                            <DataGridTextColumn Header="{DynamicResource col_percent}" Binding="{Binding Percentages, Mode=OneWay}" Width="70" />
+                            <DataGridTemplateColumn Header="{DynamicResource col_percent}" Width="100">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Panel Margin="2,3" ClipToBounds="True">
+                                            <ProgressBar Minimum="0" Maximum="100" Height="14" MinWidth="0"
+                                                         Value="{Binding Percentages, Converter={StaticResource PercentTextConverter}}" />
+                                            <TextBlock Text="{Binding Percentages}" FontSize="10"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                       Foreground="{DynamicResource TextPrimaryBrush}" />
+                                        </Panel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                             <DataGridTextColumn Header="{DynamicResource col_prio}" Binding="{Binding Priority, Mode=OneWay}" Width="80" />
                             <DataGridTextColumn Header="{DynamicResource col_version}" Binding="{Binding Version, Mode=OneWay}" Width="140" />
                         </DataGrid.Columns>
@@ -431,7 +443,7 @@
 
             <!-- ===================== MEIN SHARE ===================== -->
             <TabItem Header="{DynamicResource t_share}">
-                <Grid ColumnDefinitions="320,4,*" Margin="4">
+                <Grid x:Name="SharesSplitGrid" ColumnDefinitions="320,4,*" Margin="4">
                     <!-- Links: Freigabe-Verzeichnisbaum -->
                     <DockPanel Grid.Column="0">
                         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" Margin="2">
