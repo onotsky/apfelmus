@@ -74,6 +74,13 @@ PLIST
 
 chmod +x "$APP/Contents/MacOS/${EXE}"
 
+echo "== Codesign (ad-hoc, komplettes Bundle) =="
+# Ohne Signatur ueber das GANZE Bundle meldet spctl "code has no resources but signature
+# indicates they must be present" -> macOS haelt die App fuer beschaedigt. Eine Ad-hoc-Signatur
+# (-s -) ueber alle Bestandteile (--deep) behebt das. Keine Notarisierung (kein Apple-Account),
+# daher bleibt beim ersten Start der Rechtsklick->Oeffnen / das Entfernen der Quarantaene noetig.
+codesign --force --deep --sign - "$APP" && echo "  signiert (ad-hoc)" || echo "  WARNUNG: codesign fehlgeschlagen"
+
 echo "== Zip =="
 ZIP="$OUT/Apfelmus.Avalonia-${VER}-osx-arm64-app.zip"
 ( cd "$OUT" && ditto -c -k --keepParent "Apfelmus.app" "$ZIP" )

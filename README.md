@@ -40,6 +40,38 @@ dotnet run --project ConfigMigrator
 
 Das Tool liest `Config.dat`, schreibt `Config.xml` im selben Ordner und benennt die alte Datei anschließend in `Config.dat.bak` um (sie wird nicht gelöscht).
 
+## Installation aus den [Releases](../../releases)
+
+Alle drei Downloads sind **self-contained** – ein separat installiertes .NET wird **nicht** benötigt. In jedem Fall muss ein appleJuice-**Core** laufen, gegen den sich die GUI verbindet (Standard: `localhost:9851`).
+
+### Windows – `Apfelmus.Avalonia-<version>-win-x64.zip`
+
+ZIP entpacken und `Apfelmus.Avalonia.exe` starten. Beim ersten Start blendet der SmartScreen ggf. eine Warnung ein → „Weitere Informationen“ → „Trotzdem ausführen“.
+
+### Linux – `Apfelmus.Avalonia-<version>-linux-x64.zip`
+
+```bash
+unzip Apfelmus.Avalonia-*-linux-x64.zip -d apfelmus
+chmod +x apfelmus/Apfelmus.Avalonia
+./apfelmus/Apfelmus.Avalonia
+```
+
+### macOS (Apple Silicon) – `Apfelmus.Avalonia-<version>-osx-arm64-app.zip`
+
+Dieses ZIP **enthält bereits das fertige `Apfelmus.app`-Bundle – es muss nichts gebaut werden.**
+
+1. ZIP entpacken (Doppelklick im Finder genügt) → man erhält `Apfelmus.app`.
+2. `Apfelmus.app` nach **Programme** (`/Applications`) ziehen.
+3. Die App ist **nicht bei Apple notarisiert**, deshalb blockiert Gatekeeper den ersten Start. Einmalig **eine** der beiden Varianten:
+   - **Rechtsklick** auf `Apfelmus.app` → **„Öffnen“** → im Dialog nochmals **„Öffnen“**, oder
+   - im Terminal die Quarantäne-Markierung entfernen:
+     ```bash
+     xattr -dr com.apple.quarantine /Applications/Apfelmus.app
+     open /Applications/Apfelmus.app
+     ```
+
+Danach startet die App normal per Doppelklick; die `ajfsp://`-Verknüpfung wird dabei registriert. (Falls trotzdem „beschädigt“ gemeldet wird: Schritt 3 mit `xattr` ausführen.)
+
 ## Bauen & Starten
 
 Voraussetzung: .NET-SDK (`net10.0`). Es muss ein appleJuice-**Core** laufen, gegen den sich die GUI verbindet (Standard: `localhost:9851`).
@@ -55,7 +87,7 @@ dotnet run --project Apfelmus.Avalonia
 # -> Apfelmus.Avalonia/bin/macos-app/Apfelmus.app (+ .zip)
 ```
 
-Fertige Builds für Windows, Linux und macOS gibt es unter [Releases](../../releases).
+Das Skript signiert das Bundle ad-hoc über alle Bestandteile (`codesign --deep`), damit macOS es nicht als „beschädigt“ ablehnt. Fertige Downloads gibt es unter [Releases](../../releases) – zur Nutzung siehe oben.
 
 ## Bekannte Einschränkungen
 
