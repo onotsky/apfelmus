@@ -435,10 +435,23 @@ namespace Apfelmus.Avalonia.ViewModels
         public int CorePort { get => _corePort; set => SetProperty(ref _corePort, value); }
         public int CoreXmlPort { get => _coreXmlPort; set => SetProperty(ref _coreXmlPort, value); }
         public int CoreMaxConnections { get => _coreMaxConnections; set => SetProperty(ref _coreMaxConnections, value); }
-        public int CoreMaxUpload { get => _coreMaxUpload; set { if (SetProperty(ref _coreMaxUpload, value)) OnPropertyChanged(nameof(SpeedSlotMax)); } }
+        public int CoreMaxUpload { get => _coreMaxUpload; set { if (SetProperty(ref _coreMaxUpload, value)) { OnPropertyChanged(nameof(SpeedSlotMax)); OnPropertyChanged(nameof(CoreMaxUploadKb)); } } }
         /// <summary>Obergrenze fuer den Speed-pro-Slot-Schieberegler = Max-Upload (Fallback 1 MB/s, falls unbegrenzt).</summary>
         public double SpeedSlotMax => CoreMaxUpload > 0 ? CoreMaxUpload : 1048576;
-        public int CoreMaxDownload { get => _coreMaxDownload; set => SetProperty(ref _coreMaxDownload, value); }
+        public int CoreMaxDownload { get => _coreMaxDownload; set { if (SetProperty(ref _coreMaxDownload, value)) OnPropertyChanged(nameof(CoreMaxDownloadKb)); } }
+
+        // Der Core speichert Max-Up/Download in Bytes/s; die Einstellungen zeigen/erfassen sie in
+        // kByte/s (1 kByte = 1024 Byte). Diese Wrapper rechnen fuer die Eingabefelder hin und her.
+        public int CoreMaxUploadKb
+        {
+            get => _coreMaxUpload / 1024;
+            set => CoreMaxUpload = value < 0 ? 0 : value * 1024;
+        }
+        public int CoreMaxDownloadKb
+        {
+            get => _coreMaxDownload / 1024;
+            set => CoreMaxDownload = value < 0 ? 0 : value * 1024;
+        }
         public int CoreSpeedPerSlot { get => _coreSpeedPerSlot; set => SetProperty(ref _coreSpeedPerSlot, value); }
         public int CoreMaxNewConnectionsPerTurn { get => _coreMaxNewConn; set => SetProperty(ref _coreMaxNewConn, value); }
         public int CoreMaxSourcesPerFile { get => _coreMaxSources; set => SetProperty(ref _coreMaxSources, value); }
