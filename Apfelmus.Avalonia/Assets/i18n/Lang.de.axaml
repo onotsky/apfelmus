@@ -98,6 +98,8 @@
     <sys:String x:Key="s_hits">Treffer:</sys:String>
     <sys:String x:Key="s_sources">Quellen:</sys:String>
     <sys:String x:Key="s_close">Tab schließen</sys:String>
+    <sys:String x:Key="s_running">läuft…</sys:String>
+    <sys:String x:Key="s_done">abgeschlossen</sys:String>
 
     <sys:String x:Key="sv_connect">Verbinden</sys:String>
     <sys:String x:Key="sv_remove">Entfernen</sys:String>

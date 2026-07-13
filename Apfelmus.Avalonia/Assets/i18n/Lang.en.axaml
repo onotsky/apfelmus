@@ -98,6 +98,8 @@
     <sys:String x:Key="s_hits">Hits:</sys:String>
     <sys:String x:Key="s_sources">Sources:</sys:String>
     <sys:String x:Key="s_close">Close tab</sys:String>
+    <sys:String x:Key="s_running">running…</sys:String>
+    <sys:String x:Key="s_done">finished</sys:String>
 
     <sys:String x:Key="sv_connect">Connect</sys:String>
     <sys:String x:Key="sv_remove">Remove</sys:String>

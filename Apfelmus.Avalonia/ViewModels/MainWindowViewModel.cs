@@ -825,8 +825,30 @@ namespace Apfelmus.Avalonia.ViewModels
             foreach (var tab in SearchTabs)
             {
                 var cur = r.Search?.FirstOrDefault(s => s.id == tab.Id);
-                if (cur != null) { tab.FoundFiles = cur.FoundFiles; tab.SumSearches = cur.SumSearches; tab.Running = cur.Running; }
-                if (r.SearchEntry != null)
+                if (cur != null)
+                {
+                    tab.Seen = true;
+                    tab.FoundFiles = cur.FoundFiles; tab.SumSearches = cur.SumSearches; tab.Running = cur.Running;
+                }
+                else if (tab.Id == 0)
+                {
+                    // Race-Recovery: der Core hatte die neue Suche beim Start noch nicht registriert.
+                    // Die neueste noch keinem Tab zugeordnete Suche adoptieren.
+                    var owned = SearchTabs.Where(t => t.Id != 0).Select(t => t.Id).ToHashSet();
+                    var neu = r.Search?.Where(s => !owned.Contains(s.id)).OrderByDescending(s => s.id).FirstOrDefault();
+                    if (neu != null)
+                    {
+                        tab.Id = neu.id; tab.Seen = true;
+                        tab.FoundFiles = neu.FoundFiles; tab.SumSearches = neu.SumSearches; tab.Running = neu.Running;
+                    }
+                }
+                else if (tab.Seen)
+                {
+                    // War vorhanden, ist nun aus der Core-Liste verschwunden -> Suche beendet.
+                    tab.Running = false;
+                }
+
+                if (r.SearchEntry != null && tab.Id != 0)
                     foreach (var e in r.SearchEntry)
                         if (e.SearchId == tab.Id && !tab.Results.Any(x => x.Id == e.Id))
                             InsertSorted(tab.Results, e);
@@ -854,22 +876,33 @@ namespace Apfelmus.Avalonia.ViewModels
 
         private async Task StartSearchAsync()
         {
-            var tab = new SearchTabViewModel(SearchText) { Running = true };
+            string text = SearchText;
+            // Vor dem Start die bereits vorhandenen Such-Ids merken - so wird spaeter zweifelsfrei
+            // die NEUE Suche erkannt (statt einer zufaellig vorhandenen).
+            var before = (await _client.GetModifiedAsync("search"))?.Search?.Select(s => s.id).ToHashSet()
+                         ?? new HashSet<int>();
+
+            var tab = new SearchTabViewModel(text) { Running = true };
             SearchTabs.Add(tab);
             SelectedSearchTab = tab;
-
-            await _client.StartSearchAsync(SearchText);
-
-            // Neue Such-Id ermitteln: die neueste laufende Suche, die noch keinem Tab zugeordnet ist.
-            var known = SearchTabs.Where(t => t.Id != 0).Select(t => t.Id).ToHashSet();
-            var r = await _client.GetModifiedAsync("search");
-            var running = r?.Search?
-                .Where(s => !known.Contains(s.id))
-                .OrderByDescending(s => s.id)
-                .FirstOrDefault();
-            if (running != null) tab.Id = running.id;
-
             SearchText = string.Empty;
+
+            await _client.StartSearchAsync(text);
+
+            // Neue Such-Id mit ein paar Wiederholungen ermitteln (der Core registriert die Suche
+            // leicht verzoegert). Klappt es hier nicht, holt RefreshSearchAsync es per Race-Recovery nach.
+            for (int attempt = 0; attempt < 8 && tab.Id == 0; attempt++)
+            {
+                await Task.Delay(120);
+                var r = await _client.GetModifiedAsync("search");
+                var neu = r?.Search?.Where(s => !before.Contains(s.id)).OrderByDescending(s => s.id).FirstOrDefault();
+                if (neu != null)
+                {
+                    tab.Id = neu.id; tab.Seen = true;
+                    tab.FoundFiles = neu.FoundFiles; tab.SumSearches = neu.SumSearches; tab.Running = neu.Running;
+                }
+            }
+            StopSearchCommand.RaiseCanExecuteChanged();
         }
 
         private async Task StopSearchAsync()
