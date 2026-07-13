@@ -52,6 +52,11 @@ holt sich dabei in den Vordergrund und wechselt auf den Downloads-Tab.
   `HKCU\Software\Classes`; Linux: `.desktop` + `xdg-mime`). Mehrere gleichzeitig
   übergebene Links starten **keine** neuen Instanzen – dank Single-Instance landen sie
   in der bereits laufenden Anwendung.
+- **Linux-App-Icon:** Beim Start legt Apfelmus (idempotent) eine Launcher-`.desktop`
+  (`~/.local/share/applications/Apfelmus.Avalonia.desktop`, `StartupWMClass=Apfelmus.Avalonia`)
+  samt entpacktem Icon an. Nötig, weil GNOME/Wayland das Fenster **nicht** über das von
+  Avalonia gesetzte `Window.Icon`, sondern über die zur app_id passende `.desktop` einem
+  Dock-/Taskleisten-Icon zuordnet – sonst nur ein generisches Fallback-Icon.
 - **macOS:** über das `.app`-Bundle (`build-macos-app.sh`) mit `ajfsp`-URL-Scheme. Der
   Link wird über einen nativen `NSAppleEventManager`-Handler entgegengenommen, weil
   Avalonia 11.2 das entsprechende Ereignis unter macOS nicht selbst auslöst.

@@ -42,6 +42,13 @@ namespace Apfelmus.Avalonia
                     global::Avalonia.Threading.Dispatcher.UIThread.Post(() => HandleIncomingLink(url)));
             }
 
+            // Linux: Launcher-.desktop samt Icon sicherstellen (idempotent), damit Dock/Taskleiste/
+            // Alt-Tab das App-Icon statt eines generischen Fallbacks zeigt - unabhaengig von ajfsp.
+            if (OperatingSystem.IsLinux())
+            {
+                try { Services.ProtocolHandlerService.EnsureLinuxDesktopEntry(); } catch { }
+            }
+
             if (OperatingSystem.IsMacOS())
             {
                 void RegisterMac()
