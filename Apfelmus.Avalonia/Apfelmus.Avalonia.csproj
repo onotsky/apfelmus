@@ -27,13 +27,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.2.1" />
-    <PackageReference Include="Avalonia.Desktop" Version="11.2.1" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.1" />
-    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.1" />
-    <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.2.1" />
+    <PackageReference Include="Avalonia" Version="11.3.13" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.3.13" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.13" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.13" />
+    <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.3.13" />
     <!-- Nur fuer Debug-Diagnose (DevTools). -->
-    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.2.1" />
+    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.13" />
     <!--
       Transitive Abhaengigkeit von Avalonias Linux-/FreeDesktop-Backend. Avalonia 11.2.1 zieht
       0.20.0, das laut Advisory GHSA-xrw6-gwf8-vvr9 verwundbar ist. Direkter Verweis auf eine
