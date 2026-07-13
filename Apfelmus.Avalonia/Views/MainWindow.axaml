@@ -409,6 +409,12 @@
                                     </StackPanel>
                                     <DataGrid ItemsSource="{Binding Results}" SelectedItem="{Binding SelectedResult}" IsReadOnly="True"
                                               GridLinesVisibility="Horizontal" CanUserResizeColumns="True" CanUserReorderColumns="True">
+                                        <DataGrid.Styles>
+                                            <!-- Gruen = Datei bereits im eigenen Share vorhanden (analog WPF SearchColor). -->
+                                            <Style Selector="DataGridRow">
+                                                <Setter Property="Background" Value="{Binding SearchColor, Converter={StaticResource SearchRowBrushConverter}}" />
+                                            </Style>
+                                        </DataGrid.Styles>
                                         <DataGrid.Columns>
                                             <DataGridTemplateColumn Header="{DynamicResource col_file}" Width="Auto">
                                                 <DataGridTemplateColumn.CellTemplate>

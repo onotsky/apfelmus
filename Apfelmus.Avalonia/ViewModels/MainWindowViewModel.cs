@@ -851,9 +851,20 @@ namespace Apfelmus.Avalonia.ViewModels
                 if (r.SearchEntry != null && tab.Id != 0)
                     foreach (var e in r.SearchEntry)
                         if (e.SearchId == tab.Id && !tab.Results.Any(x => x.Id == e.Id))
+                        {
+                            e.SearchColor = SearchMatchColor(e);   // Markierung: schon im eigenen Share?
                             InsertSorted(tab.Results, e);
+                        }
             }
             StopSearchCommand.RaiseCanExecuteChanged();
+        }
+
+        /// <summary>WPF-SearchColor: 1 = Datei (per Pruefsumme) im eigenen Share vorhanden, sonst 0.</summary>
+        private int SearchMatchColor(SearchEntry e)
+        {
+            if (string.IsNullOrEmpty(e.Checksum)) return 0;
+            return Shares.Any(s => string.Equals(s.CheckSum, e.Checksum, StringComparison.OrdinalIgnoreCase))
+                ? 1 : 0;
         }
 
         /// <summary>Fuegt einen Suchtreffer alphabetisch nach Dateiname ein (A-Z), da Treffer laufend eintreffen.</summary>

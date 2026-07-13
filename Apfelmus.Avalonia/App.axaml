@@ -35,6 +35,7 @@
             <conv:PowerDownloadConverter x:Key="PowerDownloadConverter" />
             <conv:UserStatusConverter x:Key="UserStatusConverter" />
             <conv:DownloadRowBrushConverter x:Key="DownloadRowBrushConverter" />
+            <conv:SearchRowBrushConverter x:Key="SearchRowBrushConverter" />
             <conv:ServerRowBrushConverter x:Key="ServerRowBrushConverter" />
             <conv:ExtensionToIconConverter x:Key="FileIconConverter" />
             <conv:PercentTextConverter x:Key="PercentTextConverter" />
