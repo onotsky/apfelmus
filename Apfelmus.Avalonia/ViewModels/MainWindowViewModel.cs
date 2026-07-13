@@ -816,6 +816,10 @@ namespace Apfelmus.Avalonia.ViewModels
             if (sb.Length > 0) RaiseCopy(sb.ToString());
         }
 
+        // Fehl-Polls in Folge, ab denen eine gesehene Suche als beendet gilt (Fallback, falls der Core
+        // die fertige Suche aus modified.xml entfernt, statt running=false zu melden). ~6 x Refreshrate.
+        private const int SearchMissLimit = 6;
+
         private async Task RefreshSearchAsync()
         {
             if (SearchTabs.Count == 0) return;
@@ -824,11 +828,12 @@ namespace Apfelmus.Avalonia.ViewModels
 
             foreach (var tab in SearchTabs)
             {
-                var cur = r.Search?.FirstOrDefault(s => s.id == tab.Id);
+                var cur = tab.Id != 0 ? r.Search?.FirstOrDefault(s => s.id == tab.Id) : null;
                 if (cur != null)
                 {
-                    tab.Seen = true;
-                    tab.FoundFiles = cur.FoundFiles; tab.SumSearches = cur.SumSearches; tab.Running = cur.Running;
+                    // Solange das <search>-Element da ist, ist dessen Running massgeblich (wie WPF).
+                    tab.Seen = true; tab.MissCount = 0;
+                    tab.SumSearches = cur.SumSearches; tab.Running = cur.Running;
                 }
                 else if (tab.Id == 0)
                 {
@@ -844,10 +849,13 @@ namespace Apfelmus.Avalonia.ViewModels
                         tab.FoundFiles = neu.FoundFiles; tab.SumSearches = neu.SumSearches; tab.Running = neu.Running;
                     }
                 }
-                else if (tab.Seen)
+                else if (tab.Seen && tab.Running)
                 {
-                    // War vorhanden, ist nun aus der Core-Liste verschwunden -> Suche beendet.
-                    tab.Running = false;
+                    // Bereits gesehen, jetzt nicht in modified.xml: NICHT sofort beenden (die Suche kann
+                    // transient herausfallen, obwohl sie noch laeuft - siehe WPF). Erst nach mehreren
+                    // aufeinanderfolgenden Fehl-Polls als beendet werten (Fallback, falls der Core die
+                    // fertige Suche ganz entfernt, statt Running=false zu melden).
+                    if (++tab.MissCount >= SearchMissLimit) tab.Running = false;
                 }
 
                 if (r.SearchEntry != null && tab.Id != 0)

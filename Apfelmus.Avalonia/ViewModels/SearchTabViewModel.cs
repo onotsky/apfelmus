@@ -19,9 +19,13 @@ namespace Apfelmus.Avalonia.ViewModels
         public string Title { get; }
         public int Id { get; set; }
 
-        // True, sobald der Core die Suche mind. einmal in seiner Liste gemeldet hat. Verschwindet sie
-        // danach wieder, gilt die Suche als beendet (Running -> false) - so haengt der Status nicht.
+        // True, sobald der Core die Suche mind. einmal in seiner Liste gemeldet hat.
         public bool Seen { get; set; }
+
+        // Aufeinanderfolgende Polls, in denen die (bereits gesehene) Suche NICHT in modified.xml stand.
+        // Erst ab einem Schwellwert gilt sie als beendet - ein einzelner Fehl-Poll beendet nichts
+        // (die Suche kann transient aus modified.xml herausfallen, obwohl sie noch laeuft).
+        public int MissCount { get; set; }
 
         public ObservableCollection<SearchEntry> Results { get; }
 
