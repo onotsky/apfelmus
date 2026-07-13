@@ -4,9 +4,11 @@ using System.Linq;
 using System.Reflection;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Documents;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 using Avalonia.VisualTree;
 using Apfelmus.Avalonia.ViewModels;
 
@@ -187,6 +189,11 @@ namespace Apfelmus.Avalonia.Views
                 vm.ActivateRequested -= OnActivateRequested;
                 vm.ActivateRequested += OnActivateRequested;
 
+                // Servernachricht enthaelt HTML (<b>, <br>) -> als echte Inlines rendern.
+                vm.PropertyChanged -= OnVmPropertyChanged;
+                vm.PropertyChanged += OnVmPropertyChanged;
+                SetWelcomeInlines(vm.WelcomeMessage);
+
                 // Fenstergroesse wie zuletzt geschlossen (DataContext wird VOR dem Anzeigen gesetzt).
                 if (!_sizeRestored)
                 {
@@ -199,6 +206,51 @@ namespace Apfelmus.Avalonia.Views
                     if (vm.SavedWindowMaximized) WindowState = WindowState.Maximized;
                 }
             }
+        }
+
+        private void OnVmPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(MainWindowViewModel.WelcomeMessage) && DataContext is MainWindowViewModel vm)
+                SetWelcomeInlines(vm.WelcomeMessage);
+        }
+
+        // Rendert die Servernachricht: das einfache HTML (<b>/<strong>, <i>/<em>, <br>) wird in
+        // Avalonia-Inlines umgesetzt, restliche Tags entfernt und HTML-Entities dekodiert.
+        private void SetWelcomeInlines(string? html)
+        {
+            var tb = this.FindControl<TextBlock>("WelcomeText");
+            if (tb == null) return;
+            var inlines = new InlineCollection();
+            bool bold = false, italic = false;
+            foreach (var token in System.Text.RegularExpressions.Regex.Split(html ?? string.Empty, "(<[^>]+>)"))
+            {
+                if (string.IsNullOrEmpty(token)) continue;
+                if (token[0] == '<' && token[token.Length - 1] == '>')
+                {
+                    var m = System.Text.RegularExpressions.Regex.Match(token, "^</?\\s*([a-zA-Z0-9]+)");
+                    if (!m.Success) continue;
+                    string name = m.Groups[1].Value.ToLowerInvariant();
+                    bool closing = token.StartsWith("</");
+                    switch (name)
+                    {
+                        case "br": if (!closing) inlines.Add(new LineBreak()); break;
+                        case "b": case "strong": bold = !closing; break;
+                        case "i": case "em": italic = !closing; break;
+                        // andere Tags werden ignoriert (entfernt)
+                    }
+                }
+                else
+                {
+                    string text = System.Net.WebUtility.HtmlDecode(token);
+                    if (text.Length == 0) continue;
+                    inlines.Add(new Run(text)
+                    {
+                        FontWeight = bold ? FontWeight.Bold : FontWeight.Normal,
+                        FontStyle = italic ? FontStyle.Italic : FontStyle.Normal,
+                    });
+                }
+            }
+            tb.Inlines = inlines;
         }
 
         // Bei Link-Uebergabe: Fenster nach vorne holen (und aus dem Minimieren zurueckholen).

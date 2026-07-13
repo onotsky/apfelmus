@@ -153,7 +153,8 @@
                                 </Grid>
                                 <TextBlock Text="{DynamicResource c_message}" Classes="lbl" Margin="0,6,0,0" />
                                 <ScrollViewer Height="120">
-                                    <TextBlock Text="{Binding WelcomeMessage}" Classes="val" TextWrapping="Wrap" />
+                                    <!-- Inlines werden im Code-Behind aus dem HTML der Servernachricht gebaut. -->
+                                    <TextBlock x:Name="WelcomeText" Classes="val" TextWrapping="Wrap" />
                                 </ScrollViewer>
                             </StackPanel>
                         </Border>
