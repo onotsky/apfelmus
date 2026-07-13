@@ -5,6 +5,7 @@ using System.Reflection;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.VisualTree;
 using Apfelmus.Avalonia.ViewModels;
@@ -22,17 +23,18 @@ namespace Apfelmus.Avalonia.Views
             // InitializeComponent wird vom Avalonia-XAML-Compiler generiert (partial).
             InitializeComponent();
             // Doppelklick auf einen Spaltentrenner -> Spalte an den Inhalt anpassen (wie Excel/WPF).
-            AddHandler(Gestures.DoubleTappedEvent, OnGridSeparatorDoubleTapped, RoutingStrategies.Bubble);
+            AddHandler(InputElement.DoubleTappedEvent, OnGridSeparatorDoubleTapped, RoutingStrategies.Bubble);
             ApplyPlatformTitleBar();
         }
 
         // Auf macOS die nativen Fensterknoepfe (Ampeln links) nutzen; die eigenen Buttons dann
-        // ausblenden und links Platz fuer die Ampeln lassen. Auf Windows/Linux bleibt die eigene
-        // Titelleiste (NoChrome + eigene —/▢/✕-Buttons rechts) wie in der XAML definiert.
+        // ausblenden und links Platz fuer die Ampeln lassen. Auf Windows/Linux bleiben die eigenen
+        // —/▢/✕-Buttons (WindowDecorations=None in der XAML). Avalonia 12: WindowDecorations statt
+        // des frueheren ExtendClientAreaChromeHints.
         private void ApplyPlatformTitleBar()
         {
             if (!System.OperatingSystem.IsMacOS()) return;
-            ExtendClientAreaChromeHints = global::Avalonia.Platform.ExtendClientAreaChromeHints.PreferSystemChrome;
+            WindowDecorations = global::Avalonia.Controls.WindowDecorations.Full;
             if (this.FindControl<StackPanel>("TitleButtons") is { } btns) btns.IsVisible = false;
             if (this.FindControl<StackPanel>("TitleLeft") is { } left) left.Margin = new Thickness(78, 0, 0, 0);
         }

@@ -9,7 +9,7 @@
         Icon="avares://Apfelmus.Avalonia/Assets/Images/Apple-icon.png"
         Background="{DynamicResource WindowBackgroundBrush}"
         ExtendClientAreaToDecorationsHint="True"
-        ExtendClientAreaChromeHints="NoChrome"
+        WindowDecorations="None"
         ExtendClientAreaTitleBarHeightHint="-1">
 
     <!-- Tastenkuerzel fuer die Downloadliste (wie WPF-Client) -->

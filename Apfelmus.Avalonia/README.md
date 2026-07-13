@@ -74,10 +74,15 @@ Es muss ein appleJuice-**Core** laufen, gegen den sich die GUI verbindet
 # -> Apfelmus.Avalonia/bin/macos-app/Apfelmus.app (+ .zip)
 ```
 
-> Avalonia-Pakete sind auf `11.3.13` gepinnt (neueste 11.x mit passendem DataGrid-Paket);
-> `Tmds.DBus.Protocol` ist auf `0.21.3` hochgezogen (schließt Advisory GHSA-xrw6-gwf8-vvr9
-> des transitiven 0.20.0). Avalonia 12 ist bewusst noch nicht übernommen – Major mit
-> Breaking Changes (Gestures-Event, `ExtendClientAreaChromeHints`, Clipboard-API).
+> Avalonia-Pakete sind auf `12.1.0` gepinnt; `Tmds.DBus.Protocol` auf `0.94.1` (von
+> Avalonia 12 gefordert, behebt zugleich Advisory GHSA-xrw6-gwf8-vvr9). Die letzte
+> Avalonia-11-Fassung (5.4.0) liegt als Fallback im Branch `avalonia-11`.
+>
+> Migrations-Notizen (11 → 12): Doppelklick-Event `Gestures.DoubleTappedEvent` →
+> `InputElement.DoubleTappedEvent`; Fenster-Chrome `ExtendClientAreaChromeHints` →
+> `WindowDecorations` (None/BorderOnly/Full); `IClipboard.SetTextAsync` ist jetzt
+> Extension-Methode in `Avalonia.Input.Platform`. Build ohne Telemetrie-Task:
+> `AVALONIA_TELEMETRY_OPTOUT=1`.
 
 ## Aufbau
 
