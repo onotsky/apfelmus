@@ -25,8 +25,10 @@ namespace Apfelmus.Avalonia.Services
             try
             {
                 string exe = Environment.ProcessPath ?? System.Diagnostics.Process.GetCurrentProcess().MainModule!.FileName!;
+                // Desktop-Handler gehoeren nach $XDG_DATA_HOME/applications (~/.local/share/applications),
+                // NICHT nach ~/.config. LocalApplicationData = ~/.local/share unter Linux.
                 string appsDir = System.IO.Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "applications");
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "applications");
                 System.IO.Directory.CreateDirectory(appsDir);
                 const string desktopName = "apfelmus-ajfsp.desktop";
                 string desktopPath = System.IO.Path.Combine(appsDir, desktopName);
