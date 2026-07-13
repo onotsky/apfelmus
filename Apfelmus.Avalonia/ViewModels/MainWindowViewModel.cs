@@ -854,9 +854,14 @@ namespace Apfelmus.Avalonia.ViewModels
                     foreach (var e in r.SearchEntry)
                         if (e.SearchId == tab.Id && !tab.Results.Any(x => x.Id == e.Id))
                         {
-                            e.SearchColor = SearchMatchColor(e);   // Markierung: schon im eigenen Share?
+                            e.SearchColor = SearchMatchColor(e);   // Markierung: im Share (gruen)/laedt (gelb)?
                             InsertSorted(tab.Results, e);
                         }
+
+                // Treffer = tatsaechliche Anzahl gefundener Dateien (analog WPF): der Zaehler aus dem
+                // <search>-Element ist 0, sobald der Core die fertige Suche daraus entfernt hat, obwohl
+                // die Ergebnisse (searchentry) noch geliefert werden.
+                tab.FoundFiles = tab.Results.Count;
             }
             StopSearchCommand.RaiseCanExecuteChanged();
         }
