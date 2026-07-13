@@ -219,7 +219,7 @@
                                 <DataGridTextColumn Header="{DynamicResource col_loaded}" Binding="{Binding DownloadedFilesize, Converter={StaticResource FileSizeConverter}, Mode=OneWay}" Width="Auto" />
                                 <DataGridTextColumn Header="{DynamicResource col_speed}" Binding="{Binding Speed, Converter={StaticResource FileSizeConverter}, Mode=OneWay}" Width="Auto" />
                                 <DataGridTextColumn Header="{DynamicResource col_time}" Binding="{Binding TimeToEnd, Converter={StaticResource TimeConverter}, Mode=OneWay}" Width="Auto" />
-                                <DataGridTemplateColumn Header="{DynamicResource col_percent}" Width="100">
+                                <DataGridTemplateColumn Header="{DynamicResource col_percent}" Width="100" MinWidth="55">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <Panel Margin="2,3" ClipToBounds="True">
@@ -307,7 +307,7 @@
                             </DataGridTemplateColumn>
                             <DataGridTextColumn Header="{DynamicResource col_nick}" Binding="{Binding Nick, Mode=OneWay}" Width="Auto" />
                             <DataGridTextColumn Header="{DynamicResource col_speed}" Binding="{Binding Speed, Converter={StaticResource FileSizeConverter}, Mode=OneWay}" Width="Auto" />
-                            <DataGridTemplateColumn Header="{DynamicResource col_percent}" Width="100">
+                            <DataGridTemplateColumn Header="{DynamicResource col_percent}" Width="100" MinWidth="55">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Panel Margin="2,3" ClipToBounds="True">
@@ -320,8 +320,9 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <!-- Wasserstand: Fuellstand der Datei bei der Gegenstelle (Loaded 0..1). -->
-                            <DataGridTemplateColumn Header="{DynamicResource col_waterlevel}" Width="100">
+                            <!-- Wasserstand: Fuellstand der Datei bei der Gegenstelle (Loaded 0..1).
+                                 Breiter als die %-Spalte, damit die Kopfzeile "Wasserstand" nicht abgeschnitten wird. -->
+                            <DataGridTemplateColumn Header="{DynamicResource col_waterlevel}" Width="120" MinWidth="90">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Panel Margin="2,3" ClipToBounds="True">

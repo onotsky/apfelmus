@@ -19,6 +19,20 @@ namespace Apfelmus.Avalonia.Views
         private bool _restoreHooked;
         private bool _sizeRestored;
         private Dictionary<string, string> _savedSplitters = new();
+        private Dictionary<string, string> _savedColumns = new();
+
+        // Fortschrittsbalken-Spalten (feste Pixelbreite) je Grid, deren Breite gemerkt wird.
+        // Identifiziert ueber den STABILEN Index in DataGrid.Columns (Erstell-Reihenfolge; ein
+        // Umsortieren per Drag aendert nur DisplayIndex, nicht die Position in dieser Sammlung).
+        // Bewusst NUR diese Balken-Spalten - die Auto-Spalten bleiben fit-to-content.
+        private static readonly (string grid, int index)[] ProgressColumns =
+        {
+            ("DownloadsGrid", 6),  // %
+            ("UploadsGrid",   3),  // %
+            ("UploadsGrid",   4),  // Wasserstand
+        };
+
+        private static string ColKey(string grid, int index) => grid + "#" + index;
 
         public MainWindow()
         {
@@ -93,11 +107,29 @@ namespace Apfelmus.Avalonia.Views
             if (_restoreHooked || DataContext is not MainWindowViewModel vm) return;
             _restoreHooked = true;
             _savedSplitters = ParseGridLayouts(vm.SavedSplitterSizes);
+            _savedColumns = ParseGridLayouts(vm.SavedGridLayouts);
 
-            // Spaltenbreiten sind Auto (fit-to-content) -> nichts wiederherzustellen. Nur die
-            // Splitter-Positionen merken; verzoegert, sobald das jeweilige Grid realisiert ist.
+            // Auto-Spalten sind fit-to-content -> nichts wiederherzustellen. Wiederhergestellt
+            // werden Splitter-Positionen und die Breiten der Fortschrittsbalken-Spalten - jeweils
+            // verzoegert, sobald das betreffende Grid realisiert ist.
             foreach (var (name, row, idx) in SplitGrids)
                 HookSplitterRestore(name, row, idx);
+            foreach (var (grid, idx) in ProgressColumns)
+                HookColumnRestore(grid, idx);
+        }
+
+        private void HookColumnRestore(string gridName, int index)
+        {
+            if (!_savedColumns.TryGetValue(ColKey(gridName, index), out var s)
+                || !double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out double px) || px < 20)
+                return;
+            var grid = this.FindControl<DataGrid>(gridName);
+            if (grid == null) return;
+            WhenRealized(grid, () =>
+            {
+                if (index < grid.Columns.Count)
+                    grid.Columns[index].Width = new DataGridLength(px);
+            });
         }
 
         private void HookSplitterRestore(string name, bool row, int idx)
@@ -130,8 +162,9 @@ namespace Apfelmus.Avalonia.Views
             base.OnClosing(e);
         }
 
-        // Merkt die Splitter-Positionen (Spaltenbreiten sind Auto -> nicht persistiert). Nur realisierte
-        // Grids ueberschreiben die gespeicherten Werte; nicht-realisierte behalten ihren Stand.
+        // Merkt Splitter-Positionen und die Breiten der Fortschrittsbalken-Spalten (Auto-Spalten
+        // bleiben fit-to-content -> nicht persistiert). Nur realisierte Grids ueberschreiben die
+        // gespeicherten Werte; nicht-realisierte behalten ihren Stand.
         private void PersistLayouts(MainWindowViewModel vm)
         {
             var spl = ParseGridLayouts(vm.SavedSplitterSizes);
@@ -144,7 +177,16 @@ namespace Apfelmus.Avalonia.Views
                 if (v > 10) spl[name] = v.ToString("0.#", CultureInfo.InvariantCulture);
             }
 
-            vm.SaveWindowAndGrids(string.Empty, Join(spl), Width, Height, WindowState == WindowState.Maximized);
+            var cols = ParseGridLayouts(vm.SavedGridLayouts);
+            foreach (var (gridName, idx) in ProgressColumns)
+            {
+                var g = this.FindControl<DataGrid>(gridName);
+                if (g == null || !g.IsLoaded || idx >= g.Columns.Count) continue;
+                double w = g.Columns[idx].ActualWidth;
+                if (w > 20) cols[ColKey(gridName, idx)] = w.ToString("0.#", CultureInfo.InvariantCulture);
+            }
+
+            vm.SaveWindowAndGrids(Join(cols), Join(spl), Width, Height, WindowState == WindowState.Maximized);
         }
 
         private static string Join(Dictionary<string, string> map)
