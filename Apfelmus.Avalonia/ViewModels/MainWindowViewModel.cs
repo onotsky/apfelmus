@@ -833,9 +833,11 @@ namespace Apfelmus.Avalonia.ViewModels
                 else if (tab.Id == 0)
                 {
                     // Race-Recovery: der Core hatte die neue Suche beim Start noch nicht registriert.
-                    // Die neueste noch keinem Tab zugeordnete Suche adoptieren.
+                    // Zuordnung ueber den SUCHTEXT (nicht ueber ID-Raten!) - sonst wird faelschlich eine
+                    // alte, im Core haengende Suche adoptiert.
                     var owned = SearchTabs.Where(t => t.Id != 0).Select(t => t.Id).ToHashSet();
-                    var neu = r.Search?.Where(s => !owned.Contains(s.id)).OrderByDescending(s => s.id).FirstOrDefault();
+                    var neu = r.Search?.Where(s => !owned.Contains(s.id) && SameSearchText(s.SearchText, tab.Title))
+                                       .OrderByDescending(s => s.id).FirstOrDefault();
                     if (neu != null)
                     {
                         tab.Id = neu.id; tab.Seen = true;
@@ -859,13 +861,21 @@ namespace Apfelmus.Avalonia.ViewModels
             StopSearchCommand.RaiseCanExecuteChanged();
         }
 
-        /// <summary>WPF-SearchColor: 1 = Datei (per Pruefsumme) im eigenen Share vorhanden, sonst 0.</summary>
+        /// <summary>Markierung eines Treffers per Pruefsumme: 1 = im eigenen Share vorhanden (gruen),
+        /// 3 = wird gerade heruntergeladen (gelb), sonst 0.</summary>
         private int SearchMatchColor(SearchEntry e)
         {
             if (string.IsNullOrEmpty(e.Checksum)) return 0;
-            return Shares.Any(s => string.Equals(s.CheckSum, e.Checksum, StringComparison.OrdinalIgnoreCase))
-                ? 1 : 0;
+            if (Shares.Any(s => string.Equals(s.CheckSum, e.Checksum, StringComparison.OrdinalIgnoreCase)))
+                return 1;   // schon komplett im Share -> gruen
+            if (Downloads.Any(d => string.Equals(d.Hash, e.Checksum, StringComparison.OrdinalIgnoreCase)))
+                return 3;   // laeuft gerade als Download -> gelb
+            return 0;
         }
+
+        /// <summary>Vergleicht zwei Suchtexte tolerant (getrimmt, Gross-/Kleinschreibung egal).</summary>
+        private static bool SameSearchText(string? a, string? b)
+            => string.Equals((a ?? string.Empty).Trim(), (b ?? string.Empty).Trim(), StringComparison.OrdinalIgnoreCase);
 
         /// <summary>Fuegt einen Suchtreffer alphabetisch nach Dateiname ein (A-Z), da Treffer laufend eintreffen.</summary>
         private static void InsertSorted(ObservableCollection<SearchEntry> list, SearchEntry e)
@@ -901,12 +911,15 @@ namespace Apfelmus.Avalonia.ViewModels
             await _client.StartSearchAsync(text);
 
             // Neue Such-Id mit ein paar Wiederholungen ermitteln (der Core registriert die Suche
-            // leicht verzoegert). Klappt es hier nicht, holt RefreshSearchAsync es per Race-Recovery nach.
+            // leicht verzoegert). Zuordnung ueber den SUCHTEXT der neu hinzugekommenen Suche - so wird
+            // nie eine alte, im Core haengende Suche erwischt. Klappt es hier nicht, holt
+            // RefreshSearchAsync es (ebenfalls per Suchtext) nach.
             for (int attempt = 0; attempt < 8 && tab.Id == 0; attempt++)
             {
                 await Task.Delay(120);
                 var r = await _client.GetModifiedAsync("search");
-                var neu = r?.Search?.Where(s => !before.Contains(s.id)).OrderByDescending(s => s.id).FirstOrDefault();
+                var neu = r?.Search?.Where(s => !before.Contains(s.id) && SameSearchText(s.SearchText, text))
+                                    .OrderByDescending(s => s.id).FirstOrDefault();
                 if (neu != null)
                 {
                     tab.Id = neu.id; tab.Seen = true;

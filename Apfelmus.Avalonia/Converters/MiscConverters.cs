@@ -81,8 +81,8 @@ namespace Apfelmus.Avalonia.Converters
             => throw new NotSupportedException();
     }
 
-    /// <summary>Such-Treffer-Markierung (analog WPF SearchColor): 1 = im eigenen Share vorhanden
-    /// (gruen), 2 = vorhanden, aber nicht im aktiven Freigabeordner (rot), sonst keine.</summary>
+    /// <summary>Such-Treffer-Markierung: 1 = im eigenen Share vorhanden (gruen, analog WPF SearchColor),
+    /// 2 = vorhanden, aber nicht im aktiven Freigabeordner (rot), 3 = wird gerade geladen (gelb), sonst keine.</summary>
     public sealed class SearchRowBrushConverter : IValueConverter
     {
         public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
@@ -92,6 +92,7 @@ namespace Apfelmus.Avalonia.Converters
             {
                 1 => new SolidColorBrush(Color.FromArgb(55, 0, 157, 0)),     // im Share -> gruen
                 2 => new SolidColorBrush(Color.FromArgb(45, 200, 60, 60)),   // vorhanden, nicht aktiv -> rot
+                3 => new SolidColorBrush(Color.FromArgb(60, 230, 190, 0)),   // laeuft als Download -> gelb
                 _ => Brushes.Transparent
             };
         }
