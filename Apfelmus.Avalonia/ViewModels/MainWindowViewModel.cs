@@ -712,13 +712,14 @@ namespace Apfelmus.Avalonia.ViewModels
             };
         }
 
+        // Entprellt das Nachladen der Freigabeliste, wenn Uploads eine noch unbekannte Shareid haben.
+        private DateTime _lastUploadShareReload = DateTime.MinValue;
+
         private async Task RefreshUploadsAsync()
         {
             var r = await _client.GetModifiedAsync("uploads");
             if (r?.Upload == null) return;
 
-            ActiveUploads.Clear();
-            QueuedUploads.Clear();
             foreach (var u in r.Upload)
             {
                 // Dateiname stammt nicht vom Core im Upload selbst, sondern aus der Freigabe (Shareid).
@@ -729,6 +730,25 @@ namespace Apfelmus.Avalonia.ViewModels
                 // Wasserstand: wie voll die Datei bei der Gegenstelle schon ist (Loaded 0..1 -> Prozent).
                 u.WPercentages = Math.Round(u.Loaded * 100.0, 2) + " %";
             }
+
+            // Freigaben werden nur beim Start geladen; nach dem Start hinzugekommene Freigaben (z.B. fertige
+            // Downloads oder nach einer Sharepruefung) fehlen dann in Shares -> Dateiname bleibt leer.
+            // Bei unaufgeloesten Uploads die Freigabeliste einmalig (entprellt) nachladen und erneut aufloesen.
+            if (r.Upload.Any(u => string.IsNullOrEmpty(u.FileName))
+                && (DateTime.UtcNow - _lastUploadShareReload) > TimeSpan.FromSeconds(15))
+            {
+                _lastUploadShareReload = DateTime.UtcNow;
+                await RefreshSharesAsync();
+                foreach (var u in r.Upload)
+                {
+                    if (!string.IsNullOrEmpty(u.FileName)) continue;
+                    var share = Shares.FirstOrDefault(s => s.Id == u.Shareid);
+                    if (share != null) u.FileName = share.ShortFileName;
+                }
+            }
+
+            ActiveUploads.Clear();
+            QueuedUploads.Clear();
             // Standard alphabetisch nach Dateiname (A-Z).
             foreach (var u in r.Upload.Where(x => x.Status == 1).OrderBy(x => x.FileName, StringComparer.OrdinalIgnoreCase))
                 ActiveUploads.Add(u);
