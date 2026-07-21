@@ -15,17 +15,26 @@ VER="${VER:-0.0.0}"
 # Zielarchitektur als 1. Argument: osx-arm64 (Apple Silicon, Standard) oder osx-x64 (Intel).
 RID="${1:-osx-arm64}"
 OUT="$HERE/bin/macos-app/$RID"
-APP="$OUT/Apfelmus.app"
 PNG="$HERE/Assets/Images/Apple-icon.png"
 EXE="Apfelmus.Avalonia"
 
+# WICHTIG: Bundle in einem NICHT synchronisierten Temp-Verzeichnis bauen und signieren.
+# Liegt der Build unter einem Cloud-File-Provider (Nextcloud/iCloud, z.B. ~/Documents),
+# stempelt dieser staendig com.apple.FinderInfo / com.apple.fileprovider.* auf jede Datei
+# -> codesign scheitert an "resource fork, Finder information, or similar detritus not allowed".
+# In $TMPDIR (/var/folders, lokal) gibt es diese Stempel nicht. Nur das fertige DMG (+ .app fuer
+# lokale Nutzung) wird danach nach $OUT kopiert.
+WORK="$(mktemp -d)"
+trap 'rm -rf "$WORK"' EXIT
+APP="$WORK/Apfelmus.app"
+
 echo "== Publish ($RID) =="
-rm -rf "$OUT"
+rm -rf "$OUT"; mkdir -p "$OUT"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 dotnet publish "$PROJ" -c Release -r "$RID" --self-contained true -o "$APP/Contents/MacOS" | tail -1
 
 echo "== Icon (.icns) =="
-ICONSET="$OUT/Apfelmus.iconset"
+ICONSET="$WORK/Apfelmus.iconset"
 mkdir -p "$ICONSET"
 gen() { sips -z "$2" "$2" "$PNG" --out "$ICONSET/$1" >/dev/null 2>&1 || true; }
 gen icon_16x16.png 16
@@ -80,16 +89,31 @@ echo "== Codesign (ad-hoc, komplettes Bundle) =="
 # indicates they must be present" -> macOS haelt die App fuer beschaedigt. Eine Ad-hoc-Signatur
 # (-s -) ueber alle Bestandteile (--deep) behebt das. Keine Notarisierung (kein Apple-Account),
 # daher bleibt beim ersten Start der Rechtsklick->Oeffnen / das Entfernen der Quarantaene noetig.
+# Vorsorglich Detritus entfernen (im Temp-Verzeichnis sollte keiner entstehen).
+xattr -cr "$APP"; find "$APP" -name '._*' -delete
 codesign --force --deep --sign - "$APP" && echo "  signiert (ad-hoc)" || echo "  WARNUNG: codesign fehlgeschlagen"
 
-echo "== Zip =="
-ZIP="$OUT/Apfelmus.Avalonia-${VER}-${RID}-app.zip"
-( cd "$OUT" && ditto -c -k --keepParent "Apfelmus.app" "$ZIP" )
+# Als DMG ausliefern, NICHT als Zip: codesign --deep legt die Signaturen der verwalteten .NET-DLLs
+# in Extended Attributes ab. In einem Zip werden die als ._-AppleDouble-Dateien gespeichert und
+# ueberleben nur eine Extraktion mit Apples ditto/Finder - plain 'unzip' (oder Dritt-Entpacker)
+# zerstoert damit die Signatur ("App ist beschaedigt"). Ein DMG (Dateisystem-Image) bewahrt das
+# Bundle inkl. xattrs 1:1, unabhaengig vom Entpack-Tool. DMG im Temp-Verzeichnis erzeugen und
+# danach nach $OUT kopieren (die versiegelte Image-Datei ist gegen Cloud-Stempel unempfindlich).
+echo "== DMG =="
+DMG="$OUT/Apfelmus.Avalonia-${VER}-${RID}.dmg"
+rm -f "$DMG"
+hdiutil create -volname "Apfelmus ${VER}" -srcfolder "$APP" -ov -format UDZO "$WORK/out.dmg" >/dev/null
+cp "$WORK/out.dmg" "$DMG" && echo "  $DMG"
+
+# Signierte .app zusaetzlich nach $OUT spiegeln (fuer lokale Nutzung / Installation nach /Applications).
+# Hinweis: Sobald sie im synchronisierten Ordner liegt, kann der Cloud-Provider ihre Signatur wieder
+# stempeln - fuer die Installation daher aus $OUT nach /Applications kopieren und DORT neu signieren.
+ditto "$APP" "$OUT/Apfelmus.app"
 
 echo "Fertig:"
-echo "  $APP"
-echo "  $ZIP"
+echo "  $OUT/Apfelmus.app"
+echo "  $DMG"
 echo
 echo "Hinweis: ajfsp://-Verknuepfung wird von macOS registriert, sobald das Bundle"
 echo "bekannt ist - z.B. nach /Applications kopieren oder einmal:"
-echo "  /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f \"$APP\""
+echo "  /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f \"$OUT/Apfelmus.app\""

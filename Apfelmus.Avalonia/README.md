@@ -76,7 +76,7 @@ Es muss ein appleJuice-**Core** laufen, gegen den sich die GUI verbindet
 ```bash
 # macOS-App-Bundle bauen (Version aus Directory.Build.props):
 ./Apfelmus.Avalonia/build-macos-app.sh
-# -> Apfelmus.Avalonia/bin/macos-app/Apfelmus.app (+ .zip)
+# -> Apfelmus.Avalonia/bin/macos-app/<rid>/Apfelmus.app (+ .dmg)
 ```
 
 > Avalonia-Pakete sind auf `12.1.0` gepinnt; `Tmds.DBus.Protocol` auf `0.94.1` (von

@@ -44,21 +44,17 @@ TAG="v$VER"
 echo "== Apfelmus Release $TAG (Repo $REPO) =="
 
 # --- macOS-.app-Bundle bauen, bereinigen, signieren, zippen -----------------
-# build-macos-app.sh signiert selbst, scheitert aber am com.apple.provenance-xattr
-# (macOS haengt es nach dem Signieren wieder an). Deshalb hier: xattr -cr -> neu
-# signieren -> ERST DANN zippen, damit die Ad-hoc-Signatur wirklich im Zip landet.
+# build-macos-app.sh entfernt den Detritus, signiert ad-hoc (--deep) und baut ein DMG.
+# Bewusst DMG statt Zip: codesign --deep legt die Signaturen der verwalteten .NET-DLLs in
+# Extended Attributes ab; ein Zip speichert die als ._-AppleDouble, die nur Apples ditto/Finder
+# heil entpackt - plain 'unzip'/Dritt-Entpacker zerstoeren die Signatur ("App beschaedigt").
+# Ein DMG bewahrt das Bundle inkl. xattrs unabhaengig vom Entpack-Tool.
 build_mac() {
   local rid="$1"
   echo "== macOS $rid =="
   "$HERE/Apfelmus.Avalonia/build-macos-app.sh" "$rid" >/dev/null
-  local dir="$HERE/Apfelmus.Avalonia/bin/macos-app/$rid"
-  local app="$dir/Apfelmus.app"
-  xattr -cr "$app"
-  codesign --force --deep --sign - "$app" >/dev/null 2>&1 || echo "  WARN: codesign"
-  local zip="$dir/Apfelmus.Avalonia-$VER-$rid-app.zip"
-  rm -f "$zip"
-  ( cd "$dir" && ditto -c -k --keepParent Apfelmus.app "Apfelmus.Avalonia-$VER-$rid-app.zip" )
-  echo "$zip"
+  local dmg="$HERE/Apfelmus.Avalonia/bin/macos-app/$rid/Apfelmus.Avalonia-$VER-$rid.dmg"
+  echo "$dmg"
 }
 
 # --- Windows/Linux: self-contained publish + zip ----------------------------

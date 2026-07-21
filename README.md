@@ -65,12 +65,14 @@ chmod +x apfelmus/Apfelmus.Avalonia
 ./apfelmus/Apfelmus.Avalonia
 ```
 
-### macOS – `Apfelmus.Avalonia-<version>-osx-arm64-app.zip` (Apple Silicon) bzw. `-osx-x64-app.zip` (Intel)
+### macOS – `Apfelmus.Avalonia-<version>-osx-arm64.dmg` (Apple Silicon) bzw. `-osx-x64.dmg` (Intel)
 
-Passendes ZIP wählen: **`osx-arm64`** für Apple Silicon (M1/M2/M3…), **`osx-x64`** für Intel-Macs. Das ZIP **enthält bereits das fertige `Apfelmus.app`-Bundle – es muss nichts gebaut werden.**
+Passendes **DMG** wählen: **`osx-arm64`** für Apple Silicon (M1/M2/M3…), **`osx-x64`** für Intel-Macs. Das DMG **enthält bereits das fertige `Apfelmus.app`-Bundle – es muss nichts gebaut werden.**
 
-1. ZIP entpacken (Doppelklick im Finder genügt) → man erhält `Apfelmus.app`.
-2. `Apfelmus.app` nach **Programme** (`/Applications`) ziehen.
+> Bewusst DMG statt ZIP: Die ad-hoc-Signatur legt Teile in Extended Attributes ab, die ein ZIP nur über Apples Entpacker (Finder) heil übersteht – ein plain `unzip`/Dritt-Entpacker zerstört die Signatur, und macOS meldet „beschädigt". Das DMG bewahrt das Bundle unabhängig vom Werkzeug.
+
+1. DMG per Doppelklick öffnen (mounten).
+2. `Apfelmus.app` daraus nach **Programme** (`/Applications`) ziehen.
 3. Die App ist **nicht bei Apple notarisiert**, deshalb blockiert Gatekeeper den ersten Start. Einmalig **eine** der beiden Varianten:
    - **Rechtsklick** auf `Apfelmus.app` → **„Öffnen“** → im Dialog nochmals **„Öffnen“**, oder
    - im Terminal die Quarantäne-Markierung entfernen:
@@ -79,7 +81,7 @@ Passendes ZIP wählen: **`osx-arm64`** für Apple Silicon (M1/M2/M3…), **`osx-
      open /Applications/Apfelmus.app
      ```
 
-Danach startet die App normal per Doppelklick; die `ajfsp://`-Verknüpfung wird dabei registriert. (Falls trotzdem „beschädigt“ gemeldet wird: Schritt 3 mit `xattr` ausführen.)
+Danach startet die App normal per Doppelklick; die `ajfsp://`-Verknüpfung wird dabei registriert.
 
 ## ajfsp://-Linkübernahme
 
@@ -108,10 +110,10 @@ dotnet run --project Apfelmus.Avalonia
 # macOS-App-Bundle bauen (Version aus Directory.Build.props):
 ./Apfelmus.Avalonia/build-macos-app.sh            # Apple Silicon (osx-arm64, Standard)
 ./Apfelmus.Avalonia/build-macos-app.sh osx-x64    # Intel
-# -> Apfelmus.Avalonia/bin/macos-app/<rid>/Apfelmus.app (+ .zip)
+# -> Apfelmus.Avalonia/bin/macos-app/<rid>/Apfelmus.app (+ .dmg)
 ```
 
-Das Skript signiert das Bundle ad-hoc über alle Bestandteile (`codesign --deep`), damit macOS es nicht als „beschädigt“ ablehnt. Fertige Downloads gibt es unter [Releases](../../releases) – zur Nutzung siehe oben.
+Das Skript signiert das Bundle ad-hoc über alle Bestandteile (`codesign --deep`) und verpackt es als **DMG** (bewahrt die Signatur unabhängig vom Entpack-Tool; ein ZIP würde die xattr-Signaturen der .NET-DLLs beim Entpacken mit `unzip` zerstören). Fertige Downloads gibt es unter [Releases](../../releases) – zur Nutzung siehe oben.
 
 ## Bekannte Einschränkungen
 
