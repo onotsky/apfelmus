@@ -172,7 +172,12 @@
                         <Button Content="{DynamicResource d_clean}" Command="{Binding CleanFinishedCommand}" />
                         <Border Width="1" Background="{DynamicResource TextSecondaryBrush}" Margin="4,0" />
                         <TextBlock Text="{DynamicResource d_power}" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" />
-                        <ComboBox x:CompileBindings="False" Width="70" ItemsSource="{Binding PowerValues}" SelectedItem="{Binding SelectedPowerValue}" />
+                        <ComboBox x:CompileBindings="False" Width="90" ItemsSource="{Binding PowerValues}"
+                                  SelectedValueBinding="{Binding Value}" SelectedValue="{Binding SelectedPowerValue}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate><TextBlock Text="{Binding Label}" /></DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
                         <Button Content="{DynamicResource d_apply}" Command="{Binding ApplyPowerDownloadCommand}" />
                         <TextBlock Text="{DynamicResource d_priority}" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" />
                         <ComboBox x:CompileBindings="False" Width="70" ItemsSource="{Binding PriorityValues}" SelectedItem="{Binding SelectedPriority}" />

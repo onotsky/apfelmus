@@ -62,6 +62,7 @@
     <sys:String x:Key="u_active">Aktive Uploads</sys:String>
     <sys:String x:Key="u_queue">Warteschlange</sys:String>
     <sys:String x:Key="d_power">Power</sys:String>
+    <sys:String x:Key="d_pd_off">aus</sys:String>
     <sys:String x:Key="d_apply">Anwenden</sys:String>
     <sys:String x:Key="d_priority">Priorität</sys:String>
     <sys:String x:Key="d_setprio">Setzen</sys:String>

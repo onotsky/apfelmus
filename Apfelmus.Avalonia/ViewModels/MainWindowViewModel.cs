@@ -54,8 +54,14 @@ namespace Apfelmus.Avalonia.ViewModels
             ShareTree = new ObservableCollection<DirNodeViewModel>();
             SharedFolders = new ObservableCollection<SharedFolderEntry>();
 
-            PowerValues = new ObservableCollection<int> { 0, 1, 2, 3, 4, 5 };
-            PriorityValues = new ObservableCollection<int> { 1, 2, 3, 4, 5 };
+            // Powerdownload-Werte laut Core-Doku (setpowerdownload): 0 = aus, sonst 12..490,
+            // Anzeige als Verhaeltnis 1:X mit X = (Wert+10)/10 (12 -> 1:2,2 ... 490 -> 1:50).
+            // Der ComboBox uebergibt den KEY (Core-Wert), nicht die Anzeige.
+            PowerValues = new ObservableCollection<PowerOption> { new(0, LanguageManager.Get("d_pd_off")) };
+            for (int i = 12; i <= 490; i++)
+                PowerValues.Add(new PowerOption(i, "1:" + ((i + 10) / 10.0).ToString("0.#", System.Globalization.CultureInfo.CurrentCulture)));
+            // Prioritaet laut Core-Doku (setpriority): 1..250.
+            PriorityValues = new ObservableCollection<int>(System.Linq.Enumerable.Range(1, 250));
             PartlistSizes = new ObservableCollection<int> { 12, 16, 20, 24, 30, 40, 60 };
             _partlistSize = config.PartlistRowHeight > 0 ? config.PartlistRowHeight : 24;
             _selectedPowerValue = 0;
@@ -189,7 +195,7 @@ namespace Apfelmus.Avalonia.ViewModels
         public DataGridCollectionView ServersView { get; }
         public ObservableCollection<SearchTabViewModel> SearchTabs { get; }
         public ObservableCollection<ShareItem> Shares { get; }
-        public ObservableCollection<int> PowerValues { get; }
+        public ObservableCollection<PowerOption> PowerValues { get; }
         public ObservableCollection<int> PriorityValues { get; }
         public ObservableCollection<int> PartlistSizes { get; }
 
@@ -1243,4 +1249,8 @@ namespace Apfelmus.Avalonia.ViewModels
             }
         }
     }
+
+    /// <summary>Ein Powerdownload-Eintrag fuer die Auswahl: <see cref="Value"/> ist der an den Core
+    /// gesendete Wert (0 = aus, 12..490), <see cref="Label"/> die Anzeige (z.B. "1:2,2").</summary>
+    public sealed record PowerOption(int Value, string Label);
 }

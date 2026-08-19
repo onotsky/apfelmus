@@ -62,6 +62,7 @@
     <sys:String x:Key="u_active">Upload attivi</sys:String>
     <sys:String x:Key="u_queue">Coda</sys:String>
     <sys:String x:Key="d_power">Power</sys:String>
+    <sys:String x:Key="d_pd_off">disattivato</sys:String>
     <sys:String x:Key="d_apply">Applica</sys:String>
     <sys:String x:Key="d_priority">Priorità</sys:String>
     <sys:String x:Key="d_setprio">Imposta</sys:String>
