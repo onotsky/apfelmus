@@ -54,11 +54,13 @@ namespace Apfelmus.Avalonia.Converters
     /// <summary>Powerdownload-Wert -> Text (0 = aus, sonst Wert).</summary>
     public sealed class PowerDownloadConverter : IValueConverter
     {
-        // Core-Wert -> Anzeige: 0 = aus, sonst Verhaeltnis 1:X mit X = (wert+10)/10 (12 -> 1:2,2 ... 490 -> 1:50).
+        // Core-Wert -> Anzeige als Verhaeltnis 1:X mit X = (wert+10)/10: 0 -> 1:1 (kein Powerdownload),
+        // 12 -> 1:2,2 ... 490 -> 1:50.
         public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
-            => value is int i && i > 0
-                ? "1:" + ((i + 10) / 10.0).ToString("0.#", CultureInfo.CurrentCulture)
-                : Services.LanguageManager.Get("d_pd_off");
+        {
+            int i = value is int v && v > 0 ? v : 0;
+            return "1:" + ((i + 10) / 10.0).ToString("0.#", CultureInfo.CurrentCulture);
+        }
 
         public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
             => throw new NotSupportedException();

@@ -57,7 +57,7 @@ namespace Apfelmus.Avalonia.ViewModels
             // Powerdownload-Werte laut Core-Doku (setpowerdownload): 0 = aus, sonst 12..490,
             // Anzeige als Verhaeltnis 1:X mit X = (Wert+10)/10 (12 -> 1:2,2 ... 490 -> 1:50).
             // Der ComboBox uebergibt den KEY (Core-Wert), nicht die Anzeige.
-            PowerValues = new ObservableCollection<PowerOption> { new(0, LanguageManager.Get("d_pd_off")) };
+            PowerValues = new ObservableCollection<PowerOption> { new(0, "1:1") };
             for (int i = 12; i <= 490; i++)
                 PowerValues.Add(new PowerOption(i, "1:" + ((i + 10) / 10.0).ToString("0.#", System.Globalization.CultureInfo.CurrentCulture)));
             // Prioritaet laut Core-Doku (setpriority): 1..250.
