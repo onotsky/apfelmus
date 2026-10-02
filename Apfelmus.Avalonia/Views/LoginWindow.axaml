@@ -18,10 +18,10 @@
         </StackPanel>
 
         <TextBlock Text="Host" Foreground="{DynamicResource TextSecondaryBrush}" />
-        <TextBox Text="{Binding Host, Mode=TwoWay}" Watermark="localhost" />
+        <TextBox Text="{Binding Host, Mode=TwoWay}" PlaceholderText="localhost" />
 
         <TextBlock Text="Port" Foreground="{DynamicResource TextSecondaryBrush}" />
-        <TextBox Text="{Binding Port, Mode=TwoWay}" Watermark="9851" />
+        <TextBox Text="{Binding Port, Mode=TwoWay}" PlaceholderText="9851" />
 
         <TextBlock Text="Passwort" Foreground="{DynamicResource TextSecondaryBrush}" />
         <TextBox Text="{Binding Password, Mode=TwoWay}" PasswordChar="•" />

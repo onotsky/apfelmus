@@ -27,13 +27,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="12.1.0" />
-    <PackageReference Include="Avalonia.Desktop" Version="12.1.0" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.0" />
-    <PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.0" />
-    <PackageReference Include="Avalonia.Controls.DataGrid" Version="12.1.0" />
-    <!-- Nur fuer Debug-Diagnose (DevTools). -->
-    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="12.1.0" />
+    <PackageReference Include="Avalonia" Version="12.1.3" />
+    <PackageReference Include="Avalonia.Desktop" Version="12.1.3" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.3" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.3" />
+    <!-- DataGrid wird separat versioniert und hinkt dem Kern teils eine Patch-Version hinterher. -->
+    <PackageReference Include="Avalonia.Controls.DataGrid" Version="12.1.2" />
+    <!-- Avalonia.Diagnostics gibt es fuer Avalonia 12 nicht mehr (letzte Version 11.3.x); die
+         Debug-Referenz brach den Debug-Restore und wurde ohnehin nirgends benutzt. -->
     <!--
       Transitive Abhaengigkeit von Avalonias Linux-/FreeDesktop-Backend. Avalonia 11.2.1 zieht
       0.20.0, das laut Advisory GHSA-xrw6-gwf8-vvr9 verwundbar ist. Direkter Verweis auf eine

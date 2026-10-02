@@ -2,7 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="Apfelmus.Avalonia.Views.SplashWindow"
         Width="420" Height="240"
-        SystemDecorations="None" CanResize="False" ShowInTaskbar="False"
+        WindowDecorations="None" CanResize="False" ShowInTaskbar="False"
         WindowStartupLocation="CenterScreen"
         Icon="avares://Apfelmus.Avalonia/Assets/Images/Apple-icon.png"
         Background="{DynamicResource WindowBackgroundBrush}">
