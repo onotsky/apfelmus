@@ -94,10 +94,10 @@ namespace ApfelmusFramework.Classes.Modified
             set;
         }
 
-        private int uploadFrom;
+        private long uploadFrom;
 
         [XmlAttribute(AttributeName = "uploadfrom")]
-        public int UploadFrom
+        public long UploadFrom
         {
             get { return uploadFrom; }
             set
@@ -107,10 +107,10 @@ namespace ApfelmusFramework.Classes.Modified
             }
         }
 
-        private int actualUploadPosition;
+        private long actualUploadPosition;
 
         [XmlAttribute(AttributeName = "actualuploadposition")]
-        public int ActualUploadPosition
+        public long ActualUploadPosition
         {
             get { return actualUploadPosition; }
             set
@@ -120,10 +120,10 @@ namespace ApfelmusFramework.Classes.Modified
             }
         }
 
-        private int uploadTo;
+        private long uploadTo;
 
         [XmlAttribute(AttributeName = "uploadto")]
-        public int UploadTo
+        public long UploadTo
         {
             get { return uploadTo; }
             set

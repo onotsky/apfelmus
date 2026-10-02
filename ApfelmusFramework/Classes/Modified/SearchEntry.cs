@@ -41,7 +41,7 @@ namespace ApfelmusFramework.Classes.Modified
         }
 
         [XmlAttribute(AttributeName = "size")]
-        public int Size
+        public long Size
         {
             get;
             set;
