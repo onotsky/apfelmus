@@ -51,16 +51,16 @@ Das Tool liest `Config.dat`, schreibt `Config.xml` im selben Ordner und benennt 
 
 ## Installation aus den [Releases](../../releases)
 
-Alle drei Downloads sind **self-contained** – ein separat installiertes .NET wird **nicht** benötigt. In jedem Fall muss ein appleJuice-**Core** laufen, gegen den sich die GUI verbindet (Standard: `localhost:9851`).
+Alle Downloads sind **self-contained** – ein separat installiertes .NET wird **nicht** benötigt. In jedem Fall muss ein appleJuice-**Core** laufen, gegen den sich die GUI verbindet (Standard: `localhost:9851`).
 
 ### Windows – `Apfelmus.Avalonia-<version>-win-x64.zip`
 
 ZIP entpacken und `Apfelmus.Avalonia.exe` starten. Beim ersten Start blendet der SmartScreen ggf. eine Warnung ein → „Weitere Informationen“ → „Trotzdem ausführen“.
 
-### Linux – `Apfelmus.Avalonia-<version>-linux-x64.zip`
+### Linux – `Apfelmus.Avalonia-<version>-linux-x64.zip` bzw. `-linux-arm64.zip` (ARM, z. B. Raspberry Pi)
 
 ```bash
-unzip Apfelmus.Avalonia-*-linux-x64.zip -d apfelmus
+unzip Apfelmus.Avalonia-*-linux-x64.zip -d apfelmus    # bzw. *-linux-arm64.zip
 chmod +x apfelmus/Apfelmus.Avalonia
 ./apfelmus/Apfelmus.Avalonia
 ```
@@ -117,7 +117,7 @@ Das Skript signiert das Bundle ad-hoc über alle Bestandteile (`codesign --deep`
 
 ## Bekannte Einschränkungen
 
-- Dateien müssen aktuell **unter 2 GB** bleiben (`Part.FromPosition` / `FileInformation.Filesize` sind als `int` statt `long` modelliert).
+- **Dateien über 2 GB** werden seit Apfelmus **5.5.13** unterstützt (alle Größen- und Positionsangaben sind 64-Bit). Voraussetzung ist ein Core ab **0.35.185.x** (Beta); ältere Cores sind selbst auf Dateien unter 2 GB begrenzt.
 
 ## Lizenz
 

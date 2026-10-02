@@ -65,7 +65,7 @@ Runtime-switchable Dark/Light theme (`Apfelmus/Logic/ThemeManager.cs`), charcoal
 
 ### Known limitations
 
-- Files must stay **under 2GB** — `Part.FromPosition` / `FileInformation.Filesize` are modeled as `int`, not `long`.
+- Files **over 2GB** are supported since 5.5.13 (requires core 0.35.185.x or later). All sizes/offsets deserialized from the core XML are `long` (or `string` + `ParseLong`). `modified.xml` is deserialized in one piece, so a single `int` attribute overflowing would break the whole update — always use `long` for new size/offset fields.
 - License is **GPL-2.0-or-later** (`LICENSE`) — a deliberate, current choice (not currently forced by any dependency), see README.
 
 ### Git conventions
