@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# release.sh - baut alle vier Plattform-Artefakte, setzt den Tag, erstellt das GitHub-
+# release.sh - baut alle fuenf Plattform-Artefakte, setzt den Tag, erstellt das GitHub-
 # Release und raeumt ueberholte Releases auf. Version kommt zentral aus Directory.Build.props.
 #
 # Voraussetzungen: macOS (fuer die .app-Bundles: sips/iconutil/codesign), dotnet-SDK,
@@ -74,9 +74,10 @@ A_ARM="$(build_mac osx-arm64 | tail -1)"
 A_X64="$(build_mac osx-x64  | tail -1)"
 A_WIN="$(build_selfcontained win-x64   | tail -1)"
 A_LIN="$(build_selfcontained linux-x64 | tail -1)"
+A_LARM="$(build_selfcontained linux-arm64 | tail -1)"
 
 echo "== Artefakte =="
-for f in "$A_WIN" "$A_LIN" "$A_ARM" "$A_X64"; do
+for f in "$A_WIN" "$A_LIN" "$A_LARM" "$A_ARM" "$A_X64"; do
   [ -f "$f" ] || { echo "FEHLER: Artefakt fehlt: $f" >&2; exit 1; }
   echo "  $f"
 done
@@ -104,7 +105,7 @@ else
   NOTES="Apfelmus $VER
 
 Artefakte:
-- win-x64 / linux-x64: self-contained, entpacken und Apfelmus.Avalonia starten.
+- win-x64 / linux-x64 / linux-arm64: self-contained, entpacken und Apfelmus.Avalonia starten.
 - osx-arm64 / osx-x64: .app-Bundle (ad-hoc signiert). Beim ersten Start Rechtsklick -> Oeffnen."
 fi
 
@@ -115,7 +116,7 @@ if gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then
 fi
 echo "== Release $TAG erstellen =="
 gh release create "$TAG" --repo "$REPO" --title "Apfelmus $VER" --notes "$NOTES" \
-  "$A_WIN" "$A_LIN" "$A_ARM" "$A_X64"
+  "$A_WIN" "$A_LIN" "$A_LARM" "$A_ARM" "$A_X64"
 
 # --- Ueberholte Releases aufraeumen (KEEP + aktuelles Tag bleiben) -----------
 echo "== Aufraeumen (behalte: $KEEP $TAG) =="
