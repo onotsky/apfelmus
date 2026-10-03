@@ -14,7 +14,7 @@
 # Umgebungsvariablen (mit Defaults):
 #   AJ_TOKEN_FILE  Pfad zur Token-Datei            (Default: ~/aj_token)
 #   AJ_REPO        GitHub-Repo owner/name          (Default: onotsky/apfelmus)
-#   AJ_KEEP        Tags, die beim Aufraeumen bleiben (Default: "v5.4.0" - Fallback-Release)
+#   AJ_KEEP        Tags, die beim Aufraeumen bleiben (Default: leer - nur das neue Release bleibt)
 #
 set -euo pipefail
 
@@ -23,7 +23,7 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 PROJ="$HERE/Apfelmus.Avalonia/Apfelmus.Avalonia.csproj"
 TOKEN_FILE="${AJ_TOKEN_FILE:-$HOME/aj_token}"
 REPO="${AJ_REPO:-onotsky/apfelmus}"
-KEEP="${AJ_KEEP:-v5.4.0}"        # leerzeichengetrennte Liste geschuetzter Tags
+KEEP="${AJ_KEEP:-}"              # leerzeichengetrennte Liste geschuetzter Tags
 NOTES_FILE=""
 DRY_RUN=0
 
