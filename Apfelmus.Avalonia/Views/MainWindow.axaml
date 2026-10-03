@@ -377,7 +377,12 @@
             <TabItem Header="{DynamicResource t_search}">
                 <DockPanel Margin="4">
                     <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" Margin="4">
-                        <TextBox Width="300" PlaceholderText="{DynamicResource s_placeholder}" Text="{Binding SearchText, Mode=TwoWay}" />
+                        <TextBox Width="300" PlaceholderText="{DynamicResource s_placeholder}" Text="{Binding SearchText, Mode=TwoWay}">
+                            <!-- Enter startet die Suche wie der Suchen-Button. -->
+                            <TextBox.KeyBindings>
+                                <KeyBinding Gesture="Enter" Command="{Binding StartSearchCommand}" />
+                            </TextBox.KeyBindings>
+                        </TextBox>
                         <Button Content="{DynamicResource s_search}" Command="{Binding StartSearchCommand}" />
                         <Button Content="{DynamicResource s_stop}" Command="{Binding StopSearchCommand}" />
                         <Button Content="{DynamicResource s_close}" Command="{Binding CloseSearchTabCommand}" />
