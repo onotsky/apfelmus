@@ -683,7 +683,10 @@ namespace Apfelmus.Avalonia.ViewModels
             if (SelectedDownload != sel) return;
             if (pl?.FileInformation == null || pl.Parts == null) { PartlistImage = null; _partlistCells = null; return; }
 
-            var sources = DownloadSources.Where(u => u.Status == 2 || u.ActualDownloadPosition > u.DownloadFrom).ToList();
+            // Nur echte Uebertragungen (Quellen-Status 7) ueberlagern. Wartende/fertige Quellen behalten
+            // ihren letzten Bereich in DownloadFrom..ActualDownloadPosition - der ist laengst geladen
+            // (gruen) und wuerde sonst erneut orange/gelb als aktiv uebermalt.
+            var sources = DownloadSources.Where(u => u.Status == 7).ToList();
             // "Kurze Seite" verdoppelt (Anzeigebereich 148px); Zeilenzahl ergibt sich aus der einstellbaren
             // Part-Groesse (groesser = dickere, dafuer weniger Zeilen - analog WPF-PartlistRowHeight).
             const int shortSide = 148;
