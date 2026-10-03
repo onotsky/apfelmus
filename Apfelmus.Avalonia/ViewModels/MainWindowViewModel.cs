@@ -620,7 +620,8 @@ namespace Apfelmus.Avalonia.ViewModels
             {
                 d.DownloadedFilesize = d.Ready; d.CheckIfIsOver = d.Ready;
                 d.DownloadRest = (size - ready).ToString();
-                d.Percentages = size > 0 ? Math.Round(ready / (double)size * 100.0, 2) + " %" : "0 %";
+                // Abrunden statt Runden: 99,995 % (z.B. 280 KB Rest bei 5,45 GB) soll nicht als "100 %" erscheinen.
+                d.Percentages = size > 0 ? Math.Floor(ready * 10000.0 / size) / 100.0 + " %" : "0 %";
             }
 
             // Restzeit = verbleibende Bytes / aktuelle Geschwindigkeit (0 = unbekannt -> "-"), wie WPF.

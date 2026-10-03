@@ -45,14 +45,26 @@ namespace Apfelmus.Avalonia.Services
                 return (int)column;
             }
 
-            for (int i = 0; i < parts.Count; i++)
+            // Zwei Durchgaenge: erst fertige Parts, dann alle uebrigen. Nicht fertige Parts bekommen
+            // mindestens eine Zelle - bei grossen Dateien ist eine Zelle mehrere MB breit, und ein
+            // kleiner fehlender Rest (z.B. 280 KB bei 5,45 GB) fiele sonst auf null Breite und der
+            // Balken waere komplett gruen, obwohl noch etwas fehlt.
+            for (int pass = 0; pass < 2; pass++)
             {
-                long from = parts[i].FromPosition;
-                long to = (i + 1 < parts.Count) ? parts[i + 1].FromPosition : fileSize;
-                int fromColumn = ColumnForByte(from);
-                int toColumn = ColumnForByte(to);
-                int color = ColorForType(parts[i].type);
-                for (int c = fromColumn; c < toColumn; c++) { strip[c] = color; cells[c] = parts[i].type; }
+                for (int i = 0; i < parts.Count; i++)
+                {
+                    bool finished = parts[i].type == -1;
+                    if (finished != (pass == 0)) continue;
+                    long from = parts[i].FromPosition;
+                    long to = (i + 1 < parts.Count) ? parts[i + 1].FromPosition : fileSize;
+                    if (to <= from) continue;
+                    int fromColumn = ColumnForByte(from);
+                    int toColumn = ColumnForByte(to);
+                    if (!finished && toColumn <= fromColumn) toColumn = fromColumn + 1;
+                    if (fromColumn >= totalColumns) { fromColumn = totalColumns - 1; toColumn = totalColumns; }
+                    int color = ColorForType(parts[i].type);
+                    for (int c = fromColumn; c < toColumn; c++) { strip[c] = color; cells[c] = parts[i].type; }
+                }
             }
 
             if (activeSources != null)
