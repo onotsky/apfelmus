@@ -64,7 +64,12 @@
             <StackPanel Orientation="Horizontal" Spacing="8">
                 <Image Source="avares://Apfelmus.Avalonia/Assets/Images/Apple-icon.png" Width="18" Height="18" VerticalAlignment="Center" />
                 <TextBlock Text="{DynamicResource ajlink}" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" />
-                <TextBox Width="640" PlaceholderText="ajfsp://file|..." Text="{Binding AjLinkText, Mode=TwoWay}" />
+                <TextBox Width="640" PlaceholderText="ajfsp://file|..." Text="{Binding AjLinkText, Mode=TwoWay}">
+                    <!-- Enter uebertraegt den Link wie der Uebertragen-Button. -->
+                    <TextBox.KeyBindings>
+                        <KeyBinding Gesture="Enter" Command="{Binding TransferAjLinkCommand}" />
+                    </TextBox.KeyBindings>
+                </TextBox>
                 <Button Content="{DynamicResource transfer}" Command="{Binding TransferAjLinkCommand}" />
                 <TextBlock Text="{Binding ConnectionStatus}" VerticalAlignment="Center" Margin="12,0,0,0" Foreground="{DynamicResource AccentBrush}" />
             </StackPanel>
