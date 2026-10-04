@@ -120,4 +120,4 @@ Das Skript signiert das Bundle ad-hoc über alle Bestandteile (`codesign --deep`
 
 ## Lizenz
 
-GPL-2.0-or-later, siehe [LICENSE](LICENSE).
+Copyright (c) D4r3d3v1l (ZSoft). Lizenziert unter GPL-2.0-or-later, siehe [LICENSE](LICENSE).
