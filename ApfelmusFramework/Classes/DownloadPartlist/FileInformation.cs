@@ -1,10 +1,4 @@
-﻿//-----------------------------------------------------------------------
-// <copyright file="FileInformation.cs" company="ZSoft">
-//     Copyright (c) ZSoft.
-// </copyright>
-// <author>daredevil</author>
-//-----------------------------------------------------------------------
-namespace Apfelmus.Classes.DownloadPartlist
+﻿namespace Apfelmus.Classes.DownloadPartlist
 {
     using System;
     using System.Collections.Generic;

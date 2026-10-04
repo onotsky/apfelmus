@@ -1,8 +1,3 @@
-//-----------------------------------------------------------------------
-// <copyright file="LegacyConfig.cs" company="ZSoft">
-//     Copyright (c) ZSoft.
-// </copyright>
-//-----------------------------------------------------------------------
 namespace ConfigMigrator
 {
     using System;

@@ -1,10 +1,4 @@
-﻿//-----------------------------------------------------------------------
-// <copyright file="Session.cs" company="ZSoft">
-//     Copyright (c) ZSoft.
-// </copyright>
-// <author>daredevil</author>
-//-----------------------------------------------------------------------
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 
 namespace ApfelmusFramework.Classes.GetSession
 {

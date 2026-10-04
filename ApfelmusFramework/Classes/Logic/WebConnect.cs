@@ -1,10 +1,4 @@
-﻿//-----------------------------------------------------------------------
-// <copyright file="WebConnect.cs" company="ZSoft">
-//     Copyright (c) ZSoft.
-// </copyright>
-// <author>daredevil</author>
-//-----------------------------------------------------------------------
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;

@@ -1,10 +1,4 @@
-﻿//-----------------------------------------------------------------------
-// <copyright file="Information.cs" company="ZSoft">
-//     Copyright (c) ZSoft.
-// </copyright>
-// <author>daredevil</author>
-//-----------------------------------------------------------------------
-namespace Apfelmus.Classes.Information
+﻿namespace Apfelmus.Classes.Information
 {
     using System;
     using System.Collections.Generic;

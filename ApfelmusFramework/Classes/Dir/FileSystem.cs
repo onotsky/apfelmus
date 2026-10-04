@@ -1,10 +1,4 @@
-﻿//-----------------------------------------------------------------------
-// <copyright file="FileSystem.cs" company="ZSoft">
-//     Copyright (c) ZSoft.
-// </copyright>
-// <author>daredevil</author>
-//-----------------------------------------------------------------------
-namespace Apfelmus.Classes.Dir
+﻿namespace Apfelmus.Classes.Dir
 {
     using System;
     using System.Collections.Generic;

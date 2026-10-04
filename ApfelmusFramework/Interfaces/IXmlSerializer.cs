@@ -1,10 +1,4 @@
-﻿//-----------------------------------------------------------------------
-// <copyright file="IXmlSerializer.cs" company="ZSoft">
-//     Copyright (c) ZSoft.
-// </copyright>
-// <author>daredevil</author>
-//-----------------------------------------------------------------------
-namespace ApfelmusFramework.Interfaces
+﻿namespace ApfelmusFramework.Interfaces
 {
     using System;
     using System.Collections.Generic;

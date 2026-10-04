@@ -1,10 +1,4 @@
-﻿//-----------------------------------------------------------------------
-// <copyright file="Shares.cs" company="ZSoft">
-//     Copyright (c) ZSoft.
-// </copyright>
-// <author>daredevil</author>
-//-----------------------------------------------------------------------
-namespace ApfelmusFramework.Classes.Share
+﻿namespace ApfelmusFramework.Classes.Share
 {
     using System;
     using System.Collections.Generic;

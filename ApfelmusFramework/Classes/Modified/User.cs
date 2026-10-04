@@ -1,10 +1,4 @@
-﻿//-----------------------------------------------------------------------
-// <copyright file="User.cs" company="ZSoft">
-//     Copyright (c) ZSoft.
-// </copyright>
-// <author>daredevil</author>
-//-----------------------------------------------------------------------
-namespace ApfelmusFramework.Classes.Modified
+﻿namespace ApfelmusFramework.Classes.Modified
 {
     using System;
     using System.ComponentModel;

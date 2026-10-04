@@ -1,11 +1,4 @@
-﻿//-----------------------------------------------------------------------
-// <copyright file="CreateMd5Hash.cs" company="ZSoft">
-//     Copyright (c) ZSoft.
-// </copyright>
-// <author>daredevil</author>
-//-----------------------------------------------------------------------
-
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 
 namespace ApfelmusFramework.Classes.Logic

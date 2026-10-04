@@ -1,10 +1,4 @@
-﻿//-----------------------------------------------------------------------
-// <copyright file="GeneralInformation.cs" company="ZSoft">
-//     Copyright (c) ZSoft.
-// </copyright>
-// <author>daredevil</author>
-//-----------------------------------------------------------------------
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 using ApfelmusFramework.Classes.Allgemein;
 
 namespace ApfelmusFramework.Classes.Information

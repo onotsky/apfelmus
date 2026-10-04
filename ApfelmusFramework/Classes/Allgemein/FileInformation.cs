@@ -1,10 +1,4 @@
-﻿//-----------------------------------------------------------------------
-// <copyright file="FileInformation.cs" company="ZSoft">
-//     Copyright (c) ZSoft.
-// </copyright>
-// <author>daredevil</author>
-//-----------------------------------------------------------------------
-namespace ApfelmusFramework.Classes.Allgemein
+﻿namespace ApfelmusFramework.Classes.Allgemein
 {
     using System;
     using System.Collections.Generic;

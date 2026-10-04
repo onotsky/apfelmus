@@ -1,10 +1,4 @@
-﻿//-----------------------------------------------------------------------
-// <copyright file="SettingsDirectory.cs" company="ZSoft">
-//     Copyright (c) ZSoft.
-// </copyright>
-// <author>daredevil</author>
-//-----------------------------------------------------------------------
-namespace ApfelmusFramework.Classes.Settings
+﻿namespace ApfelmusFramework.Classes.Settings
 {
     using System;
     using System.Collections.Generic;

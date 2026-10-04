@@ -1,9 +1,3 @@
-//-----------------------------------------------------------------------
-// <copyright file="ConfigSerializer.cs" company="ZSoft">
-//     Copyright (c) ZSoft.
-// </copyright>
-// <author>daredevil</author>
-//-----------------------------------------------------------------------
 namespace ApfelmusFramework.Classes.Serializer
 {
     using System;

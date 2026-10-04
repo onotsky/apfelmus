@@ -1,10 +1,4 @@
-﻿//-----------------------------------------------------------------------
-// <copyright file="GetSession.cs" company="ZSoft">
-//     Copyright (c) ZSoft.
-// </copyright>
-// <author>daredevil</author>
-//-----------------------------------------------------------------------
-namespace Apfelmus.Classes.GetSession
+﻿namespace Apfelmus.Classes.GetSession
 {
     using System;
     using System.Collections.Generic;

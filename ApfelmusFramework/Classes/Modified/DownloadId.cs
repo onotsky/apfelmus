@@ -1,10 +1,4 @@
 ﻿using System;
-//-----------------------------------------------------------------------
-// <copyright file="DownloadId.cs" company="ZSoft">
-//     Copyright (c) ZSoft.
-// </copyright>
-// <author>daredevil</author>
-//-----------------------------------------------------------------------
 namespace ApfelmusFramework.Classes.Modified
 {
     using System;
