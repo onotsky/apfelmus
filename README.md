@@ -73,13 +73,12 @@ Passendes **DMG** wählen: **`osx-arm64`** für Apple Silicon (M1/M2/M3…), **`
 
 1. DMG per Doppelklick öffnen (mounten).
 2. `Apfelmus.app` daraus nach **Programme** (`/Applications`) ziehen.
-3. Die App ist **nicht bei Apple notarisiert**, deshalb blockiert Gatekeeper den ersten Start. Einmalig **eine** der beiden Varianten:
-   - **Rechtsklick** auf `Apfelmus.app` → **„Öffnen“** → im Dialog nochmals **„Öffnen“**, oder
-   - im Terminal die Quarantäne-Markierung entfernen:
-     ```bash
-     xattr -dr com.apple.quarantine /Applications/Apfelmus.app
-     open /Applications/Apfelmus.app
-     ```
+3. Die App ist **nicht bei Apple notarisiert**, deshalb blockiert Gatekeeper den ersten Start. Einmalig im **Terminal** die Quarantäne-Markierung entfernen:
+   ```bash
+   xattr -dr com.apple.quarantine /Applications/Apfelmus.app
+   open /Applications/Apfelmus.app
+   ```
+   Alternativ ohne Terminal: Start versuchen, dann **Systemeinstellungen → Datenschutz & Sicherheit** → ganz unten bei Apfelmus **„Trotzdem öffnen“**. Der frühere Weg *Rechtsklick → Öffnen* funktioniert seit macOS 15 (Sequoia) **nicht mehr**.
 
 Danach startet die App normal per Doppelklick; die `ajfsp://`-Verknüpfung wird dabei registriert.
 

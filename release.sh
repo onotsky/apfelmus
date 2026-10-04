@@ -107,7 +107,10 @@ else
 
 Artefakte:
 - win-x64 / win-arm64 / linux-x64 / linux-arm64: self-contained, entpacken und Apfelmus.Avalonia starten.
-- osx-arm64 / osx-x64: .app-Bundle (ad-hoc signiert). Beim ersten Start Rechtsklick -> Oeffnen."
+- osx-arm64 / osx-x64: DMG mit Apfelmus.app (nicht notarisiert). Apfelmus.app nach Programme ziehen,
+  dann einmalig im Terminal:
+    xattr -dr com.apple.quarantine /Applications/Apfelmus.app
+  (Rechtsklick -> Oeffnen funktioniert seit macOS 15 nicht mehr.)"
 fi
 
 # --- Release erstellen (ersetzt ein evtl. vorhandenes gleiches Tag-Release) --
