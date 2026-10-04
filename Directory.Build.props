@@ -19,7 +19,7 @@
     <Version>5.5.20</Version>
     <Company>ZSoft</Company>
     <Product>Apfelmus</Product>
-    <Authors>daredevil</Authors>
+    <Authors>D4r3d3v1l</Authors>
     <Copyright>Copyright (c) ZSoft</Copyright>
 
     <!-- InformationalVersion sauber als reines SemVer halten (kein +git-hash-Anhang). -->
