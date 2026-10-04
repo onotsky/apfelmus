@@ -53,9 +53,9 @@ Das Tool liest `Config.dat`, schreibt `Config.xml` im selben Ordner und benennt 
 
 Alle Downloads sind **self-contained** – ein separat installiertes .NET wird **nicht** benötigt. In jedem Fall muss ein appleJuice-**Core** laufen, gegen den sich die GUI verbindet (Standard: `localhost:9851`).
 
-### Windows – `Apfelmus.Avalonia-<version>-win-x64.zip`
+### Windows – `Apfelmus.Avalonia-<version>-win-x64.zip` bzw. `-win-arm64.zip` (ARM, z. B. Snapdragon/Surface)
 
-ZIP entpacken und `Apfelmus.Avalonia.exe` starten. Beim ersten Start blendet der SmartScreen ggf. eine Warnung ein → „Weitere Informationen“ → „Trotzdem ausführen“.
+Auf ARM-Geräten die **win-arm64**-Variante nehmen: Sie läuft nativ statt in der x64-Emulation (schneller, sparsamer). ZIP entpacken und `Apfelmus.Avalonia.exe` starten. Beim ersten Start blendet der SmartScreen ggf. eine Warnung ein → „Weitere Informationen“ → „Trotzdem ausführen“.
 
 ### Linux – `Apfelmus.Avalonia-<version>-linux-x64.zip` bzw. `-linux-arm64.zip` (ARM, z. B. Raspberry Pi)
 
