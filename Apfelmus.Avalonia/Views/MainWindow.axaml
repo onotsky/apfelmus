@@ -285,7 +285,10 @@
                                 </StackPanel>
                             </StackPanel>
                             <Border BorderBrush="{DynamicResource TextSecondaryBrush}" BorderThickness="1">
+                                <!-- Interpolation aus: das kleine Bitmap (240 x Zeilen) soll als scharfe Zellen
+                                     skaliert werden, nicht weichgezeichnet (sonst verwaschene Streifen). -->
                                 <Image Source="{Binding PartlistImage}" Stretch="Fill"
+                                       RenderOptions.BitmapInterpolationMode="None"
                                        PointerMoved="Partlist_PointerMoved" PointerExited="Partlist_PointerExited" />
                             </Border>
                             </DockPanel>

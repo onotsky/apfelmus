@@ -45,26 +45,62 @@ namespace Apfelmus.Avalonia.Services
                 return (int)column;
             }
 
-            // Zwei Durchgaenge: erst fertige Parts, dann alle uebrigen. Nicht fertige Parts bekommen
-            // mindestens eine Zelle - bei grossen Dateien ist eine Zelle mehrere MB breit, und ein
-            // kleiner fehlender Rest (z.B. 280 KB bei 5,45 GB) fiele sonst auf null Breite und der
-            // Balken waere komplett gruen, obwohl noch etwas fehlt.
-            for (int pass = 0; pass < 2; pass++)
+            // Pro Zelle werden die Bytes nach Typ aufsummiert und die Zelle als Mischfarbe gezeichnet:
+            // Anteil fertig -> gruen, Rest in der Farbe des ueberwiegenden fehlenden Typs. Bei grossen
+            // Dateien ist eine Zelle viele MB breit, waehrend der Core in ~0,5-1-MB-Stuecken verstreut
+            // laedt - fast jede Zelle ist gemischt. "Erster/letzter gewinnt" zeigte dann entweder kaum
+            // Gruen (fehlend gewinnt) oder verschluckte kleine Reste (fertig gewinnt).
+            long[] doneBytes = new long[totalColumns];
+            var missingBytes = new Dictionary<int, long>[totalColumns];
+            double bytesPerColumn = fileSize / (double)totalColumns;
+
+            for (int i = 0; i < parts.Count; i++)
             {
-                for (int i = 0; i < parts.Count; i++)
+                long from = Math.Max(0, parts[i].FromPosition);
+                long to = Math.Min(fileSize, (i + 1 < parts.Count) ? parts[i + 1].FromPosition : fileSize);
+                if (to <= from) continue;
+                int type = parts[i].type;
+                int c = Math.Min(totalColumns - 1, ColumnForByte(from));
+                while (c < totalColumns && from < to)
                 {
-                    bool finished = parts[i].type == -1;
-                    if (finished != (pass == 0)) continue;
-                    long from = parts[i].FromPosition;
-                    long to = (i + 1 < parts.Count) ? parts[i + 1].FromPosition : fileSize;
-                    if (to <= from) continue;
-                    int fromColumn = ColumnForByte(from);
-                    int toColumn = ColumnForByte(to);
-                    if (!finished && toColumn <= fromColumn) toColumn = fromColumn + 1;
-                    if (fromColumn >= totalColumns) { fromColumn = totalColumns - 1; toColumn = totalColumns; }
-                    int color = ColorForType(parts[i].type);
-                    for (int c = fromColumn; c < toColumn; c++) { strip[c] = color; cells[c] = parts[i].type; }
+                    long cellEnd = c == totalColumns - 1 ? to : Math.Min(to, (long)Math.Ceiling((c + 1) * bytesPerColumn));
+                    long n = cellEnd - from;
+                    if (n > 0)
+                    {
+                        if (type == -1) doneBytes[c] += n;
+                        else
+                        {
+                            var d = missingBytes[c] ??= new Dictionary<int, long>();
+                            d[type] = d.TryGetValue(type, out long v) ? v + n : n;
+                        }
+                        from = cellEnd;
+                    }
+                    c++;
                 }
+            }
+
+            int green = ColorForType(-1);
+            for (int c = 0; c < totalColumns; c++)
+            {
+                var missing = missingBytes[c];
+                if (missing == null)
+                {
+                    // Zelle ohne fehlende Bytes: fertig (oder nicht abgedeckt -> wie fehlend behandeln).
+                    strip[c] = doneBytes[c] > 0 ? green : ColorForType(0);
+                    cells[c] = doneBytes[c] > 0 ? -1 : 0;
+                    continue;
+                }
+                long missingTotal = 0; int mainType = 0; long mainBytes = -1;
+                foreach (var kv in missing)
+                {
+                    missingTotal += kv.Value;
+                    if (kv.Value > mainBytes) { mainBytes = kv.Value; mainType = kv.Key; }
+                }
+                double doneFraction = doneBytes[c] / (double)(doneBytes[c] + missingTotal);
+                // Unvollstaendige Zellen hoechstens zu 75 % gruen mischen, damit auch ein kleiner
+                // Rest (z.B. 280 KB in einer 3,5-MB-Zelle) sichtbar von "komplett fertig" abweicht.
+                strip[c] = Mix(ColorForType(mainType), green, Math.Min(doneFraction, 0.75));
+                cells[c] = mainType;
             }
 
             if (activeSources != null)
@@ -103,6 +139,13 @@ namespace Apfelmus.Avalonia.Services
             double t = (clamped - 1) / (double)(MaxGradientSources - 1);
             byte ch = (byte)Math.Round(220 - (t * 190));
             return Argb(255, ch, ch, 255);                     // je mehr Quellen, desto dunkler blau
+        }
+
+        /// <summary>Lineare Mischung zweier ARGB-Farben (t = 0 -> a, t = 1 -> b).</summary>
+        private static int Mix(int a, int b, double t)
+        {
+            byte Ch(int shift) => (byte)Math.Round(((a >> shift) & 0xFF) * (1 - t) + ((b >> shift) & 0xFF) * t);
+            return Argb(255, Ch(16), Ch(8), Ch(0));
         }
 
         // Bgra8888: int little-endian ergibt Bytefolge B,G,R,A.
