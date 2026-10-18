@@ -66,7 +66,8 @@ namespace Apfelmus.Avalonia.Services
         }
 
         // Vergleicht zwei Versionsstrings ("5.3.20") numerisch; fehlende Stellen zaehlen als 0.
-        private static int Compare(string a, string b)
+        // Auch vom CoreUpdateChecker genutzt (vierstellige Core-Versionen).
+        internal static int Compare(string a, string b)
         {
             var pa = a.Split('.');
             var pb = b.Split('.');

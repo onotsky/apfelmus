@@ -77,6 +77,7 @@ namespace Apfelmus.Avalonia.ViewModels
             CoreExitCommand = new RelayCommand(() => _client.ExitCoreAsync());
             CheckForUpdatesCommand = new RelayCommand(() => CheckForUpdatesAsync(manual: true));
             OpenLatestReleaseCommand = new RelayCommand(() => { OpenLatestRelease(); return Task.CompletedTask; });
+            OpenCoreReleaseCommand = new RelayCommand(() => { OpenCoreRelease(); return Task.CompletedTask; });
             ApplyDarkThemeCommand = new RelayCommand(() => ApplyTheme(ThemeNames.Dark));
             ApplyLightThemeCommand = new RelayCommand(() => ApplyTheme(ThemeNames.Light));
             GermanCommand = new RelayCommand(() => ApplyLanguage("de"));
@@ -217,6 +218,7 @@ namespace Apfelmus.Avalonia.ViewModels
         public RelayCommand CoreExitCommand { get; }
         public RelayCommand CheckForUpdatesCommand { get; }
         public RelayCommand OpenLatestReleaseCommand { get; }
+        public RelayCommand OpenCoreReleaseCommand { get; }
         public RelayCommand ApplyDarkThemeCommand { get; }
         public RelayCommand ApplyLightThemeCommand { get; }
         public RelayCommand GermanCommand { get; }
@@ -421,6 +423,38 @@ namespace Apfelmus.Avalonia.ViewModels
             catch { /* kein Browser verfuegbar -> ignorieren */ }
         }
         public string CoreVersion { get => _coreVersion; private set => SetProperty(ref _coreVersion, value); }
+
+        // ---- Core-Versionspruefung (GitHub-Releases applejuicenetz/core, inkl. Betas) ----
+        private bool _coreUpdateChecked;
+        private bool _coreUpdateAvailable;
+        private string _coreUpdateHint = string.Empty;
+        private string _coreReleaseUrl = string.Empty;
+
+        /// <summary>True, wenn ein neuerer Core (stabil oder Beta) verfuegbar ist.</summary>
+        public bool CoreUpdateAvailable { get => _coreUpdateAvailable; private set => SetProperty(ref _coreUpdateAvailable, value); }
+        /// <summary>Klickbarer Hinweis auf dem Start-Tab, z.B. "0.35.186.1 (Beta) verfuegbar".</summary>
+        public string CoreUpdateHint { get => _coreUpdateHint; private set => SetProperty(ref _coreUpdateHint, value); }
+
+        /// <summary>Einmal pro Sitzung, sobald die Core-Version bekannt ist (schont das GitHub-API-Limit).</summary>
+        private async Task CheckCoreUpdateAsync(string coreVersion)
+        {
+            _coreUpdateChecked = true;
+            var res = await CoreUpdateChecker.CheckAsync(coreVersion);
+            if (res == null || !res.IsNewer) { CoreUpdateAvailable = false; return; }
+            _coreReleaseUrl = res.HtmlUrl;
+            string version = res.IsPrerelease ? res.LatestVersion + " " + LanguageManager.Get("core_upd_beta") : res.LatestVersion;
+            CoreUpdateHint = string.Format(LanguageManager.Get("core_upd_available"), version);
+            CoreUpdateAvailable = true;
+        }
+
+        private void OpenCoreRelease()
+        {
+            string url = string.IsNullOrWhiteSpace(_coreReleaseUrl)
+                ? "https://applejuicenetz.github.io/downloads/applejuice-core/"
+                : _coreReleaseUrl;
+            try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo { FileName = url, UseShellExecute = true }); }
+            catch { /* kein Browser verfuegbar -> ignorieren */ }
+        }
         public int Users { get => _users; private set => SetProperty(ref _users, value); }
         public int Files { get => _files; private set => SetProperty(ref _files, value); }
         public int OpenConnections { get => _openConnections; private set => SetProperty(ref _openConnections, value); }
@@ -545,6 +579,7 @@ namespace Apfelmus.Avalonia.ViewModels
             if (info.GeneralInformation != null)
             {
                 CoreVersion = info.GeneralInformation.Version ?? "-";
+                if (!_coreUpdateChecked && CoreVersion != "-") _ = CheckCoreUpdateAsync(CoreVersion);
                 if (!string.IsNullOrEmpty(info.GeneralInformation.FileSystem?.Seperator))
                     _fileSeparator = info.GeneralInformation.FileSystem.Seperator;
             }

@@ -16,6 +16,8 @@
     <sys:String x:Key="upd_available">Aggiornamento {0} disponibile</sys:String>
     <sys:String x:Key="upd_current">Hai la versione più recente.</sys:String>
     <sys:String x:Key="upd_failed">Controllo aggiornamenti non riuscito (nessuna connessione?).</sys:String>
+    <sys:String x:Key="core_upd_available">Nuovo core {0} disponibile</sys:String>
+    <sys:String x:Key="core_upd_beta">(beta)</sys:String>
 
     <sys:String x:Key="ajlink">AJLink:</sys:String>
     <sys:String x:Key="transfer">Trasferisci</sys:String>
