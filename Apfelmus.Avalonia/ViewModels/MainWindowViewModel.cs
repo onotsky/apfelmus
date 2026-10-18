@@ -425,7 +425,7 @@ namespace Apfelmus.Avalonia.ViewModels
         public string CoreVersion { get => _coreVersion; private set => SetProperty(ref _coreVersion, value); }
 
         // ---- Core-Versionspruefung (GitHub-Releases applejuicenetz/core, inkl. Betas) ----
-        private bool _coreUpdateChecked;
+        private string _coreUpdateCheckedFor = string.Empty; // Core-Version, fuer die zuletzt geprueft wurde
         private bool _coreUpdateAvailable;
         private string _coreUpdateHint = string.Empty;
         private string _coreReleaseUrl = string.Empty;
@@ -435,12 +435,17 @@ namespace Apfelmus.Avalonia.ViewModels
         /// <summary>Klickbarer Hinweis auf dem Start-Tab, z.B. "0.35.186.1 (Beta) verfuegbar".</summary>
         public string CoreUpdateHint { get => _coreUpdateHint; private set => SetProperty(ref _coreUpdateHint, value); }
 
-        /// <summary>Einmal pro Sitzung, sobald die Core-Version bekannt ist (schont das GitHub-API-Limit).</summary>
+        /// <summary>
+        /// Einmal je Core-Version (schont das GitHub-API-Limit): beim Verbinden und erneut, wenn der Core
+        /// im laufenden Betrieb ausgetauscht wurde - sonst bliebe der Hinweis nach dem Update stehen.
+        /// </summary>
         private async Task CheckCoreUpdateAsync(string coreVersion)
         {
-            _coreUpdateChecked = true;
+            _coreUpdateCheckedFor = coreVersion;
+            CoreUpdateAvailable = false; // alten Hinweis sofort ausblenden, bis das neue Ergebnis da ist
             var res = await CoreUpdateChecker.CheckAsync(coreVersion);
-            if (res == null || !res.IsNewer) { CoreUpdateAvailable = false; return; }
+            if (coreVersion != CoreVersion) return; // inzwischen erneut gewechselt -> dortige Pruefung gilt
+            if (res == null || !res.IsNewer) return;
             _coreReleaseUrl = res.HtmlUrl;
             string version = res.IsPrerelease ? res.LatestVersion + " " + LanguageManager.Get("core_upd_beta") : res.LatestVersion;
             CoreUpdateHint = string.Format(LanguageManager.Get("core_upd_available"), version);
@@ -579,7 +584,7 @@ namespace Apfelmus.Avalonia.ViewModels
             if (info.GeneralInformation != null)
             {
                 CoreVersion = info.GeneralInformation.Version ?? "-";
-                if (!_coreUpdateChecked && CoreVersion != "-") _ = CheckCoreUpdateAsync(CoreVersion);
+                if (CoreVersion != "-" && CoreVersion != _coreUpdateCheckedFor) _ = CheckCoreUpdateAsync(CoreVersion);
                 if (!string.IsNullOrEmpty(info.GeneralInformation.FileSystem?.Seperator))
                     _fileSeparator = info.GeneralInformation.FileSystem.Seperator;
             }
