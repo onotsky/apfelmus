@@ -16,8 +16,9 @@
     <sys:String x:Key="upd_available">Update {0} available</sys:String>
     <sys:String x:Key="upd_current">You have the latest version.</sys:String>
     <sys:String x:Key="upd_failed">Update check failed (no connection?).</sys:String>
-    <sys:String x:Key="core_upd_available">New core {0} available</sys:String>
-    <sys:String x:Key="core_upd_beta">(beta)</sys:String>
+    <sys:String x:Key="core_upd_available">↑ {0}</sys:String>
+    <sys:String x:Key="core_upd_beta">Beta</sys:String>
+    <sys:String x:Key="core_upd_tooltip">New core available – click to open the release page</sys:String>
 
     <sys:String x:Key="ajlink">AJLink:</sys:String>
     <sys:String x:Key="transfer">Transfer</sys:String>

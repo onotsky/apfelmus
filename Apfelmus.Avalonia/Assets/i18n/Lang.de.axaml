@@ -16,8 +16,9 @@
     <sys:String x:Key="upd_available">Update {0} verfügbar</sys:String>
     <sys:String x:Key="upd_current">Sie haben die neueste Version.</sys:String>
     <sys:String x:Key="upd_failed">Update-Prüfung fehlgeschlagen (keine Verbindung?).</sys:String>
-    <sys:String x:Key="core_upd_available">Neuer Core {0} verfügbar</sys:String>
-    <sys:String x:Key="core_upd_beta">(Beta)</sys:String>
+    <sys:String x:Key="core_upd_available">↑ {0}</sys:String>
+    <sys:String x:Key="core_upd_beta">Beta</sys:String>
+    <sys:String x:Key="core_upd_tooltip">Neuer Core verfügbar – Klick öffnet die Release-Seite</sys:String>
 
     <sys:String x:Key="ajlink">AJLink:</sys:String>
     <sys:String x:Key="transfer">Übertragen</sys:String>

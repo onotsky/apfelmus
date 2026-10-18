@@ -110,7 +110,7 @@
             <TabItem Header="{DynamicResource t_start}">
                 <ScrollViewer>
                     <WrapPanel Margin="12">
-                        <Border Classes="card" Width="280" Height="140">
+                        <Border Classes="card" Width="280" Height="110">
                             <StackPanel Spacing="4">
                                 <TextBlock Text="{DynamicResource c_client}" Classes="cardheader" />
                                 <Grid ColumnDefinitions="120,*" RowDefinitions="Auto,Auto,Auto">
@@ -118,11 +118,11 @@
                                     <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding GuiVersion}" Classes="val" />
                                     <TextBlock Grid.Row="1" Grid.Column="0" Text="{DynamicResource c_core}" Classes="lbl" />
                                     <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding CoreVersion}" Classes="val" />
-                                    <!-- Neuerer Core (stabil oder Beta) auf GitHub -> oeffnet die Release-Seite. -->
-                                    <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,6,0,0"
-                                            Content="{Binding CoreUpdateHint}" Command="{Binding OpenCoreReleaseCommand}"
-                                            IsVisible="{Binding CoreUpdateAvailable}" Background="{DynamicResource AccentBrush}"
-                                            Foreground="White" Padding="8,2" Cursor="Hand" />
+                                    <!-- Neuerer Core (stabil oder Beta) auf GitHub: dezenter Link unter der
+                                         Core-Version, oeffnet die Release-Seite. -->
+                                    <Button Grid.Row="2" Grid.Column="1" Classes="link" Content="{Binding CoreUpdateHint}"
+                                            Command="{Binding OpenCoreReleaseCommand}" IsVisible="{Binding CoreUpdateAvailable}"
+                                            ToolTip.Tip="{DynamicResource core_upd_tooltip}" />
                                 </Grid>
                             </StackPanel>
                         </Border>
