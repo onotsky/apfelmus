@@ -46,6 +46,7 @@
     <sys:String x:Key="c_servername">Server name</sys:String>
     <sys:String x:Key="c_connectedsince">Connected since</sys:String>
     <sys:String x:Key="c_message">Message</sys:String>
+    <sys:String x:Key="c_news">News</sys:String>
 
     <sys:String x:Key="d_continue">Continue</sys:String>
     <sys:String x:Key="d_break">Pause</sys:String>

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -235,6 +236,7 @@ namespace Apfelmus.Avalonia.Views
                 vm.PropertyChanged -= OnVmPropertyChanged;
                 vm.PropertyChanged += OnVmPropertyChanged;
                 SetWelcomeInlines(vm.WelcomeMessage);
+                SetNewsInlines(vm.NewsHtml);
 
                 // Fenstergroesse wie zuletzt geschlossen (DataContext wird VOR dem Anzeigen gesetzt).
                 if (!_sizeRestored)
@@ -254,6 +256,94 @@ namespace Apfelmus.Avalonia.Views
         {
             if (e.PropertyName == nameof(MainWindowViewModel.WelcomeMessage) && DataContext is MainWindowViewModel vm)
                 SetWelcomeInlines(vm.WelcomeMessage);
+            else if (e.PropertyName == nameof(MainWindowViewModel.NewsHtml) && DataContext is MainWindowViewModel nvm)
+                SetNewsInlines(nvm.NewsHtml);
+        }
+
+        // Rendert die News-Seite (einfaches HTML): <p>/<ul>/<li>/<br> als Zeilen bzw. Aufzaehlung,
+        // <a href> als klickbarer Link (oeffnet den Browser), <b>/<i> als Schnitt; Rest wird entfernt.
+        private void SetNewsInlines(string? html)
+        {
+            var tb = this.FindControl<TextBlock>("NewsText");
+            if (tb == null) return;
+            var inlines = new InlineCollection();
+            string body = html ?? string.Empty;
+            int bi = body.IndexOf("<body", StringComparison.OrdinalIgnoreCase);
+            if (bi >= 0) body = body.Substring(bi);
+            bool bold = false, italic = false;
+            string? href = null;
+            var linkText = new System.Text.StringBuilder();
+
+            void Break()
+            {
+                // Hoechstens einen Umbruch am Stueck, nie am Anfang
+                if (inlines.Count > 0 && inlines[inlines.Count - 1] is not LineBreak) inlines.Add(new LineBreak());
+            }
+
+            foreach (var token in System.Text.RegularExpressions.Regex.Split(body, "(<[^>]+>)"))
+            {
+                if (string.IsNullOrEmpty(token)) continue;
+                if (token[0] == '<' && token[token.Length - 1] == '>')
+                {
+                    var m = System.Text.RegularExpressions.Regex.Match(token, "^</?\\s*([a-zA-Z0-9]+)");
+                    if (!m.Success) continue;
+                    string name = m.Groups[1].Value.ToLowerInvariant();
+                    bool closing = token.StartsWith("</");
+                    switch (name)
+                    {
+                        case "br": if (!closing) inlines.Add(new LineBreak()); break;
+                        case "p": case "ul": if (closing) { Break(); inlines.Add(new LineBreak()); } break;
+                        case "li":
+                            if (!closing) inlines.Add(new Run("\u2022 "));
+                            else Break();
+                            break;
+                        case "b": case "strong": bold = !closing; break;
+                        case "i": case "em": italic = !closing; break;
+                        case "a":
+                            if (!closing)
+                            {
+                                var hm = System.Text.RegularExpressions.Regex.Match(token, "href\\s*=\\s*[\"']([^\"']+)[\"']", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                                href = hm.Success ? System.Net.WebUtility.HtmlDecode(hm.Groups[1].Value) : null;
+                                linkText.Clear();
+                            }
+                            else
+                            {
+                                string label = linkText.ToString().Trim();
+                                string? url = href;
+                                href = null;
+                                if (label.Length == 0) break;
+                                if (url == null || !Uri.TryCreate(url, UriKind.Absolute, out var uri)
+                                    || (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
+                                {
+                                    inlines.Add(new Run(label));
+                                    break;
+                                }
+                                var btn = new Button { Content = label, Classes = { "link" } };
+                                ToolTip.SetTip(btn, url);
+                                btn.Click += (_, _) =>
+                                {
+                                    try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo { FileName = url, UseShellExecute = true }); }
+                                    catch { /* kein Browser verfuegbar -> ignorieren */ }
+                                };
+                                inlines.Add(new InlineUIContainer(btn));
+                            }
+                            break;
+                    }
+                }
+                else
+                {
+                    string text = System.Net.WebUtility.HtmlDecode(token);
+                    if (href != null) { linkText.Append(text); continue; }
+                    text = System.Text.RegularExpressions.Regex.Replace(text, "\\s+", " ");
+                    if (string.IsNullOrWhiteSpace(text)) continue;
+                    inlines.Add(new Run(text.Trim())
+                    {
+                        FontWeight = bold ? FontWeight.Bold : FontWeight.Normal,
+                        FontStyle = italic ? FontStyle.Italic : FontStyle.Normal,
+                    });
+                }
+            }
+            tb.Inlines = inlines;
         }
 
         // Rendert die Servernachricht: das einfache HTML (<b>/<strong>, <i>/<em>, <br>) wird in

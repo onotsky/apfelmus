@@ -168,6 +168,16 @@
                                 </ScrollViewer>
                             </StackPanel>
                         </Border>
+
+                        <!-- News-Seite des appleJuice-Projekts, passend zur Core-Version (Inlines im Code-Behind). -->
+                        <Border Classes="card" Width="420" Height="230">
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="{DynamicResource c_news}" Classes="cardheader" />
+                                <ScrollViewer Height="180">
+                                    <TextBlock x:Name="NewsText" Classes="val" TextWrapping="Wrap" />
+                                </ScrollViewer>
+                            </StackPanel>
+                        </Border>
                     </WrapPanel>
                 </ScrollViewer>
             </TabItem>

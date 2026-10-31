@@ -422,6 +422,8 @@ namespace Apfelmus.Avalonia.ViewModels
             try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo { FileName = url, UseShellExecute = true }); }
             catch { /* kein Browser verfuegbar -> ignorieren */ }
         }
+        public string NewsHtml { get => _newsHtml; private set => SetProperty(ref _newsHtml, value); }
+        private string _newsHtml = string.Empty;
         public string CoreVersion { get => _coreVersion; private set => SetProperty(ref _coreVersion, value); }
 
         // ---- Core-Versionspruefung (GitHub-Releases applejuicenetz/core, inkl. Betas) ----
@@ -429,6 +431,7 @@ namespace Apfelmus.Avalonia.ViewModels
         private bool _coreUpdateAvailable;
         private string _coreUpdateHint = string.Empty;
         private string _coreReleaseUrl = string.Empty;
+        private string _newsLoadedFor = string.Empty; // Core-Version, fuer die die News zuletzt geladen wurden
 
         /// <summary>True, wenn ein neuerer Core (stabil oder Beta) verfuegbar ist.</summary>
         public bool CoreUpdateAvailable { get => _coreUpdateAvailable; private set => SetProperty(ref _coreUpdateAvailable, value); }
@@ -439,6 +442,13 @@ namespace Apfelmus.Avalonia.ViewModels
         /// Einmal je Core-Version (schont das GitHub-API-Limit): beim Verbinden und erneut, wenn der Core
         /// im laufenden Betrieb ausgetauscht wurde - sonst bliebe der Hinweis nach dem Update stehen.
         /// </summary>
+        private async Task LoadNewsAsync(string coreVersion)
+        {
+            var html = await NewsFetcher.FetchAsync(coreVersion);
+            if (coreVersion != CoreVersion) return; // Core inzwischen gewechselt -> dortiger Abruf gilt
+            if (html != null) NewsHtml = html;
+        }
+
         private async Task CheckCoreUpdateAsync(string coreVersion)
         {
             _coreUpdateCheckedFor = coreVersion;
@@ -585,6 +595,7 @@ namespace Apfelmus.Avalonia.ViewModels
             {
                 CoreVersion = info.GeneralInformation.Version ?? "-";
                 if (CoreVersion != "-" && CoreVersion != _coreUpdateCheckedFor) _ = CheckCoreUpdateAsync(CoreVersion);
+                if (CoreVersion != "-" && CoreVersion != _newsLoadedFor) { _newsLoadedFor = CoreVersion; _ = LoadNewsAsync(CoreVersion); }
                 if (!string.IsNullOrEmpty(info.GeneralInformation.FileSystem?.Seperator))
                     _fileSeparator = info.GeneralInformation.FileSystem.Seperator;
             }
