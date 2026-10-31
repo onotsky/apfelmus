@@ -47,11 +47,29 @@ namespace ApfelmusFramework.Classes.Logic
         #endregion
         #region Methods
 
+        /// <summary>
+        /// Baut die GET-Anfrage. Steuerzeichen (v.a. CR/LF) in Pfad/Query oder Hostname werden
+        /// abgewiesen: sonst koennten Werte aus Ordnernamen, Links oder Eingaben eigene Header bzw.
+        /// eine zweite Anfrage einschleusen (HTTP Request Splitting).
+        /// </summary>
+        private string BuildRequest(string anfrage)
+        {
+            if (anfrage == null || HasControlChars(anfrage) || HasControlChars(serverName))
+                throw new ArgumentException("Ungueltige Zeichen in der Core-Anfrage");
+
+            return string.Format("GET {0} HTTP/1.1\r\nHost: {1}\r\nConnection: Close\r\n\r\n", anfrage, serverName);
+        }
+
+        private static bool HasControlChars(string value)
+        {
+            return value != null && value.Any(c => c < 0x20 || c == 0x7F);
+        }
+
         public void StartXMLFunction(string anfrage)
         {
             try
             {
-                string request = string.Format("GET {0} HTTP/1.1\r\nHost: {1}\r\nConnection: Close\r\n\r\n", anfrage, serverName);
+                string request = BuildRequest(anfrage);
 
                 byte[] bytesSent = Encoding.ASCII.GetBytes(request);
 
@@ -75,7 +93,7 @@ namespace ApfelmusFramework.Classes.Logic
         {
             try
             {
-                string request = string.Format("GET {0} HTTP/1.1\r\nHost: {1}\r\nConnection: Close\r\n\r\n", anfrage, serverName);
+                string request = BuildRequest(anfrage);
                 if (!useZip)
                     request = request.Replace("&mode=zip", string.Empty);
 
@@ -153,7 +171,7 @@ namespace ApfelmusFramework.Classes.Logic
         {
             try
             {
-                string request = string.Format("GET {0} HTTP/1.1\r\nHost: {1}\r\nConnection: Close\r\n\r\n", anfrage, serverName);
+                string request = BuildRequest(anfrage);
                 byte[] bytesSent = Encoding.ASCII.GetBytes(request);
                 byte[] bytesReceived = new byte[0x200];
                 StringBuilder response = new StringBuilder();
@@ -230,7 +248,7 @@ namespace ApfelmusFramework.Classes.Logic
         {
             try
             {
-                string request = String.Format("GET {0} HTTP/1.1\r\nHost: {1}\r\nConnection: Close\r\n\r\n", anfrage, serverName);
+                string request = BuildRequest(anfrage);
                 byte[] bytesSent = Encoding.ASCII.GetBytes(request);
                 byte[] bytesReceived = new byte[0x200];
                 List<string> serverList = new List<string>();

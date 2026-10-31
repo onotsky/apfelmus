@@ -19,7 +19,18 @@ namespace ApfelmusFramework.Classes.Serializer
         public static void SerializeToFile(Config.Config config)
         {
             Directory.CreateDirectory(path);
-            using (FileStream fileStream = new FileStream(xmlFileName, FileMode.Create, FileAccess.Write))
+
+            // Die Config enthaelt den MD5-Wert des Core-Passworts, der dem Core als Zugangsdaten reicht.
+            // Unter macOS/Linux daher nur fuer den Benutzer lesbar (0600) - auch bestehende Dateien.
+            var options = new FileStreamOptions { Mode = FileMode.Create, Access = FileAccess.Write };
+            if (!OperatingSystem.IsWindows())
+            {
+                options.UnixCreateMode = UnixFileMode.UserRead | UnixFileMode.UserWrite;
+                if (File.Exists(xmlFileName))
+                    File.SetUnixFileMode(xmlFileName, UnixFileMode.UserRead | UnixFileMode.UserWrite);
+            }
+
+            using (FileStream fileStream = new FileStream(xmlFileName, options))
             {
                 xmlSerializer.Serialize(fileStream, config);
             }

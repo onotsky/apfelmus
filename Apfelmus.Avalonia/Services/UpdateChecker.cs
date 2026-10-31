@@ -45,7 +45,7 @@ namespace Apfelmus.Avalonia.Services
                 return new UpdateResult
                 {
                     LatestVersion = latest,
-                    HtmlUrl = url,
+                    HtmlUrl = IsGitHubUrl(url) ? url : string.Empty,
                     IsNewer = Compare(latest, currentVersion) > 0,
                 };
             }
@@ -53,6 +53,15 @@ namespace Apfelmus.Avalonia.Services
             {
                 return null;
             }
+        }
+
+        // Die Release-URL wird per Shell geoeffnet - nur https://github.com zulassen, sonst (leer)
+        // greift die fest hinterlegte Release-Seite. Auch vom CoreUpdateChecker genutzt.
+        internal static bool IsGitHubUrl(string url)
+        {
+            return Uri.TryCreate(url, UriKind.Absolute, out var uri)
+                && uri.Scheme == Uri.UriSchemeHttps
+                && uri.Host.Equals("github.com", StringComparison.OrdinalIgnoreCase);
         }
 
         // Tags kommen als "v5.3.20" (aktuell) oder frueher "avalonia-v5.3.15" - alles vor der

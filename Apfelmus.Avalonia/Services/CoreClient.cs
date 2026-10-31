@@ -51,7 +51,7 @@ namespace Apfelmus.Avalonia.Services
         {
             string q = string.IsNullOrEmpty(path)
                 ? "/xml/directory.xml?password=" + _config.Password + "&mode=zip"
-                : "/xml/directory.xml?directory=" + path!.Replace(" ", "%20") + "&password=" + _config.Password + "&mode=zip";
+                : "/xml/directory.xml?directory=" + Uri.EscapeDataString(path!) + "&password=" + _config.Password + "&mode=zip";
             return QueryAsync(q);
         }
 
@@ -61,7 +61,7 @@ namespace Apfelmus.Avalonia.Services
             var sb = new System.Text.StringBuilder("/function/setsettings?countshares=" + shares.Count);
             for (int i = 0; i < shares.Count; i++)
             {
-                sb.Append("&sharedirectory").Append(i + 1).Append('=').Append((shares[i].path ?? string.Empty).Replace(" ", "%20"));
+                sb.Append("&sharedirectory").Append(i + 1).Append('=').Append(Uri.EscapeDataString(shares[i].path ?? string.Empty));
                 sb.Append("&sharesub").Append(i + 1).Append('=').Append(shares[i].sub ? "true" : "false");
             }
             sb.Append("&password=").Append(_config.Password);
@@ -145,7 +145,7 @@ namespace Apfelmus.Avalonia.Services
             => Fire("/function/cleandownloadlist?password=" + _config.Password);
 
         public Task RenameDownloadAsync(int id, string newName)
-            => Fire("/function/renamedownload?id=" + id + "&name=" + (newName ?? string.Empty).Replace(" ", "%20") + "&password=" + _config.Password);
+            => Fire("/function/renamedownload?id=" + id + "&name=" + Uri.EscapeDataString(newName ?? string.Empty) +"&password=" + _config.Password);
 
         /// <summary>Setzt das Zielverzeichnis eines Downloads (Pfad auf dem Core-Rechner).</summary>
         public Task SetTargetDirAsync(int id, string dir)
@@ -188,8 +188,11 @@ namespace Apfelmus.Avalonia.Services
                     if (list?.Server == null) return;
                     foreach (var s in list.Server)
                     {
+                        // Die Liste kommt von extern (unverschluesselt) -> nur Server-Links durchlassen
+                        // und wie alle anderen Links einheitlich kodieren (kein Parameter-Einschleusen).
+                        if (s?.Link == null || !s.Link.StartsWith("ajfsp://server|", StringComparison.OrdinalIgnoreCase)) continue;
                         using var web = new WebConnect(_config.HostName, _config.Port);
-                        web.StartXMLFunction("/function/processlink?link=" + s.Link + "&password=" + _config.Password);
+                        web.StartXMLFunction("/function/processlink?link=" + Uri.EscapeDataString(Uri.UnescapeDataString(s.Link)) + "&password=" + _config.Password);
                     }
                 }
                 catch (Exception) { }

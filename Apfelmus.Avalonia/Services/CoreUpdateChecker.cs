@@ -48,7 +48,7 @@ namespace Apfelmus.Avalonia.Services
                     best = new CoreUpdateResult
                     {
                         LatestVersion = tag,
-                        HtmlUrl = rel.TryGetProperty("html_url", out var u) ? u.GetString() ?? "" : "",
+                        HtmlUrl = rel.TryGetProperty("html_url", out var u) && UpdateChecker.IsGitHubUrl(u.GetString() ?? "") ? u.GetString()! : "",
                         IsPrerelease = rel.TryGetProperty("prerelease", out var p) && p.GetBoolean(),
                         IsNewer = UpdateChecker.Compare(tag, currentCoreVersion!) > 0,
                     };

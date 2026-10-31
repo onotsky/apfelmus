@@ -37,7 +37,11 @@ namespace Apfelmus.Avalonia.Services
         {
             try
             {
-                string path = Path.Combine(Path.GetTempPath(), "apfelmus.singleinstance.lock");
+                // Pro Benutzer statt im (unter Linux geteilten) /tmp: dort koennte ein anderer Benutzer
+                // die Datei vorab anlegen/sperren oder per Symlink umlenken.
+                string dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Apfelmus");
+                Directory.CreateDirectory(dir);
+                string path = Path.Combine(dir, "singleinstance.lock");
                 _lock = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
                 return true;
             }
@@ -61,7 +65,7 @@ namespace Apfelmus.Avalonia.Services
             {
                 try
                 {
-                    using var client = new NamedPipeClientStream(".", PipeName, PipeDirection.Out);
+                    using var client = new NamedPipeClientStream(".", PipeName, PipeDirection.Out, PipeOptions.CurrentUserOnly);
                     client.Connect(400);
                     using var w = new StreamWriter(client) { AutoFlush = true };
                     w.WriteLine(link ?? string.Empty);
@@ -80,12 +84,14 @@ namespace Apfelmus.Avalonia.Services
             {
                 try
                 {
+                    // CurrentUserOnly: nur Prozesse desselben Benutzers duerfen Links einspeisen
+                    // (sonst koennte jeder lokale Benutzer Downloads im eigenen Core ausloesen).
                     using var server = new NamedPipeServerStream(PipeName, PipeDirection.In, 1,
-                        PipeTransmissionMode.Byte, PipeOptions.None);
+                        PipeTransmissionMode.Byte, PipeOptions.CurrentUserOnly);
                     server.WaitForConnection();
                     using var r = new StreamReader(server);
                     string? link = r.ReadLine();
-                    if (!string.IsNullOrWhiteSpace(link))
+                    if (!string.IsNullOrWhiteSpace(link) && link.StartsWith("ajfsp://", StringComparison.OrdinalIgnoreCase))
                     {
                         var cb = _onLink;
                         if (cb != null) cb(link!);

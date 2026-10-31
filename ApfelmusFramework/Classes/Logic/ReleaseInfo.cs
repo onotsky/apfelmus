@@ -43,6 +43,14 @@ namespace ApfelmusFramework.Classes.Logic
             string ajfsp = "ajfsp://file%7C" + Uri.EscapeDataString(fileName) + "%7C" + hash + "%7C" + size + "/";
             string url = host.Replace("%s", ajfsp);
 
+            // Der Host ist frei konfigurierbar und die URL wird per Shell geoeffnet - nur echte
+            // Web-Adressen zulassen (kein file://, keine Programmpfade o.ae.).
+            if (!Uri.TryCreate(url, UriKind.Absolute, out var uri)
+                || (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
+            {
+                return;
+            }
+
             Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true });
         }
     }
