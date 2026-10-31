@@ -162,4 +162,28 @@
     <sys:String x:Key="fw_reachable">reachable</sys:String>
     <sys:String x:Key="fw_behind">behind firewall</sys:String>
 
+    <sys:String x:Key="t_log">Log</sys:String>
+    <sys:String x:Key="log_copy">Copy</sys:String>
+    <sys:String x:Key="log_clear">Clear</sys:String>
+    <sys:String x:Key="log_hint">GUI events – not the core log</sys:String>
+    <sys:String x:Key="log_col_time">Time</sys:String>
+    <sys:String x:Key="log_col_level">Level</sys:String>
+    <sys:String x:Key="log_col_message">Message</sys:String>
+    <sys:String x:Key="log_level_info">Info</sys:String>
+    <sys:String x:Key="log_level_warning">Warning</sys:String>
+    <sys:String x:Key="log_level_error">Error</sys:String>
+    <sys:String x:Key="log_started">Apfelmus {0} started</sys:String>
+    <sys:String x:Key="log_conn_up">Connected to the core</sys:String>
+    <sys:String x:Key="log_conn_lost">Connection to the core lost</sys:String>
+    <sys:String x:Key="log_conn_failed">Core not reachable</sys:String>
+    <sys:String x:Key="log_cmd_failed">Command not sent (core not reachable): {0}</sys:String>
+    <sys:String x:Key="log_upd_failed">Update check failed</sys:String>
+    <sys:String x:Key="log_upd_gui">New Apfelmus version available: {0}</sys:String>
+    <sys:String x:Key="log_upd_core">New core available: {0}</sys:String>
+    <sys:String x:Key="log_gui_saved">GUI settings saved</sys:String>
+    <sys:String x:Key="log_gui_save_failed">GUI settings could not be saved: {0}</sys:String>
+    <sys:String x:Key="log_core_settings_unreachable">Core settings not reachable</sys:String>
+    <sys:String x:Key="log_core_settings_sent">Core settings sent to the core</sys:String>
+    <sys:String x:Key="log_link_sent">ajfsp link passed to the core</sys:String>
+    <sys:String x:Key="log_link_external">ajfsp link from outside passed to the core</sys:String>
 </ResourceDictionary>

@@ -65,7 +65,12 @@ namespace ApfelmusFramework.Classes.Logic
             return value != null && value.Any(c => c < 0x20 || c == 0x7F);
         }
 
-        public void StartXMLFunction(string anfrage)
+        /// <summary>
+        /// Schickt ein Kommando ohne die Antwort zu lesen. Liefert true, wenn die Anfrage an den Core
+        /// gesendet wurde; false, wenn er nicht erreichbar war oder das Senden scheiterte. Ob der Core
+        /// das Kommando auch akzeptiert hat (z.B. falsches Passwort), laesst sich daraus NICHT ableiten.
+        /// </summary>
+        public bool StartXMLFunction(string anfrage)
         {
             try
             {
@@ -78,15 +83,18 @@ namespace ApfelmusFramework.Classes.Logic
                 using (Socket s = GetSocket(serverName, serverPort))
                 {
                     if (s == null)
-                        return;
+                        return false;
 
                     s.Send(bytesSent, bytesSent.Length, 0);
+                    return true;
                 }
             }
             catch (Exception ex)
             {
                 logger.Error("Fehler beim Aufruf der XML-Function", ex);
             }
+
+            return false;
         }
 
         public string GetHttpResult(string anfrage, bool useZip)

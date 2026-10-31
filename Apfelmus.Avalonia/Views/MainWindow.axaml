@@ -680,6 +680,27 @@
                 </StackPanel>
                 </ScrollViewer>
             </TabItem>
+
+            <!-- ===================== PROTOKOLL (Ereignisse der GUI, nicht das Core-Log) ===================== -->
+            <TabItem Header="{DynamicResource t_log}">
+                <DockPanel Margin="4">
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" Margin="4">
+                        <Button Content="{DynamicResource log_copy}" Command="{Binding CopyLogCommand}" />
+                        <Button Content="{DynamicResource log_clear}" Command="{Binding ClearLogCommand}" />
+                        <TextBlock Text="{DynamicResource log_hint}" VerticalAlignment="Center" Margin="8,0,0,0"
+                                   Foreground="{DynamicResource TextSecondaryBrush}" />
+                    </StackPanel>
+                    <DataGrid x:Name="LogGrid" x:CompileBindings="False" ItemsSource="{Binding LogEntries}"
+                              IsReadOnly="True" CanUserSortColumns="False"
+                              GridLinesVisibility="Horizontal" CanUserResizeColumns="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="{DynamicResource log_col_time}" Binding="{Binding TimeText, Mode=OneWay}" Width="Auto" />
+                            <DataGridTextColumn Header="{DynamicResource log_col_level}" Binding="{Binding LevelText, Mode=OneWay}" Width="Auto" />
+                            <DataGridTextColumn Header="{DynamicResource log_col_message}" Binding="{Binding Message, Mode=OneWay}" Width="*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+            </TabItem>
         </TabControl>
     </DockPanel>
 </Window>

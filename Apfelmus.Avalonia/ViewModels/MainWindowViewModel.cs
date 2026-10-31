@@ -76,6 +76,8 @@ namespace Apfelmus.Avalonia.ViewModels
             TransferAjLinkCommand = new RelayCommand(TransferAjLinkAsync, () => !string.IsNullOrWhiteSpace(AjLinkText));
             CoreExitCommand = new RelayCommand(() => _client.ExitCoreAsync());
             CheckForUpdatesCommand = new RelayCommand(() => CheckForUpdatesAsync(manual: true));
+            ClearLogCommand = new RelayCommand(() => { EventLog.Clear(); return Task.CompletedTask; });
+            CopyLogCommand = new RelayCommand(() => { RaiseCopy(EventLog.ToText()); return Task.CompletedTask; });
             OpenLatestReleaseCommand = new RelayCommand(() => { OpenLatestRelease(); return Task.CompletedTask; });
             OpenCoreReleaseCommand = new RelayCommand(() => { OpenCoreRelease(); return Task.CompletedTask; });
             ApplyDarkThemeCommand = new RelayCommand(() => ApplyTheme(ThemeNames.Dark));
@@ -149,6 +151,7 @@ namespace Apfelmus.Avalonia.ViewModels
             // Gespeicherte Sprache anwenden.
             LanguageManager.Apply(LanguageManager.Normalize(config.LanguageFile));
             UpdateConnectionStatusText(); // lokalisierter Startwert ("Verbinde…")
+            EventLog.Info("log_started", GuiVersion);
 
             // Beim Start uebergebener ajfsp-Link (Protokoll-Handler) -> an den Core weiterreichen.
             if (!string.IsNullOrWhiteSpace(startupLink))
@@ -217,6 +220,11 @@ namespace Apfelmus.Avalonia.ViewModels
         public RelayCommand TransferAjLinkCommand { get; }
         public RelayCommand CoreExitCommand { get; }
         public RelayCommand CheckForUpdatesCommand { get; }
+        public RelayCommand ClearLogCommand { get; }
+        public RelayCommand CopyLogCommand { get; }
+
+        /// <summary>Ereignisprotokoll der GUI (neueste zuerst) fuer den Protokoll-Tab.</summary>
+        public ObservableCollection<LogEntry> LogEntries => EventLog.Entries;
         public RelayCommand OpenLatestReleaseCommand { get; }
         public RelayCommand OpenCoreReleaseCommand { get; }
         public RelayCommand ApplyDarkThemeCommand { get; }
@@ -396,11 +404,13 @@ namespace Apfelmus.Avalonia.ViewModels
             var res = await UpdateChecker.CheckAsync(GuiVersion);
             if (res == null)
             {
+                EventLog.Warning("log_upd_failed");
                 if (manual) UpdateStatus = LanguageManager.Get("upd_failed");
                 return;
             }
             if (res.IsNewer)
             {
+                EventLog.Info("log_upd_gui", res.LatestVersion);
                 _latestReleaseUrl = res.HtmlUrl;
                 UpdateHint = string.Format(LanguageManager.Get("upd_available"), res.LatestVersion);
                 UpdateAvailable = true;
@@ -456,6 +466,7 @@ namespace Apfelmus.Avalonia.ViewModels
             var res = await CoreUpdateChecker.CheckAsync(coreVersion);
             if (coreVersion != CoreVersion) return; // inzwischen erneut gewechselt -> dortige Pruefung gilt
             if (res == null || !res.IsNewer) return;
+            EventLog.Info("log_upd_core", res.LatestVersion);
             _coreReleaseUrl = res.HtmlUrl;
             string version = res.IsPrerelease ? res.LatestVersion + " " + LanguageManager.Get("core_upd_beta") : res.LatestVersion;
             CoreUpdateHint = string.Format(LanguageManager.Get("core_upd_available"), version);
@@ -584,11 +595,23 @@ namespace Apfelmus.Avalonia.ViewModels
         public WriteableBitmap? PartlistImage { get => _partlistImage; private set => SetProperty(ref _partlistImage, value); }
 
         // ---- Polling ----
+        // Protokolliert nur Wechsel, nicht jeden Poll (sonst liefe das Log bei toter Verbindung voll).
+        private void SetConnState(int state)
+        {
+            if (state != _connState)
+            {
+                if (state == 1) EventLog.Info("log_conn_up");
+                else if (state == 2) EventLog.Warning(_connState == 1 ? "log_conn_lost" : "log_conn_failed");
+            }
+            _connState = state;
+            UpdateConnectionStatusText();
+        }
+
         private async Task PollAsync()
         {
             var info = await _client.GetInformationAsync();
-            if (info == null) { _connState = 2; UpdateConnectionStatusText(); return; }
-            _connState = 1; UpdateConnectionStatusText();
+            if (info == null) { SetConnState(2); return; }
+            SetConnState(1);
 
             // information.xml liefert NUR die GeneralInformation (Core-Version + Dateisystem-Trenner).
             if (info.GeneralInformation != null)
@@ -985,6 +1008,7 @@ namespace Apfelmus.Avalonia.ViewModels
         private async Task TransferAjLinkAsync()
         {
             await _client.ProcessLinkAsync(Uri.EscapeDataString(Uri.UnescapeDataString(AjLinkText.Trim())));
+            EventLog.Info("log_link_sent");
             AjLinkText = string.Empty;
             FocusDownloads();
         }
@@ -1073,6 +1097,7 @@ namespace Apfelmus.Avalonia.ViewModels
             // Erst dekodieren, dann einheitlich EINMAL kodieren - sonst wird %7C zu %257C (Doppelkodierung).
             string raw = Uri.UnescapeDataString(link.Trim());
             _ = _client.ProcessLinkAsync(Uri.EscapeDataString(raw));
+            EventLog.Info("log_link_external");
             FocusDownloads();
         }
 
@@ -1140,15 +1165,16 @@ namespace Apfelmus.Avalonia.ViewModels
                 {
                     SettingsStatus = "Gespeichert.";
                 }
+                EventLog.Info("log_gui_saved");
             }
-            catch (Exception ex) { SettingsStatus = "Fehler: " + ex.Message; }
+            catch (Exception ex) { SettingsStatus = "Fehler: " + ex.Message; EventLog.Error("log_gui_save_failed", ex.Message); }
             return Task.CompletedTask;
         }
 
         private async Task LoadCoreSettingsAsync()
         {
             var s = await _client.GetSettingsAsync();
-            if (s == null) { CoreSettingsStatus = "Core-Einstellungen nicht erreichbar."; return; }
+            if (s == null) { CoreSettingsStatus = "Core-Einstellungen nicht erreichbar."; EventLog.Warning("log_core_settings_unreachable"); return; }
             _coreSettings = s;
             CoreNick = s.Nick ?? string.Empty;
             CorePort = s.Port; CoreXmlPort = s.XmlPort;
@@ -1190,6 +1216,7 @@ namespace Apfelmus.Avalonia.ViewModels
             };
             await _client.SetSettingsAsync(s);
             CoreSettingsStatus = "An Core gesendet.";
+            EventLog.Info("log_core_settings_sent");
         }
 
         private async Task ChangePasswordAsync()

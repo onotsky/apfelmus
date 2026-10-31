@@ -206,10 +206,19 @@ namespace Apfelmus.Avalonia.Services
                 try
                 {
                     using var web = new WebConnect(_config.HostName, _config.Port);
-                    web.StartXMLFunction(function);
+                    if (!web.StartXMLFunction(function))
+                        EventLog.Warning("log_cmd_failed", CommandName(function));
                 }
-                catch (Exception) { }
+                catch (Exception) { EventLog.Warning("log_cmd_failed", CommandName(function)); }
             });
+        }
+
+        // Nur der Pfad (z.B. /function/canceldownload): die Query traegt das Passwort und darf
+        // nicht ins Protokoll.
+        private static string CommandName(string function)
+        {
+            int q = function.IndexOf('?');
+            return q >= 0 ? function.Substring(0, q) : function;
         }
 
         private Task<AppleJuice?> QueryAsync(string query)

@@ -23,6 +23,7 @@ Umschaltbares Hell-/Dunkel-Design (Anthrazit + Grün) – zur Laufzeit über **D
 - **Suchen** – Volltextsuche mit einem eigenen Ergebnis-Tab je Suchlauf
 - **Server** – bekannte appleJuice-Server, Verbindungsstatus, offizielle Serverliste holen
 - **Mein Share** – Verzeichnisbaum zum Freigeben/Entfernen von Ordnern, Freitextfilter, Prioritäten, Link(s)/Quelle(n) kopieren
+- **Protokoll** – Ereignisse der GUI (Verbindung zum Core hergestellt/verloren, nicht gesendete Befehle, Updates, gespeicherte Einstellungen); bewusst nicht das Log des Cores, das dessen Schnittstelle nicht liefert
 - **Einstellungen** – GUI-Optionen sowie die kompletten Core-Einstellungen (Nick, Verzeichnisse, Ports, Limits, Speed pro Slot, Autoconnect) und Passwortänderung
 
 Geklickte `ajfsp://`-Links aus dem Browser werden an Apfelmus (und damit an den Core) übergeben; die App holt sich dabei in den Vordergrund und wechselt auf den Downloads-Tab. Wie die Verknüpfung je Plattform registriert wird, steht unter [ajfsp://-Linkübernahme](#ajfsp-linkübernahme).

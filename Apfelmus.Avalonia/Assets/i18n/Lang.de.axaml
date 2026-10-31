@@ -162,4 +162,28 @@
     <sys:String x:Key="fw_reachable">erreichbar</sys:String>
     <sys:String x:Key="fw_behind">hinter Firewall</sys:String>
 
+    <sys:String x:Key="t_log">Protokoll</sys:String>
+    <sys:String x:Key="log_copy">Kopieren</sys:String>
+    <sys:String x:Key="log_clear">Leeren</sys:String>
+    <sys:String x:Key="log_hint">Ereignisse der GUI – nicht das Log des Cores</sys:String>
+    <sys:String x:Key="log_col_time">Zeit</sys:String>
+    <sys:String x:Key="log_col_level">Stufe</sys:String>
+    <sys:String x:Key="log_col_message">Meldung</sys:String>
+    <sys:String x:Key="log_level_info">Info</sys:String>
+    <sys:String x:Key="log_level_warning">Warnung</sys:String>
+    <sys:String x:Key="log_level_error">Fehler</sys:String>
+    <sys:String x:Key="log_started">Apfelmus {0} gestartet</sys:String>
+    <sys:String x:Key="log_conn_up">Verbindung zum Core hergestellt</sys:String>
+    <sys:String x:Key="log_conn_lost">Verbindung zum Core verloren</sys:String>
+    <sys:String x:Key="log_conn_failed">Core nicht erreichbar</sys:String>
+    <sys:String x:Key="log_cmd_failed">Befehl nicht gesendet (Core nicht erreichbar): {0}</sys:String>
+    <sys:String x:Key="log_upd_failed">Update-Prüfung fehlgeschlagen</sys:String>
+    <sys:String x:Key="log_upd_gui">Neue Apfelmus-Version verfügbar: {0}</sys:String>
+    <sys:String x:Key="log_upd_core">Neuer Core verfügbar: {0}</sys:String>
+    <sys:String x:Key="log_gui_saved">GUI-Einstellungen gespeichert</sys:String>
+    <sys:String x:Key="log_gui_save_failed">GUI-Einstellungen konnten nicht gespeichert werden: {0}</sys:String>
+    <sys:String x:Key="log_core_settings_unreachable">Core-Einstellungen nicht erreichbar</sys:String>
+    <sys:String x:Key="log_core_settings_sent">Core-Einstellungen an den Core gesendet</sys:String>
+    <sys:String x:Key="log_link_sent">ajfsp-Link an den Core übergeben</sys:String>
+    <sys:String x:Key="log_link_external">ajfsp-Link von außen an den Core übergeben</sys:String>
 </ResourceDictionary>
