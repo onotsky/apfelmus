@@ -693,10 +693,34 @@
                     <DataGrid x:Name="LogGrid" x:CompileBindings="False" ItemsSource="{Binding LogEntries}"
                               IsReadOnly="True" CanUserSortColumns="False"
                               GridLinesVisibility="Horizontal" CanUserResizeColumns="True">
+                        <DataGrid.Styles>
+                            <!-- Warnung/Fehler farbig; Fehler zusaetzlich fett (nicht nur Farbe als Unterscheidung) -->
+                            <Style Selector="TextBlock.logwarn">
+                                <Setter Property="Foreground" Value="{DynamicResource LogWarningBrush}" />
+                            </Style>
+                            <Style Selector="TextBlock.logerr">
+                                <Setter Property="Foreground" Value="{DynamicResource LogErrorBrush}" />
+                                <Setter Property="FontWeight" Value="SemiBold" />
+                            </Style>
+                        </DataGrid.Styles>
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="{DynamicResource log_col_time}" Binding="{Binding TimeText, Mode=OneWay}" Width="Auto" />
-                            <DataGridTextColumn Header="{DynamicResource log_col_level}" Binding="{Binding LevelText, Mode=OneWay}" Width="Auto" />
-                            <DataGridTextColumn Header="{DynamicResource log_col_message}" Binding="{Binding Message, Mode=OneWay}" Width="*" />
+                            <DataGridTemplateColumn Header="{DynamicResource log_col_level}" Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding LevelText}" VerticalAlignment="Center" Margin="12,0"
+                                                   Classes.logwarn="{Binding IsWarning}" Classes.logerr="{Binding IsError}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="{DynamicResource log_col_message}" Width="*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Message}" VerticalAlignment="Center" Margin="12,0" TextWrapping="Wrap"
+                                                   Classes.logwarn="{Binding IsWarning}" Classes.logerr="{Binding IsError}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
                 </DockPanel>

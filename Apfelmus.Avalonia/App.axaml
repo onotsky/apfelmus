@@ -15,6 +15,9 @@
                     <SolidColorBrush x:Key="AccentBrush" Color="#4CAF7D" />
                     <SolidColorBrush x:Key="TextPrimaryBrush" Color="#ECEFF1" />
                     <SolidColorBrush x:Key="TextSecondaryBrush" Color="#8FA0AB" />
+                    <!-- Protokoll-Tab: Warnung (Bernstein) / Fehler (Rot), auf #1E2226 gut lesbar -->
+                    <SolidColorBrush x:Key="LogWarningBrush" Color="#E0B24C" />
+                    <SolidColorBrush x:Key="LogErrorBrush" Color="#EF7B7B" />
                 </ResourceDictionary>
                 <ResourceDictionary x:Key="Light">
                     <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#F4F6F8" />
@@ -22,6 +25,9 @@
                     <SolidColorBrush x:Key="AccentBrush" Color="#2E8B57" />
                     <SolidColorBrush x:Key="TextPrimaryBrush" Color="#1E2226" />
                     <SolidColorBrush x:Key="TextSecondaryBrush" Color="#556069" />
+                    <!-- Protokoll-Tab: dunklere Toene, damit sie auf #F4F6F8 genug Kontrast haben -->
+                    <SolidColorBrush x:Key="LogWarningBrush" Color="#8A5A00" />
+                    <SolidColorBrush x:Key="LogErrorBrush" Color="#C62828" />
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
 

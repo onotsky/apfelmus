@@ -24,6 +24,10 @@ namespace Apfelmus.Avalonia.Services
 
         public string TimeText => Time.ToString("G", CultureInfo.CurrentCulture);
 
+        // Fuer die Einfaerbung im Protokoll-Tab (Style-Klassen).
+        public bool IsWarning => Level == LogLevel.Warning;
+        public bool IsError => Level == LogLevel.Error;
+
         /// <summary>Lokalisierte Stufe fuer die Anzeige.</summary>
         public string LevelText => LanguageManager.Get(Level switch
         {
