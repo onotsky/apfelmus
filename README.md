@@ -88,7 +88,19 @@ Geklickte `ajfsp://`-Links (z. B. `ajfsp://file|Name|Hash|Größe/`) werden an d
 
 > **macOS-Hinweis:** Die Linkübernahme funktioniert nur mit dem gebauten **`.app`-Bundle**, nicht beim Start via `dotnet run` (dann existiert kein Bundle mit registriertem URL-Scheme).
 
-> **Windows-Browser-Hinweis:** Das Anklicken von `ajfsp://`-Links funktioniert unter Windows nur mit **Chromium-basierten Browsern** (Chrome, Edge, Brave, Opera …), die den in der Registry registrierten Handler zuverlässig starten. **Firefox** behandelt unbekannte externe Protokolle restriktiver und startet den Handler i. d. R. **nicht** – dort den Link stattdessen kopieren und in das **AJLink-Feld** einfügen.
+> **Firefox (Windows und Linux):** Firefox startet den Handler nicht von selbst. Der Handler muss einmalig in der Datei `handlers.json` des Firefox-Profils eingetragen werden (Firefox dafür beenden; den Profilordner öffnet `about:support` → „Profilordner“). Im Block `"schemes"` ergänzen:
+>
+> ```json
+> "ajfsp": {
+>   "action": 2,
+>   "ask": false,
+>   "handlers": [
+>     { "name": "Apfelmus", "path": "C:\\Pfad\\Apfelmus.Avalonia.exe" }
+>   ]
+> }
+> ```
+>
+> Unter Linux ist `path` der Pfad zur Datei `Apfelmus.Avalonia` (z. B. `/opt/apfelmus/Apfelmus.Avalonia`); unter Windows müssen Backslashes doppelt geschrieben werden. Chromium-basierte Browser (Chrome, Edge, Brave, Opera …) nutzen dagegen die Systemverknüpfung und brauchen keine Anpassung. Alternativ lässt sich ein Link in jedem Browser kopieren und in das **AJLink-Feld** einfügen.
 
 ## Bauen & Starten
 
