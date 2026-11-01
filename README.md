@@ -88,7 +88,9 @@ Geklickte `ajfsp://`-Links (z. B. `ajfsp://file|Name|Hash|Größe/`) werden an d
 
 > **macOS-Hinweis:** Die Linkübernahme funktioniert nur mit dem gebauten **`.app`-Bundle**, nicht beim Start via `dotnet run` (dann existiert kein Bundle mit registriertem URL-Scheme).
 
-> **Firefox (Windows und Linux):** Firefox startet den Handler nicht von selbst. Der Handler muss einmalig in der Datei `handlers.json` des Firefox-Profils eingetragen werden (Firefox dafür beenden; den Profilordner öffnet `about:support` → „Profilordner“). Im Block `"schemes"` ergänzen:
+> **Firefox:** Beim ersten Klick auf einen `ajfsp://`-Link fragt Firefox, womit der Link geöffnet werden soll. Dort einmalig die Datei `Apfelmus.Avalonia.exe` (Windows) bzw. `Apfelmus.Avalonia` (Linux) aus dem entpackten Apfelmus-Ordner auswählen und „Immer“ bzw. „Links dieses Typs immer öffnen“ ankreuzen – danach öffnen sich weitere Links direkt in Apfelmus. Unter Windows getestet, unter Linux ungetestet. Chromium-basierte Browser (Chrome, Edge, Brave, Opera …) nutzen die Systemverknüpfung und brauchen keine Anpassung. Notfalls lässt sich ein Link in jedem Browser kopieren und in das **AJLink-Feld** einfügen.
+>
+> *Alternative:* Wer die Rückfrage umgehen oder eine falsche Auswahl korrigieren möchte, trägt den Handler bei beendetem Firefox in der Datei `handlers.json` des Profils ein (Profilordner: `about:support` → „Profilordner“). Im Block `"schemes"` ergänzen:
 >
 > ```json
 > "ajfsp": {
@@ -100,7 +102,7 @@ Geklickte `ajfsp://`-Links (z. B. `ajfsp://file|Name|Hash|Größe/`) werden an d
 > }
 > ```
 >
-> Unter Linux ist `path` der Pfad zur Datei `Apfelmus.Avalonia` (z. B. `/opt/apfelmus/Apfelmus.Avalonia`); unter Windows müssen Backslashes doppelt geschrieben werden. Chromium-basierte Browser (Chrome, Edge, Brave, Opera …) nutzen dagegen die Systemverknüpfung und brauchen keine Anpassung. Alternativ lässt sich ein Link in jedem Browser kopieren und in das **AJLink-Feld** einfügen.
+> Unter Windows müssen Backslashes im Pfad doppelt geschrieben werden.
 
 ## Bauen & Starten
 
