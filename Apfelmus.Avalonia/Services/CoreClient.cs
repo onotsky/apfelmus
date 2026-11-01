@@ -220,15 +220,23 @@ namespace Apfelmus.Avalonia.Services
             });
         }
 
-        // Die Antworttexte des Cores sind nicht dokumentiert. "ok" ist der Normalfall; alles andere
-        // (z.B. "already downloaded") wird als Info ins Protokoll geschrieben, nicht als Fehler gewertet.
+        // Die Antworttexte des Cores sind nicht dokumentiert. Normalfall sind eine leere Antwort, "ok"
+        // und - wie beim Core des Maintainers fuer /function/search beobachtet - ein leeres
+        // HTML-Geruest (<html><body></body></html>). Alles andere (z.B. "already downloaded") wird
+        // als Info ins Protokoll geschrieben, nicht als Fehler gewertet.
         private static bool IsNoteworthyReply(string body)
-            => body.Length > 0 && !body.TrimEnd('.', '!').Equals("ok", StringComparison.OrdinalIgnoreCase);
+        {
+            string text = StripTags(body);
+            return text.Length > 0 && !text.TrimEnd('.', '!').Equals("ok", StringComparison.OrdinalIgnoreCase);
+        }
 
-        // Antwort fuer die Anzeige: Steuerzeichen raus, auf 120 Zeichen gekuerzt.
+        private static string StripTags(string body)
+            => System.Text.RegularExpressions.Regex.Replace(body, "<[^>]*>", " ").Trim();
+
+        // Antwort fuer die Anzeige: HTML-Tags und Steuerzeichen raus, auf 120 Zeichen gekuerzt.
         private static string ShortReply(string body)
         {
-            var chars = body.Select(c => char.IsControl(c) ? ' ' : c).ToArray();
+            var chars = StripTags(body).Select(c => char.IsControl(c) ? ' ' : c).ToArray();
             string text = new string(chars).Trim();
             return text.Length <= 120 ? text : text.Substring(0, 120) + "…";
         }
