@@ -28,7 +28,7 @@ namespace Apfelmus.Avalonia.Services
         {
             try
             {
-                using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(8) };
+                using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(8), MaxResponseContentBufferSize = 4 * 1024 * 1024 };
                 // GitHub verlangt einen User-Agent, sonst 403.
                 http.DefaultRequestHeaders.UserAgent.ParseAdd("Apfelmus-UpdateCheck");
                 http.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");

@@ -897,7 +897,7 @@ namespace Apfelmus.Avalonia.ViewModels
         {
             await LoadCoreSettingsAsync();
             await _client.SetSharesAsync(CurrentShares());
-            CoreSettingsStatus = "Shareüberprüfung gestartet.";
+            CoreSettingsStatus = LanguageManager.Get("msg_share_check");
         }
 
         /// <summary>Kopiert die ajfsp-Links aller markierten Freigaben (mehrzeilig) - fuer die Mehrfachauswahl.</summary>
@@ -1159,22 +1159,22 @@ namespace Apfelmus.Avalonia.ViewModels
                 if (RegisterAjfspProtocol && Services.ProtocolHandlerService.IsSupported)
                 {
                     bool ok = Services.ProtocolHandlerService.Register();
-                    SettingsStatus = ok ? "Gespeichert. ajfsp-Verknüpfung registriert." : "Gespeichert (ajfsp-Registrierung fehlgeschlagen).";
+                    SettingsStatus = LanguageManager.Get(ok ? "msg_saved_proto" : "msg_saved_proto_failed");
                 }
                 else
                 {
-                    SettingsStatus = "Gespeichert.";
+                    SettingsStatus = LanguageManager.Get("msg_saved");
                 }
                 EventLog.Info("log_gui_saved");
             }
-            catch (Exception ex) { SettingsStatus = "Fehler: " + ex.Message; EventLog.Error("log_gui_save_failed", ex.Message); }
+            catch (Exception ex) { SettingsStatus = string.Format(LanguageManager.Get("msg_error"), ex.Message); EventLog.Error("log_gui_save_failed", ex.Message); }
             return Task.CompletedTask;
         }
 
         private async Task LoadCoreSettingsAsync()
         {
             var s = await _client.GetSettingsAsync();
-            if (s == null) { CoreSettingsStatus = "Core-Einstellungen nicht erreichbar."; EventLog.Warning("log_core_settings_unreachable"); return; }
+            if (s == null) { CoreSettingsStatus = LanguageManager.Get("msg_core_unreachable"); EventLog.Warning("log_core_settings_unreachable"); return; }
             _coreSettings = s;
             CoreNick = s.Nick ?? string.Empty;
             CorePort = s.Port; CoreXmlPort = s.XmlPort;
@@ -1183,7 +1183,7 @@ namespace Apfelmus.Avalonia.ViewModels
             CoreMaxSourcesPerFile = s.MaxSourcesPerFile;
             CoreIncomingDir = s.IncomingDirectory ?? string.Empty; CoreTempDir = s.TemporaryDirectory ?? string.Empty;
             CoreAutoConnect = s.AutoConnect;
-            CoreSettingsStatus = "Geladen.";
+            CoreSettingsStatus = LanguageManager.Get("msg_loaded");
             RefreshSharedFolders();
         }
 
@@ -1215,7 +1215,7 @@ namespace Apfelmus.Avalonia.ViewModels
                 TemporaryDirectory = CoreTempDir, AutoConnect = CoreAutoConnect,
             };
             await _client.SetSettingsAsync(s);
-            CoreSettingsStatus = "An Core gesendet.";
+            CoreSettingsStatus = LanguageManager.Get("msg_sent");
             EventLog.Info("log_core_settings_sent");
         }
 
@@ -1226,9 +1226,9 @@ namespace Apfelmus.Avalonia.ViewModels
             {
                 _config.Password = newMd5;
                 ConfigSerializer.SerializeToFile(_config);
-                CoreSettingsStatus = "Passwort geändert.";
+                CoreSettingsStatus = LanguageManager.Get("msg_pw_changed");
             }
-            catch (Exception ex) { CoreSettingsStatus = "Passwort-Fehler: " + ex.Message; }
+            catch (Exception ex) { CoreSettingsStatus = string.Format(LanguageManager.Get("msg_pw_error"), ex.Message); }
             NewPassword = string.Empty;
         }
 

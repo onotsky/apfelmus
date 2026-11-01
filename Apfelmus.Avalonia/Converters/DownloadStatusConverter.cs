@@ -2,35 +2,25 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using Avalonia.Data.Converters;
+using Apfelmus.Avalonia.Services;
 
 namespace Apfelmus.Avalonia.Converters
 {
     /// <summary>
     /// Bildet den Download-Statuscode des Cores auf einen lesbaren Text ab
-    /// (deutsche Texte, analog zu den downloadstatusN-Schluesseln des WPF-Clients).
+    /// (Texte aus den Sprachdateien, Schluessel ds_N - analog zu den downloadstatusN des WPF-Clients).
+    /// Der Text wird beim Aufbereiten der Zeile gelesen; nach einem Sprachwechsel zeigt eine Zeile
+    /// ihn neu, sobald sich ihr Status aendert.
     /// </summary>
     public sealed class DownloadStatusConverter : IValueConverter
     {
-        private static readonly Dictionary<int, string> Map = new()
-        {
-            [0] = "suchen",
-            [1] = "temp. Fehler",
-            [2] = "überträgt",
-            [12] = "fertigstellen",
-            [13] = "Fehler beim Fertigstellen",
-            [14] = "fertig",
-            [15] = "abbrechen",
-            [16] = "in Erstellung",
-            [17] = "abgebrochen",
-            [18] = "pausiert",
-            [19] = "undefiniert",
-        };
+        private static readonly HashSet<int> Known = new() { 0, 1, 2, 12, 13, 14, 15, 16, 17, 18, 19 };
 
         public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
-            if (value is int code && Map.TryGetValue(code, out var text))
+            if (value is int code && Known.Contains(code))
             {
-                return text;
+                return LanguageManager.Get("ds_" + code);
             }
 
             return value?.ToString() ?? string.Empty;

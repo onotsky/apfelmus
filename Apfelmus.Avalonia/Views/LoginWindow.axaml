@@ -17,21 +17,21 @@
                        VerticalAlignment="Center" Foreground="{DynamicResource TextPrimaryBrush}" />
         </StackPanel>
 
-        <TextBlock Text="Host" Foreground="{DynamicResource TextSecondaryBrush}" />
+        <TextBlock Text="{DynamicResource lg_host}" Foreground="{DynamicResource TextSecondaryBrush}" />
         <TextBox Text="{Binding Host, Mode=TwoWay}" PlaceholderText="localhost" />
 
-        <TextBlock Text="Port" Foreground="{DynamicResource TextSecondaryBrush}" />
+        <TextBlock Text="{DynamicResource lg_port}" Foreground="{DynamicResource TextSecondaryBrush}" />
         <TextBox Text="{Binding Port, Mode=TwoWay}" PlaceholderText="9851" />
 
-        <TextBlock Text="Passwort" Foreground="{DynamicResource TextSecondaryBrush}" />
+        <TextBlock Text="{DynamicResource lg_password}" Foreground="{DynamicResource TextSecondaryBrush}" />
         <TextBox Text="{Binding Password, Mode=TwoWay}" PasswordChar="•" />
 
-        <CheckBox Content="Kompression verwenden" IsChecked="{Binding UseCompression, Mode=TwoWay}"
+        <CheckBox Content="{DynamicResource lg_compression}" IsChecked="{Binding UseCompression, Mode=TwoWay}"
                   Foreground="{DynamicResource TextPrimaryBrush}" />
-        <CheckBox Content="Login-Fenster künftig überspringen" IsChecked="{Binding HideLoginWindow, Mode=TwoWay}"
+        <CheckBox Content="{DynamicResource lg_skip}" IsChecked="{Binding HideLoginWindow, Mode=TwoWay}"
                   Foreground="{DynamicResource TextPrimaryBrush}" />
 
-        <Button Content="Verbinden" Command="{Binding LoginCommand}"
+        <Button Content="{DynamicResource lg_connect}" Command="{Binding LoginCommand}"
                 HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
                 Background="{DynamicResource AccentBrush}" Foreground="White" Margin="0,6,0,0" />
 

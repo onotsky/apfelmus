@@ -94,6 +94,8 @@ namespace Apfelmus.Avalonia
                 ApfelmusFramework.Classes.Config.Config? saved = null;
                 try { saved = ApfelmusFramework.Classes.Serializer.ConfigSerializer.DeserializeFromFile(); }
                 catch { /* keine/erste Config */ }
+                // Sprache schon vor dem Login-Fenster anwenden (sonst bliebe es ohne Texte bzw. deutsch).
+                Services.LanguageManager.Apply(Services.LanguageManager.Normalize(saved?.LanguageFile));
                 bool skipLogin = saved != null && saved.HideLoginWindow && !string.IsNullOrEmpty(saved.Password);
 
                 if (skipLogin)

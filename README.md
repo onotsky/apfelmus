@@ -34,21 +34,14 @@ Geklickte `ajfsp://`-Links aus dem Browser werden an Apfelmus (und damit an den 
 |---|---|
 | `Apfelmus.Avalonia` | Die Avalonia-GUI (Views, ViewModels, Converter, Themes, i18n, Services) – die eigentliche Anwendung |
 | `ApfelmusFramework` | **Plattformneutrale Kernbibliothek (`net10.0`):** Core-Kommunikation (XML/HTTP-API), Datenmodelle/DTOs, XML-(De)Serialisierung, Config und Hilfslogik. Bewusst UI-frameworkunabhängig |
-| `ConfigMigrator` | Einmal-Kommandozeilentool zur Migration alter `Config.dat` (BinaryFormatter) auf `Config.xml` (XmlSerializer), siehe unten |
 
 Der alte WPF-Client (`Apfelmus`, `WpfCustomControlLibrary1`) liegt im Branch `wpf-legacy`.
 
 ## Konfigurationsmigration (Config.dat → Config.xml)
 
-Ältere Installationen speichern ihre Einstellungen in `%AppData%\Apfelmus\Config.dat` (per `BinaryFormatter`). Aktuelle Versionen verwenden stattdessen `Config.xml` (per `XmlSerializer`) – dadurch hat die App selbst keine `BinaryFormatter`-Abhängigkeit mehr, die es ab .NET 9 ohnehin nicht mehr gibt.
+Ältere Installationen (WPF-Client bis 5.2.x) speichern ihre Einstellungen in `%AppData%\Apfelmus\Config.dat` (per `BinaryFormatter`). Aktuelle Versionen verwenden `Config.xml` (per `XmlSerializer`); beim ersten Start ohne `Config.xml` legt Apfelmus eine neue, leere Konfiguration an.
 
-Beim ersten Start ohne vorhandene `Config.xml` legt Apfelmus einfach eine neue, leere Konfiguration an. Um stattdessen die bisherigen Einstellungen (Server, Passwort, Sprache, Theme, …) zu übernehmen, einmalig das Migrationstool ausführen:
-
-```
-dotnet run --project ConfigMigrator
-```
-
-Das Tool liest `Config.dat`, schreibt `Config.xml` im selben Ordner und benennt die alte Datei anschließend in `Config.dat.bak` um (sie wird nicht gelöscht).
+Das frühere Migrationstool `ConfigMigrator` ist nicht mehr Teil von `main`, weil es das nicht mehr unterstützte `BinaryFormatter` braucht. Es liegt unverändert im Branch [`wpf-legacy`](../../tree/wpf-legacy): dort auschecken und `dotnet run --project ConfigMigrator` ausführen. Das Tool schreibt `Config.xml` in den Ordner von `Config.dat` und benennt die alte Datei in `Config.dat.bak` um.
 
 ## Installation aus den [Releases](../../releases)
 

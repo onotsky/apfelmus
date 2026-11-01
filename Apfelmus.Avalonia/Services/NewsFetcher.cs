@@ -17,7 +17,7 @@ namespace Apfelmus.Avalonia.Services
         {
             try
             {
-                using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(8) };
+                using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(8), MaxResponseContentBufferSize = 2 * 1024 * 1024 };
                 http.DefaultRequestHeaders.UserAgent.ParseAdd("Apfelmus-News");
                 string name = Uri.EscapeDataString(string.IsNullOrWhiteSpace(coreVersion) ? "404" : coreVersion);
                 using var resp = await http.GetAsync(BaseUrl + name + ".html");

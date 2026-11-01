@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using Avalonia.Data.Converters;
 using Avalonia.Media;
+using Apfelmus.Avalonia.Services;
 
 namespace Apfelmus.Avalonia.Converters
 {
@@ -123,27 +124,15 @@ namespace Apfelmus.Avalonia.Converters
     {
         // Quellen-Status (andere Codes als der Download-Status!), laut Core-API-PDF:
         // 2 = versuche zu verbinden, 5 = in Warteschlange, 7 = Uebertragung, 14 = Queue voll (Gegenseite).
-        private static readonly Dictionary<int, string> Map = new()
-        {
-            [0] = "neu",
-            [1] = "verbinde",
-            [2] = "verbinde",
-            [3] = "Warteschlange",
-            [4] = "nicht erreichbar",
-            [5] = "Warteschlange",
-            [6] = "verbunden",
-            [7] = "überträgt",
-            [8] = "fertig",
-            [11] = "Fehler",
-            [12] = "fertig",
-            [13] = "Fehler",
-            [14] = "Queue voll",
-            [15] = "abbrechen",
-            [16] = "pausiert",
-        };
+        // Texte aus den Sprachdateien (Schluessel us_N, unbekannte Codes us_unknown).
+        private static readonly HashSet<int> Known = new() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 11, 12, 13, 14, 15, 16 };
 
         public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
-            => value is int c ? (Map.TryGetValue(c, out var t) ? t : "unbekannt") : (value?.ToString() ?? string.Empty);
+        {
+            if (value is int c)
+                return LanguageManager.Get(Known.Contains(c) ? "us_" + c : "us_unknown");
+            return value?.ToString() ?? string.Empty;
+        }
 
         public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
             => throw new NotSupportedException();

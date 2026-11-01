@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using ApfelmusFramework.Classes.Allgemein;
 using Config = ApfelmusFramework.Classes.Config.Config;
@@ -206,11 +207,30 @@ namespace Apfelmus.Avalonia.Services
                 try
                 {
                     using var web = new WebConnect(_config.HostName, _config.Port);
-                    if (!web.StartXMLFunction(function))
-                        EventLog.Warning("log_cmd_failed", CommandName(function));
+                    var reply = web.ExecuteCommand(function);
+                    string cmd = CommandName(function);
+                    if (!reply.Sent)
+                        EventLog.Warning("log_cmd_failed", cmd);
+                    else if (reply.StatusCode >= 400)
+                        EventLog.Warning("log_cmd_rejected", cmd, reply.StatusCode);
+                    else if (IsNoteworthyReply(reply.Body))
+                        EventLog.Info("log_cmd_reply", cmd, ShortReply(reply.Body));
                 }
                 catch (Exception) { EventLog.Warning("log_cmd_failed", CommandName(function)); }
             });
+        }
+
+        // Die Antworttexte des Cores sind nicht dokumentiert. "ok" ist der Normalfall; alles andere
+        // (z.B. "already downloaded") wird als Info ins Protokoll geschrieben, nicht als Fehler gewertet.
+        private static bool IsNoteworthyReply(string body)
+            => body.Length > 0 && !body.TrimEnd('.', '!').Equals("ok", StringComparison.OrdinalIgnoreCase);
+
+        // Antwort fuer die Anzeige: Steuerzeichen raus, auf 120 Zeichen gekuerzt.
+        private static string ShortReply(string body)
+        {
+            var chars = body.Select(c => char.IsControl(c) ? ' ' : c).ToArray();
+            string text = new string(chars).Trim();
+            return text.Length <= 120 ? text : text.Substring(0, 120) + "…";
         }
 
         // Nur der Pfad (z.B. /function/canceldownload): die Query traegt das Passwort und darf

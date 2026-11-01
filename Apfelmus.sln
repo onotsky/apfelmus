@@ -5,8 +5,6 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApfelmusFramework", "ApfelmusFramework\ApfelmusFramework.csproj", "{DA17CBED-2033-40EA-8982-F8A092FAC033}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigMigrator", "ConfigMigrator\ConfigMigrator.csproj", "{F8C0E486-5298-49CF-AE7F-A618297C84F9}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apfelmus.Avalonia", "Apfelmus.Avalonia\Apfelmus.Avalonia.csproj", "{7E2C1A44-9B3D-4F6E-8C21-5A9D0B7E4F10}"
 EndProject
 Global

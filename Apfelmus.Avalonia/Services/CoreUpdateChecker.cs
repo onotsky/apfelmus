@@ -33,7 +33,7 @@ namespace Apfelmus.Avalonia.Services
             if (!VersionTag.IsMatch(currentCoreVersion ?? string.Empty)) return null;
             try
             {
-                using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(8) };
+                using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(8), MaxResponseContentBufferSize = 4 * 1024 * 1024 };
                 http.DefaultRequestHeaders.UserAgent.ParseAdd("Apfelmus-CoreUpdateCheck");
                 http.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
 

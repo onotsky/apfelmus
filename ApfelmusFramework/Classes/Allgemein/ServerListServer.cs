@@ -38,7 +38,7 @@ namespace ApfelmusFramework.Classes.Allgemein
 
         private XmlSerializer serializer = new XmlSerializer(typeof(Serverlist));
 
-        private static readonly HttpClient httpClient = new HttpClient();
+        private static readonly HttpClient httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(15), MaxResponseContentBufferSize = 4 * 1024 * 1024 };
 
         public object DeserializeToObj(string xmlStr)
         {

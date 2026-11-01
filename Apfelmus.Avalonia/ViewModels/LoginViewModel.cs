@@ -105,12 +105,12 @@ namespace Apfelmus.Avalonia.ViewModels
         {
             if (!int.TryParse(Port, out int port))
             {
-                StatusMessage = "Ungueltiger Port.";
+                StatusMessage = LanguageManager.Get("lg_invalid_port");
                 return;
             }
 
             IsBusy = true;
-            StatusMessage = "Verbinde...";
+            StatusMessage = LanguageManager.Get("lg_connecting");
 
             var config = new Config
             {
@@ -127,7 +127,7 @@ namespace Apfelmus.Avalonia.ViewModels
             bool reachable = await client.CheckConnectionAsync();
             if (!reachable)
             {
-                StatusMessage = "Core nicht erreichbar. Host/Port pruefen.";
+                StatusMessage = LanguageManager.Get("lg_unreachable");
                 IsBusy = false;
                 return;
             }
@@ -138,7 +138,7 @@ namespace Apfelmus.Avalonia.ViewModels
             }
             catch (Exception ex)
             {
-                StatusMessage = "Config konnte nicht gespeichert werden: " + ex.Message;
+                StatusMessage = string.Format(LanguageManager.Get("lg_config_failed"), ex.Message);
             }
 
             IsBusy = false;

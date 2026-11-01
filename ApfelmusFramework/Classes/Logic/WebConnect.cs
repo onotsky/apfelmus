@@ -15,12 +15,18 @@ namespace ApfelmusFramework.Classes.Logic
     /// <summary>
     /// Kapselt die gesamte HTTP-Kommunikation mit dem appleJuice-Core ueber rohe Socket-GET-Requests.
     /// Zwei Aufruf-Familien: /xml/*.xml (abgefragter Zustand, via GetHttpResult als XML) und /function/*
-    /// (Kommandos; StartXMLFunction feuert ohne Antwort, GetFunctionResult liest den Klartext-Body).
+    /// (Kommandos; StartXMLFunction feuert ohne Antwort, ExecuteCommand liest Status und Body der Antwort).
     /// Jede Anfrage traegt das Core-Passwort als MD5-Hex. IDisposable, da pro Poll-Zyklus viele
     /// Instanzen entstehen und der Socket garantiert geschlossen werden muss (frueher Leak).
     /// </summary>
     public class WebConnect : IDisposable
     {
+        // Obergrenzen, damit ein fehlerhafter oder boesartiger Core den Speicher nicht fuellen kann.
+        // Grosszuegig bemessen (sehr grosse Share-Listen), aber endlich.
+        private const int MaxResponseBytes = 128 * 1024 * 1024;     // empfangene Rohdaten je Abfrage
+        private const int MaxDecompressedChars = 256 * 1024 * 1024; // entpackter XML-Text
+        private const int MaxCommandReplyChars = 64 * 1024;         // Antwort auf ein Kommando
+
         private string serverName;
         private int serverPort;
         private ILog logger;
@@ -119,9 +125,13 @@ namespace ApfelmusFramework.Classes.Logic
 
                 s.Send(bytesSent, SocketFlags.None);
 
+                long received = 0;
                 do
                 {
                     count = s.Receive(bytesReceived, bytesReceived.Length, 0);
+                    received += count;
+                    if (received > MaxResponseBytes)
+                        throw new InvalidDataException("Antwort des Cores ueberschreitet das Limit");
                     if (header == string.Empty && useZip)
                     {
                         for (int i = 0; i < count; i++)
@@ -169,13 +179,14 @@ namespace ApfelmusFramework.Classes.Logic
         }
 
         /// <summary>
-        /// Fuehrt einen /function/*-Aufruf aus und liefert den reinen Antwort-Body des Cores
-        /// zurueck (HTTP-Header entfernt, KEINE XML-Extraktion). Im Gegensatz zu
-        /// StartXMLFunction wird die Antwort ueberhaupt gelesen; im Gegensatz zu GetHttpResult
-        /// wird sie nicht als XML interpretiert - die /function-Antworten (z.B. "ok",
-        /// "already downloaded") sind kein wohlgeformtes XML und wuerden dort verworfen.
+        /// Fuehrt ein /function/*-Kommando aus und liest die (kurze) Antwort des Cores mit.
+        /// Sent sagt, ob die Anfrage den Core erreicht hat; StatusCode (0 = keine lesbare Antwort)
+        /// und Body zeigen, was er geantwortet hat. Fehlt die Antwort oder reisst die Verbindung ab
+        /// (z.B. beendet sich der Core bei exitcore sofort), ist das KEIN Fehler: Sent bleibt true.
+        /// Die Antworttexte des Cores sind in der Schnittstellenbeschreibung nicht festgelegt - Aufrufer
+        /// sollten sie anzeigen, aber nicht von bestimmten Texten abhaengig machen.
         /// </summary>
-        public string GetFunctionResult(string anfrage)
+        public CommandReply ExecuteCommand(string anfrage)
         {
             try
             {
@@ -183,33 +194,61 @@ namespace ApfelmusFramework.Classes.Logic
                 byte[] bytesSent = Encoding.ASCII.GetBytes(request);
                 byte[] bytesReceived = new byte[0x200];
                 StringBuilder response = new StringBuilder();
-                int count;
 
                 using (Socket s = GetSocket(serverName, serverPort))
                 {
                     if (s == null)
-                        return null;
+                        return new CommandReply();
 
                     s.Send(bytesSent, SocketFlags.None);
 
-                    do
+                    try
                     {
-                        count = s.Receive(bytesReceived, bytesReceived.Length, 0);
-                        response.Append(Encoding.ASCII.GetString(bytesReceived, 0, count));
+                        int count;
+                        do
+                        {
+                            count = s.Receive(bytesReceived, bytesReceived.Length, 0);
+                            response.Append(Encoding.ASCII.GetString(bytesReceived, 0, count));
+                        }
+                        while (count > 0 && response.Length <= MaxCommandReplyChars);
                     }
-                    while (count > 0);
+                    catch (SocketException)
+                    {
+                        // Kommando ist raus; die Antwort ging verloren (Timeout/Abbruch).
+                    }
                 }
 
-                string full = response.ToString();
-                int idx = full.IndexOf("\r\n\r\n");
-                return idx >= 0 ? full.Substring(idx + 4).Trim() : full.Trim();
+                return ParseReply(response.ToString());
             }
             catch (Exception ex)
             {
-                logger.Error("Fehler beim Ausfuehren der Function", ex);
+                logger.Error("Fehler beim Ausfuehren des Kommandos", ex);
             }
 
-            return string.Empty;
+            return new CommandReply();
+        }
+
+        private static CommandReply ParseReply(string full)
+        {
+            int status = 0;
+            if (full.StartsWith("HTTP/", StringComparison.Ordinal))
+            {
+                // Statuszeile: "HTTP/1.1 200 OK"
+                int sp = full.IndexOf(' ');
+                if (sp > 0 && sp + 4 <= full.Length && int.TryParse(full.AsSpan(sp + 1, 3), out int code))
+                    status = code;
+            }
+
+            // Der Core trennt Header und Body teils mit \r\n\r\n, teils mit \n\n.
+            int crlf = full.IndexOf("\r\n\r\n", StringComparison.Ordinal);
+            int lf = full.IndexOf("\n\n", StringComparison.Ordinal);
+            string body;
+            if (crlf >= 0 && (lf < 0 || crlf < lf)) body = full.Substring(crlf + 4);
+            else if (lf >= 0) body = full.Substring(lf + 2);
+            else body = status > 0 ? string.Empty : full;
+
+            if (body.Length > MaxCommandReplyChars) body = body.Substring(0, MaxCommandReplyChars);
+            return new CommandReply { Sent = true, StatusCode = status, Body = body.Trim() };
         }
 
         private Socket GetSocket(string hostName, int port)
@@ -247,63 +286,6 @@ namespace ApfelmusFramework.Classes.Logic
             {
                 logger.Error("Fehler beim Aufbau der Socketverbindung!", ex);
                 socket2?.Close();
-            }
-
-            return null;
-        }
-
-        public List<string> GetServerOutHtml(string anfrage)
-        {
-            try
-            {
-                string request = BuildRequest(anfrage);
-                byte[] bytesSent = Encoding.ASCII.GetBytes(request);
-                byte[] bytesReceived = new byte[0x200];
-                List<string> serverList = new List<string>();
-                int count = 0;
-                string header = string.Empty;
-
-                using (TcpClient client = new TcpClient(serverName, serverPort))
-                {
-                    using (NetworkStream nStream = client.GetStream())
-                    {
-                        nStream.Write(bytesSent, 0, bytesSent.Length);
-                        do
-                        {
-                            count = nStream.Read(bytesReceived, 0, bytesReceived.Length);
-                            header += Encoding.ASCII.GetString(bytesReceived, 0, count);
-                        }
-                        while (count > 0);
-                    }
-                }
-
-                int index = header.IndexOf("ajfsp://server|");
-                int num2 = header.IndexOf("<!--TYPO3SEARCH_end-->");
-                if ((index != -1) && (num2 != -1))
-                {
-                    header = header.Substring(index, num2 - index);
-                    while (header.Contains("ajfsp://server|"))
-                    {
-                        int startIndex = header.IndexOf("ajfsp");
-                        int endIndex = header.IndexOf("/\">");
-                        if ((endIndex - startIndex) <= 0)
-                        {
-                            return serverList;
-                        }
-
-                        string serverLink = header.Substring(startIndex, endIndex - startIndex);
-                        header = header.Substring(endIndex + 3, header.Length - (endIndex + 3));
-                        if (header.IndexOf("<font color=#ff0000>") != 0)
-                        {
-                            serverList.Add(serverLink);
-                        }
-                    }
-                }
-                return serverList;
-            }
-            catch (Exception ex)
-            {
-                logger.Error("Fehler beim holen der Serverliste", ex);
             }
 
             return null;
@@ -351,9 +333,8 @@ namespace ApfelmusFramework.Classes.Logic
         {
             try
             {
-                string str = string.Empty;
-
-                byte[] buffer = new byte[zipBytes.Length];
+                StringBuilder result = new StringBuilder();
+                byte[] buffer = new byte[64 * 1024];
                 using (MemoryStream mStream = new MemoryStream(zipBytes, 0, zipBytes.Length))
                 {
                     for (int i = 0; i < 2; i++)
@@ -364,11 +345,13 @@ namespace ApfelmusFramework.Classes.Logic
                         do
                         {
                             num = stream.Read(buffer, 0, buffer.Length);
-                            str += Encoding.ASCII.GetString(buffer, 0, num);
+                            result.Append(Encoding.ASCII.GetString(buffer, 0, num));
+                            if (result.Length > MaxDecompressedChars)
+                                throw new InvalidDataException("Entpackte Antwort ueberschreitet das Limit");
                         }
                         while (num > 0);
 
-                        return str;
+                        return result.ToString();
                     }
                 }
             }
@@ -402,5 +385,18 @@ namespace ApfelmusFramework.Classes.Logic
             }
             disposed = true;
         }
+    }
+
+    /// <summary>Ergebnis von <see cref="WebConnect.ExecuteCommand"/>.</summary>
+    public sealed class CommandReply
+    {
+        /// <summary>true, wenn die Anfrage an den Core gesendet wurde.</summary>
+        public bool Sent { get; init; }
+
+        /// <summary>HTTP-Status der Antwort; 0, wenn keine lesbare Antwort kam.</summary>
+        public int StatusCode { get; init; }
+
+        /// <summary>Antwort-Body (getrimmt, auf 64 KB begrenzt).</summary>
+        public string Body { get; init; } = string.Empty;
     }
 }
