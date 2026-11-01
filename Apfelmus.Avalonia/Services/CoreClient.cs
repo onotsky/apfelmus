@@ -208,45 +208,80 @@ namespace Apfelmus.Avalonia.Services
                 {
                     using var web = new WebConnect(_config.HostName, _config.Port);
                     var reply = web.ExecuteCommand(function);
-                    string cmd = CommandName(function);
+                    var action = ActionKey(function);
                     if (!reply.Sent)
-                        EventLog.Warning("log_cmd_failed", cmd);
+                        EventLog.Warning("log_cmd_failed", action);
+                    else if (reply.StatusCode is 401 or 403)
+                        EventLog.Warning("log_cmd_denied", action);
                     else if (reply.StatusCode >= 400)
-                        EventLog.Warning("log_cmd_rejected", cmd, reply.StatusCode);
-                    else if (IsNoteworthyReply(reply.Body))
-                        EventLog.Info("log_cmd_reply", cmd, ShortReply(reply.Body));
+                        EventLog.Warning("log_cmd_rejected", action, reply.StatusCode);
+                    else
+                        LogReply(function, action, reply.Body);
                 }
-                catch (Exception) { EventLog.Warning("log_cmd_failed", CommandName(function)); }
+                catch (Exception) { EventLog.Warning("log_cmd_failed", ActionKey(function)); }
             });
         }
 
         // Die Antworttexte des Cores sind nicht dokumentiert. Normalfall sind eine leere Antwort, "ok"
         // und - wie beim Core des Maintainers fuer /function/search beobachtet - ein leeres
-        // HTML-Geruest (<html><body></body></html>). Alles andere (z.B. "already downloaded") wird
-        // als Info ins Protokoll geschrieben, nicht als Fehler gewertet.
-        private static bool IsNoteworthyReply(string body)
+        // HTML-Geruest (<html><body></body></html>). Bekannt ist "already downloaded"; alles andere
+        // wird als Info mit dem Text des Cores ins Protokoll geschrieben, nicht als Fehler gewertet.
+        private static void LogReply(string function, LogKey action, string body)
         {
             string text = StripTags(body);
-            return text.Length > 0 && !text.TrimEnd('.', '!').Equals("ok", StringComparison.OrdinalIgnoreCase);
+            if (text.Length == 0 || text.TrimEnd('.', '!').Equals("ok", StringComparison.OrdinalIgnoreCase))
+                return;
+
+            if (text.Contains("already downloaded", StringComparison.OrdinalIgnoreCase))
+            {
+                string? name = LinkInfo.FileName(QueryValue(function, "link"));
+                if (name != null) EventLog.Info("log_already_file", name);
+                else EventLog.Info("log_already");
+                return;
+            }
+
+            EventLog.Info("log_cmd_reply", action, ShortReply(text));
         }
 
         private static string StripTags(string body)
             => System.Text.RegularExpressions.Regex.Replace(body, "<[^>]*>", " ").Trim();
 
-        // Antwort fuer die Anzeige: HTML-Tags und Steuerzeichen raus, auf 120 Zeichen gekuerzt.
-        private static string ShortReply(string body)
+        // Antwort fuer die Anzeige: Steuerzeichen raus, auf 120 Zeichen gekuerzt.
+        private static string ShortReply(string text)
         {
-            var chars = StripTags(body).Select(c => char.IsControl(c) ? ' ' : c).ToArray();
-            string text = new string(chars).Trim();
-            return text.Length <= 120 ? text : text.Substring(0, 120) + "…";
+            var chars = text.Select(c => char.IsControl(c) ? ' ' : c).ToArray();
+            string clean = new string(chars).Trim();
+            return clean.Length <= 120 ? clean : clean.Substring(0, 120) + "…";
         }
 
-        // Nur der Pfad (z.B. /function/canceldownload): die Query traegt das Passwort und darf
-        // nicht ins Protokoll.
-        private static string CommandName(string function)
+        // Bezeichnung des Befehls fuer Meldungen (z.B. "Download abbrechen") - nur aus dem Pfad
+        // abgeleitet, nie aus der Query: die traegt das Passwort und darf nicht ins Protokoll.
+        private static readonly System.Collections.Generic.HashSet<string> KnownCommands = new()
+        {
+            "canceldownload", "cancelsearch", "cleandownloadlist", "exitcore", "pausedownload",
+            "processlink", "removeserver", "renamedownload", "resumedownload", "search", "serverlogin",
+            "setpassword", "setpowerdownload", "setpriority", "setsettings", "settargetdir",
+        };
+
+        private static LogKey ActionKey(string function)
         {
             int q = function.IndexOf('?');
-            return q >= 0 ? function.Substring(0, q) : function;
+            string path = q >= 0 ? function.Substring(0, q) : function;
+            string name = path.Substring(path.LastIndexOf('/') + 1);
+            return new LogKey(KnownCommands.Contains(name) ? "cmd_" + name : "cmd_unknown");
+        }
+
+        // Liest EINEN Parameter aus der Query (dekodiert); die uebrigen - v.a. password - bleiben unberuehrt.
+        private static string? QueryValue(string function, string key)
+        {
+            int q = function.IndexOf('?');
+            if (q < 0) return null;
+            foreach (string part in function.Substring(q + 1).Split('&'))
+            {
+                if (part.StartsWith(key + "=", StringComparison.Ordinal))
+                    return Uri.UnescapeDataString(part.Substring(key.Length + 1));
+            }
+            return null;
         }
 
         private Task<AppleJuice?> QueryAsync(string query)

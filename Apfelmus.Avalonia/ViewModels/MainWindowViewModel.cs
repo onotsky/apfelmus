@@ -1005,10 +1005,21 @@ namespace Apfelmus.Avalonia.ViewModels
         }
 
         // ---- Commands impl ----
+        // Meldung fuer einen uebergebenen Link: mit Dateiname bzw. Server, soweit erkennbar.
+        private static void LogLink(string link)
+        {
+            string? file = LinkInfo.FileName(link);
+            if (file != null) { EventLog.Info("log_link_file", file); return; }
+            string? server = LinkInfo.Server(link);
+            if (server != null) EventLog.Info("log_link_server", server);
+            else EventLog.Info("log_link_sent");
+        }
+
         private async Task TransferAjLinkAsync()
         {
-            await _client.ProcessLinkAsync(Uri.EscapeDataString(Uri.UnescapeDataString(AjLinkText.Trim())));
-            EventLog.Info("log_link_sent");
+            string link = AjLinkText.Trim();
+            await _client.ProcessLinkAsync(Uri.EscapeDataString(Uri.UnescapeDataString(link)));
+            LogLink(link);
             AjLinkText = string.Empty;
             FocusDownloads();
         }
@@ -1097,7 +1108,7 @@ namespace Apfelmus.Avalonia.ViewModels
             // Erst dekodieren, dann einheitlich EINMAL kodieren - sonst wird %7C zu %257C (Doppelkodierung).
             string raw = Uri.UnescapeDataString(link.Trim());
             _ = _client.ProcessLinkAsync(Uri.EscapeDataString(raw));
-            EventLog.Info("log_link_external");
+            LogLink(raw);
             FocusDownloads();
         }
 

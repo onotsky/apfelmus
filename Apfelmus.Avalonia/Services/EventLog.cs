@@ -1,12 +1,16 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using Avalonia.Threading;
 
 namespace Apfelmus.Avalonia.Services
 {
     public enum LogLevel { Info, Warning, Error }
+
+    /// <summary>Verweist als Platzhalter-Argument auf einen Text der Sprachdateien (wird beim Eintragen uebersetzt).</summary>
+    public readonly record struct LogKey(string Key);
 
     /// <summary>Ein Eintrag im GUI-Ereignisprotokoll (Zeitpunkt, Stufe, Text).</summary>
     public sealed class LogEntry
@@ -78,6 +82,8 @@ namespace Apfelmus.Avalonia.Services
         private static string Format(string key, object[] args)
         {
             string text = LanguageManager.Get(key);
+            // Ein LogKey als Argument wird ebenfalls uebersetzt (z.B. die Bezeichnung eines Befehls).
+            args = args.Select(a => a is LogKey k ? LanguageManager.Get(k.Key) : a).ToArray();
             try { return args.Length == 0 ? text : string.Format(text, args); }
             catch (FormatException) { return text; }
         }
