@@ -23,7 +23,8 @@ Umschaltbares Hell-/Dunkel-Design (Anthrazit + Grün) – zur Laufzeit über **D
 - **Suchen** – Volltextsuche mit einem eigenen Ergebnis-Tab je Suchlauf
 - **Server** – bekannte appleJuice-Server, Verbindungsstatus, offizielle Serverliste holen
 - **Mein Share** – Verzeichnisbaum zum Freigeben/Entfernen von Ordnern, Freitextfilter, Prioritäten, Link(s)/Quelle(n) kopieren
-- **Protokoll** – Ereignisse der GUI (Verbindung zum Core hergestellt/verloren, nicht gesendete Befehle, Updates, gespeicherte Einstellungen); bewusst nicht das Log des Cores, das dessen Schnittstelle nicht liefert
+- **Protokoll** – Ereignisse der GUI (Verbindung zum Core hergestellt/verloren, nicht gesendete Befehle, Updates, gespeicherte Einstellungen); nicht das Log des Cores, das dessen Schnittstelle nicht liefert
+- **Core-Log** *(optional)* – das Log des Cores, geliefert vom kleinen Begleitdienst `ajcore-logd` auf dem Core-Rechner; Einrichtung unter [Core-Log einrichten](#core-log-einrichten)
 - **Einstellungen** – GUI-Optionen sowie die kompletten Core-Einstellungen (Nick, Verzeichnisse, Ports, Limits, Speed pro Slot, Autoconnect) und Passwortänderung
 
 Geklickte `ajfsp://`-Links aus dem Browser werden an Apfelmus (und damit an den Core) übergeben; die App holt sich dabei in den Vordergrund und wechselt auf den Downloads-Tab. Wie die Verknüpfung je Plattform registriert wird, steht unter [ajfsp://-Linkübernahme](#ajfsp-linkübernahme).
@@ -103,6 +104,16 @@ Geklickte `ajfsp://`-Links (z. B. `ajfsp://file|Name|Hash|Größe/`) werden an d
 > ```
 >
 > Unter Windows müssen Backslashes im Pfad doppelt geschrieben werden.
+
+## Core-Log einrichten
+
+Die Schnittstelle des appleJuice-Cores liefert kein Log. Wer es in Apfelmus sehen möchte, startet auf dem **Core-Rechner** den Begleitdienst [`ajcore-logd`](ajcore-logd/) (Go, nur Standardbibliothek; Linux mit systemd, der Core läuft als systemd-Dienst und loggt auf stdout ins Journal). Er stellt die letzten Zeilen per HTTP bereit; Apfelmus holt sie alle 5 Sekunden ab.
+
+1. **Dienst installieren** – Schritt für Schritt in [`ajcore-logd/README.md`](ajcore-logd/README.md): bauen, Token erzeugen, systemd-Unit anpassen (Adresse, erlaubtes Netz, Name der Core-Einheit) und starten.
+2. **In Apfelmus eintragen** – *Einstellungen → GUI*: **Core-Log-Dienst (URL)**, z. B. `http://192.168.1.10:9852`, und **Core-Log-Dienst (Token)**, dann *GUI speichern*. Das Token ohne Leerzeichen und ohne Zeilenende-Zeichen einfügen (zsh zeigt am Ende ein `%`, das nicht dazugehört).
+3. Der Tab **Core-Log** füllt sich nach wenigen Sekunden. Im Tab **Protokoll** steht, ob der Dienst erreichbar ist oder das Token abgelehnt wurde. Ohne Eintrag bleibt der Tab leer, alles andere verhält sich wie bisher.
+
+Die Verbindung ist unverschlüsselt (HTTP) und durch Token und Netzfreigabe geschützt – nur in einem vertrauenswürdigen Netz betreiben, sonst einen TLS-Proxy davorsetzen.
 
 ## Bauen & Starten
 
