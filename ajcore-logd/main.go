@@ -1,4 +1,4 @@
-// ajcore-logd: liest das Log des appleJuice-Cores aus dem systemd-Journal und
+// ajcore-logd: liest das Log des appleJuice-Cores (systemd-Journal oder Logdatei) und
 // stellt die letzten Zeilen per HTTP (Bearer-Token) bereit. Nur Standardbibliothek.
 package main
 
@@ -13,6 +13,7 @@ import (
 	"os"
 	"os/exec"
 	"regexp"
+	"runtime"
 	"strconv"
 	"strings"
 	"sync"
@@ -154,7 +155,8 @@ func follow(unit string, backlog int, dropNoise bool, ring *Ring) {
 func main() {
 	listen := flag.String("listen", "127.0.0.1:9852", "Adresse:Port")
 	tokenFile := flag.String("token-file", "", "Datei mit dem Bearer-Token (Pflicht)")
-	unit := flag.String("unit", "ajcore", "systemd-Dienst des Cores")
+	file := flag.String("file", "", "Logdatei des Cores verfolgen (Windows/macOS/Linux); Pflicht ausserhalb von Linux")
+	unit := flag.String("unit", "ajcore", "systemd-Dienst des Cores (Linux, wenn -file nicht gesetzt ist)")
 	size := flag.Int("buffer", 2000, "Zeilen im Ringpuffer")
 	allow := flag.String("allow", "10.1.0.0/16", "erlaubtes Netz (CIDR); Anfragen von anderswo werden abgewiesen")
 	keepNoise := flag.Bool("keep-noise", false, "Statusticker und check-Zeilen nicht verwerfen")
@@ -178,7 +180,15 @@ func main() {
 	}
 
 	ring := &Ring{max: *size, started: time.Now()}
-	go follow(*unit, *size, !*keepNoise, ring)
+	switch {
+	case *file != "":
+		go tailFile(*file, *size, !*keepNoise, ring)
+		log.Printf("liest Logdatei %s", *file)
+	case runtime.GOOS == "linux":
+		go follow(*unit, *size, !*keepNoise, ring)
+	default:
+		log.Fatal("auf diesem System gibt es kein systemd-Journal: bitte -file <Logdatei des Cores> angeben")
+	}
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) { w.Write([]byte("ok\n")) })
@@ -208,6 +218,6 @@ func main() {
 	})
 	srv := &http.Server{Addr: *listen, Handler: mux, ReadHeaderTimeout: 5 * time.Second,
 		WriteTimeout: 10 * time.Second}
-	log.Printf("ajcore-logd lauscht auf %s (Einheit %s)", *listen, *unit)
+	log.Printf("ajcore-logd lauscht auf %s", *listen)
 	log.Fatal(srv.ListenAndServe())
 }

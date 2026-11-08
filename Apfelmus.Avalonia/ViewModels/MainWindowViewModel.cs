@@ -34,6 +34,10 @@ namespace Apfelmus.Avalonia.ViewModels
         {
             _config = config;
             _client = new CoreClient(config);
+            // Gespeichertes Design beim Start anwenden (App.axaml startet fest mit Dunkel).
+            if (Application.Current != null)
+                Application.Current.RequestedThemeVariant =
+                    string.Equals(config.Theme, ThemeNames.Light, StringComparison.OrdinalIgnoreCase) ? ThemeVariant.Light : ThemeVariant.Dark;
             _registerProtocol = config.ProtocolHandler;
 
             Downloads = new ObservableCollection<Download>();

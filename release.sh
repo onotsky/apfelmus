@@ -77,6 +77,12 @@ A_WARM="$(build_selfcontained win-arm64 | tail -1)"
 A_LIN="$(build_selfcontained linux-x64 | tail -1)"
 A_LARM="$(build_selfcontained linux-arm64 | tail -1)"
 
+# ajcore-logd (Core-Log-Dienst): fertige Binaries aus ajcore-logd/dist/ (erzeugt mit ajcore-logd/build.sh,
+# braucht Go) werden, falls vorhanden, ans Release gehaengt.
+EXTRA=()
+for f in "$HERE"/ajcore-logd/dist/ajcore-logd-*; do [ -f "$f" ] && EXTRA+=("$f"); done
+echo "== ajcore-logd-Binaries: ${#EXTRA[@]} =="
+
 echo "== Artefakte =="
 for f in "$A_WIN" "$A_WARM" "$A_LIN" "$A_LARM" "$A_ARM" "$A_X64"; do
   [ -f "$f" ] || { echo "FEHLER: Artefakt fehlt: $f" >&2; exit 1; }
@@ -120,7 +126,7 @@ if gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then
 fi
 echo "== Release $TAG erstellen =="
 gh release create "$TAG" --repo "$REPO" --title "Apfelmus $VER" --notes "$NOTES" \
-  "$A_WIN" "$A_WARM" "$A_LIN" "$A_LARM" "$A_ARM" "$A_X64"
+  "$A_WIN" "$A_WARM" "$A_LIN" "$A_LARM" "$A_ARM" "$A_X64" ${EXTRA[@]+"${EXTRA[@]}"}
 
 # --- Ueberholte Releases aufraeumen (KEEP + aktuelles Tag bleiben) -----------
 echo "== Aufraeumen (behalte: $KEEP $TAG) =="

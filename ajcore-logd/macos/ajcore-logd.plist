@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- LaunchAgent für ajcore-logd (macOS). Pfade, Adresse und Netz anpassen, dann:
+     cp ajcore-logd.plist ~/Library/LaunchAgents/local.ajcore-logd.plist
+     launchctl load ~/Library/LaunchAgents/local.ajcore-logd.plist -->
+<plist version="1.0">
+<dict>
+    <key>Label</key><string>local.ajcore-logd</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/local/bin/ajcore-logd</string>
+        <string>-listen</string><string>192.168.1.10:9852</string>
+        <string>-allow</string><string>192.168.0.0/16</string>
+        <string>-file</string><string>/Users/DEINNAME/appleJuice/core.log</string>
+        <string>-token-file</string><string>/Users/DEINNAME/.ajcore-logd.token</string>
+    </array>
+    <key>RunAtLoad</key><true/>
+    <key>KeepAlive</key><true/>
+</dict>
+</plist>
