@@ -125,6 +125,8 @@
 
     <sys:String x:Key="set_gui">GUI</sys:String>
     <sys:String x:Key="set_refresh">Refreshrate (ms)</sys:String>
+    <sys:String x:Key="set_corelog_url">Core-Log-Dienst (URL)</sys:String>
+    <sys:String x:Key="set_corelog_token">Core-Log-Dienst (Token)</sys:String>
     <sys:String x:Key="set_infourl">Info-URL (%s = Dateilink)</sys:String>
     <sys:String x:Key="set_design">Design</sys:String>
     <sys:String x:Key="set_guisave">GUI speichern</sys:String>
@@ -166,6 +168,11 @@
     <sys:String x:Key="log_copy">Kopieren</sys:String>
     <sys:String x:Key="log_clear">Leeren</sys:String>
     <sys:String x:Key="log_hint">Ereignisse der GUI – nicht das Log des Cores</sys:String>
+    <sys:String x:Key="t_corelog">Core-Log</sys:String>
+    <sys:String x:Key="corelog_hint">Log des Cores, geliefert vom Log-Dienst auf dem Core-Rechner. Adresse und Token stehen in den Einstellungen.</sys:String>
+    <sys:String x:Key="log_corelog_up">Das Core-Log wird empfangen.</sys:String>
+    <sys:String x:Key="log_corelog_failed">Das Core-Log ist nicht erreichbar. Läuft der Log-Dienst, und stimmt die Adresse?</sys:String>
+    <sys:String x:Key="log_corelog_denied">Der Log-Dienst hat den Zugriff verweigert. Bitte das Token prüfen.</sys:String>
     <sys:String x:Key="log_col_time">Zeit</sys:String>
     <sys:String x:Key="log_col_level">Stufe</sys:String>
     <sys:String x:Key="log_col_message">Meldung</sys:String>

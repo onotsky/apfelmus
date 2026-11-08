@@ -71,6 +71,8 @@ namespace Apfelmus.Avalonia.ViewModels
             _refreshRate = config.RefreshRate > 0 ? config.RefreshRate : 1500;
             _releaseInfoHost = string.IsNullOrWhiteSpace(config.ReleaseInfoHost) ? ReleaseInfo.DefaultHost : config.ReleaseInfoHost;
             _showLoginNextStart = !config.HideLoginWindow;
+            _coreLogUrl = config.CoreLogUrl ?? string.Empty;
+            _coreLogToken = config.CoreLogToken ?? string.Empty;
 
             // AJLink / Menue
             TransferAjLinkCommand = new RelayCommand(TransferAjLinkAsync, () => !string.IsNullOrWhiteSpace(AjLinkText));
@@ -78,6 +80,8 @@ namespace Apfelmus.Avalonia.ViewModels
             CheckForUpdatesCommand = new RelayCommand(() => CheckForUpdatesAsync(manual: true));
             ClearLogCommand = new RelayCommand(() => { EventLog.Clear(); return Task.CompletedTask; });
             CopyLogCommand = new RelayCommand(() => { RaiseCopy(EventLog.ToText()); return Task.CompletedTask; });
+            ClearCoreLogCommand = new RelayCommand(() => { CoreLog.Clear(); return Task.CompletedTask; });
+            CopyCoreLogCommand = new RelayCommand(() => { RaiseCopy(CoreLog.ToText()); return Task.CompletedTask; });
             OpenLatestReleaseCommand = new RelayCommand(() => { OpenLatestRelease(); return Task.CompletedTask; });
             OpenCoreReleaseCommand = new RelayCommand(() => { OpenCoreRelease(); return Task.CompletedTask; });
             ApplyDarkThemeCommand = new RelayCommand(() => ApplyTheme(ThemeNames.Dark));
@@ -142,6 +146,7 @@ namespace Apfelmus.Avalonia.ViewModels
             _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(_refreshRate) };
             _timer.Tick += async (_, _) => await PollAsync();
             _timer.Start();
+            _coreLogClient.Configure(_config.CoreLogUrl, _config.CoreLogToken);
             _ = PollAsync();
             _ = LoadCoreSettingsAsync();
             _ = RefreshSharesAsync();   // Freigaben einmalig laden (danach nur manuell, siehe PollAsync).
@@ -222,9 +227,18 @@ namespace Apfelmus.Avalonia.ViewModels
         public RelayCommand CheckForUpdatesCommand { get; }
         public RelayCommand ClearLogCommand { get; }
         public RelayCommand CopyLogCommand { get; }
+        public RelayCommand ClearCoreLogCommand { get; }
+        public RelayCommand CopyCoreLogCommand { get; }
 
         /// <summary>Ereignisprotokoll der GUI (neueste zuerst) fuer den Protokoll-Tab.</summary>
         public ObservableCollection<LogEntry> LogEntries => EventLog.Entries;
+        public ObservableCollection<CoreLogEntry> CoreLogEntries => CoreLog.Entries;
+
+        // Optionaler Log-Dienst auf dem Core-Rechner (ajcore-logd), siehe Services/CoreLogClient.cs.
+        private readonly CoreLogClient _coreLogClient = new();
+        private string _coreLogUrl = string.Empty, _coreLogToken = string.Empty;
+        public string CoreLogUrl { get => _coreLogUrl; set => SetProperty(ref _coreLogUrl, value); }
+        public string CoreLogToken { get => _coreLogToken; set => SetProperty(ref _coreLogToken, value); }
         public RelayCommand OpenLatestReleaseCommand { get; }
         public RelayCommand OpenCoreReleaseCommand { get; }
         public RelayCommand ApplyDarkThemeCommand { get; }
@@ -1164,7 +1178,10 @@ namespace Apfelmus.Avalonia.ViewModels
                 _config.ReleaseInfoHost = string.IsNullOrWhiteSpace(ReleaseInfoHost) ? ReleaseInfo.DefaultHost : ReleaseInfoHost.Trim();
                 _config.HideLoginWindow = !ShowLoginNextStart;
                 _config.ProtocolHandler = RegisterAjfspProtocol;
+                _config.CoreLogUrl = CoreLogUrl.Trim();
+                _config.CoreLogToken = CoreLogToken.Trim();
                 ConfigSerializer.SerializeToFile(_config);
+                _coreLogClient.Configure(_config.CoreLogUrl, _config.CoreLogToken);
                 _timer.Interval = TimeSpan.FromMilliseconds(_config.RefreshRate);
 
                 if (RegisterAjfspProtocol && Services.ProtocolHandlerService.IsSupported)

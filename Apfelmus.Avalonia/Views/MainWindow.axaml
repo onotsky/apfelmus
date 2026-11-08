@@ -607,7 +607,7 @@
                   <Border Classes="card" Margin="0">
                    <StackPanel Spacing="10">
                     <TextBlock Text="{DynamicResource c_gui}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" />
-                    <Grid ColumnDefinitions="220,*" RowDefinitions="Auto,Auto,Auto">
+                    <Grid ColumnDefinitions="220,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
                         <TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource set_refresh}" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" />
                         <TextBox Grid.Row="0" Grid.Column="1" Width="120" HorizontalAlignment="Left" Text="{Binding RefreshRate, Mode=TwoWay}" />
                         <TextBlock Grid.Row="1" Grid.Column="0" Text="{DynamicResource set_infourl}" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,8,0,0" />
@@ -617,6 +617,10 @@
                             <Button Content="Dunkel" Command="{Binding ApplyDarkThemeCommand}" />
                             <Button Content="Hell" Command="{Binding ApplyLightThemeCommand}" />
                         </StackPanel>
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="{DynamicResource set_corelog_url}" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,8,0,0" />
+                        <TextBox Grid.Row="3" Grid.Column="1" Margin="0,8,0,0" PlaceholderText="http://10.1.5.250:9852" Text="{Binding CoreLogUrl, Mode=TwoWay}" />
+                        <TextBlock Grid.Row="4" Grid.Column="0" Text="{DynamicResource set_corelog_token}" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,8,0,0" />
+                        <TextBox Grid.Row="4" Grid.Column="1" Margin="0,8,0,0" PasswordChar="•" Text="{Binding CoreLogToken, Mode=TwoWay}" />
                     </Grid>
                     <CheckBox Content="{DynamicResource set_showlogin}" IsChecked="{Binding ShowLoginNextStart, Mode=TwoWay}"
                               Foreground="{DynamicResource TextPrimaryBrush}" />
@@ -718,6 +722,32 @@
                                     <DataTemplate>
                                         <TextBlock Text="{Binding Message}" VerticalAlignment="Center" Margin="12,0" TextWrapping="Wrap"
                                                    Classes.logwarn="{Binding IsWarning}" Classes.logerr="{Binding IsError}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+            </TabItem>
+
+            <!-- ===================== CORE-LOG (vom Log-Dienst ajcore-logd auf dem Core-Rechner) ===================== -->
+            <TabItem Header="{DynamicResource t_corelog}">
+                <DockPanel Margin="4">
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" Margin="4">
+                        <Button Content="{DynamicResource log_copy}" Command="{Binding CopyCoreLogCommand}" />
+                        <Button Content="{DynamicResource log_clear}" Command="{Binding ClearCoreLogCommand}" />
+                        <TextBlock Text="{DynamicResource corelog_hint}" VerticalAlignment="Center" Margin="8,0,0,0"
+                                   Foreground="{DynamicResource TextSecondaryBrush}" />
+                    </StackPanel>
+                    <DataGrid x:CompileBindings="False" ItemsSource="{Binding CoreLogEntries}"
+                              IsReadOnly="True" CanUserSortColumns="False"
+                              GridLinesVisibility="Horizontal" CanUserResizeColumns="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="{DynamicResource log_col_time}" Binding="{Binding TimeText, Mode=OneWay}" Width="Auto" />
+                            <DataGridTemplateColumn Header="{DynamicResource log_col_message}" Width="*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Message}" VerticalAlignment="Center" Margin="12,0" TextWrapping="Wrap" />
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>

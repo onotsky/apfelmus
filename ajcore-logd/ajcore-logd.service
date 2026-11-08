@@ -1,0 +1,20 @@
+[Unit]
+Description=ajcore-logd (Core-Log per HTTP)
+After=ajcore.service
+
+[Service]
+ExecStart=/usr/local/bin/ajcore-logd -listen 10.1.5.250:9852 -allow 10.1.0.0/16 -token-file %d/token
+DynamicUser=yes
+SupplementaryGroups=systemd-journal
+IPAddressDeny=any
+IPAddressAllow=10.1.0.0/16
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+LoadCredential=token:/etc/ajcore-logd.token
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

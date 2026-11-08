@@ -100,6 +100,24 @@
             set { releaseInfoHost = value; }
         }
 
+        private string coreLogUrl;
+        private string coreLogToken;
+
+        // Optionaler Log-Dienst (ajcore-logd) auf dem Core-Rechner: Basis-URL (z. B. http://10.1.5.250:9852)
+        // und Bearer-Token. Leer = Core-Log-Tab bleibt leer. Das Token ist ein Zugangsdatum wie das
+        // Passwort (Config wird unter macOS/Linux mit 0600 geschrieben).
+        public string CoreLogUrl
+        {
+            get { return coreLogUrl; }
+            set { coreLogUrl = value; }
+        }
+
+        public string CoreLogToken
+        {
+            get { return coreLogToken; }
+            set { coreLogToken = value; }
+        }
+
         private int partlistRowHeight;
 
         // Hoehe (in Pixel) einer Zeile im Partlisten-Balken. Groesser = weniger, dafuer dickere

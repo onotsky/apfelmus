@@ -125,6 +125,8 @@
 
     <sys:String x:Key="set_gui">GUI</sys:String>
     <sys:String x:Key="set_refresh">Refresh rate (ms)</sys:String>
+    <sys:String x:Key="set_corelog_url">Core log service (URL)</sys:String>
+    <sys:String x:Key="set_corelog_token">Core log service (token)</sys:String>
     <sys:String x:Key="set_infourl">Info URL (%s = file link)</sys:String>
     <sys:String x:Key="set_design">Theme</sys:String>
     <sys:String x:Key="set_guisave">Save GUI</sys:String>
@@ -166,6 +168,11 @@
     <sys:String x:Key="log_copy">Copy</sys:String>
     <sys:String x:Key="log_clear">Clear</sys:String>
     <sys:String x:Key="log_hint">GUI events – not the core log</sys:String>
+    <sys:String x:Key="t_corelog">Core log</sys:String>
+    <sys:String x:Key="corelog_hint">Core log, delivered by the log service on the core machine. Address and token are set in Settings.</sys:String>
+    <sys:String x:Key="log_corelog_up">Receiving the core log.</sys:String>
+    <sys:String x:Key="log_corelog_failed">The core log is not reachable. Is the log service running, and is the address correct?</sys:String>
+    <sys:String x:Key="log_corelog_denied">The log service denied access. Please check the token.</sys:String>
     <sys:String x:Key="log_col_time">Time</sys:String>
     <sys:String x:Key="log_col_level">Level</sys:String>
     <sys:String x:Key="log_col_message">Message</sys:String>

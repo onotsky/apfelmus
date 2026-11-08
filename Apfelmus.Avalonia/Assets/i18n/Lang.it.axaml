@@ -125,6 +125,8 @@
 
     <sys:String x:Key="set_gui">GUI</sys:String>
     <sys:String x:Key="set_refresh">Frequenza aggiornamento (ms)</sys:String>
+    <sys:String x:Key="set_corelog_url">Servizio log del core (URL)</sys:String>
+    <sys:String x:Key="set_corelog_token">Servizio log del core (token)</sys:String>
     <sys:String x:Key="set_infourl">URL info (%s = link file)</sys:String>
     <sys:String x:Key="set_design">Tema</sys:String>
     <sys:String x:Key="set_guisave">Salva GUI</sys:String>
@@ -166,6 +168,11 @@
     <sys:String x:Key="log_copy">Copia</sys:String>
     <sys:String x:Key="log_clear">Svuota</sys:String>
     <sys:String x:Key="log_hint">Eventi della GUI – non il log del core</sys:String>
+    <sys:String x:Key="t_corelog">Log del core</sys:String>
+    <sys:String x:Key="corelog_hint">Log del core, fornito dal servizio log sul computer del core. Indirizzo e token si impostano nelle Impostazioni.</sys:String>
+    <sys:String x:Key="log_corelog_up">Il log del core viene ricevuto.</sys:String>
+    <sys:String x:Key="log_corelog_failed">Il log del core non è raggiungibile. Il servizio log è in esecuzione e l'indirizzo è corretto?</sys:String>
+    <sys:String x:Key="log_corelog_denied">Il servizio log ha negato l'accesso. Controllare il token.</sys:String>
     <sys:String x:Key="log_col_time">Ora</sys:String>
     <sys:String x:Key="log_col_level">Livello</sys:String>
     <sys:String x:Key="log_col_message">Messaggio</sys:String>
