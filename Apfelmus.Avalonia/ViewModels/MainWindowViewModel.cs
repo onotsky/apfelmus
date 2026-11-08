@@ -78,6 +78,7 @@ namespace Apfelmus.Avalonia.ViewModels
             TransferAjLinkCommand = new RelayCommand(TransferAjLinkAsync, () => !string.IsNullOrWhiteSpace(AjLinkText));
             CoreExitCommand = new RelayCommand(() => _client.ExitCoreAsync());
             CheckForUpdatesCommand = new RelayCommand(() => CheckForUpdatesAsync(manual: true));
+            OpenGitHubCommand = new RelayCommand(() => { OpenGitHub(); return Task.CompletedTask; });
             ClearLogCommand = new RelayCommand(() => { EventLog.Clear(); return Task.CompletedTask; });
             CopyLogCommand = new RelayCommand(() => { RaiseCopy(EventLog.ToText()); return Task.CompletedTask; });
             ClearCoreLogCommand = new RelayCommand(() => { CoreLog.Clear(); return Task.CompletedTask; });
@@ -225,6 +226,7 @@ namespace Apfelmus.Avalonia.ViewModels
         public RelayCommand TransferAjLinkCommand { get; }
         public RelayCommand CoreExitCommand { get; }
         public RelayCommand CheckForUpdatesCommand { get; }
+        public RelayCommand OpenGitHubCommand { get; }
         public RelayCommand ClearLogCommand { get; }
         public RelayCommand CopyLogCommand { get; }
         public RelayCommand ClearCoreLogCommand { get; }
@@ -435,6 +437,13 @@ namespace Apfelmus.Avalonia.ViewModels
                 UpdateAvailable = false;
                 if (manual) UpdateStatus = LanguageManager.Get("upd_current");
             }
+        }
+
+        /// <summary>Hilfe-Menue: oeffnet die Projektseite auf GitHub im Standardbrowser.</summary>
+        private static void OpenGitHub()
+        {
+            try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo { FileName = "https://github.com/onotsky/apfelmus", UseShellExecute = true }); }
+            catch { /* kein Browser verfuegbar -> ignorieren */ }
         }
 
         /// <summary>Oeffnet die Release-Seite im Standardbrowser (Klick auf den Hinweis/Button).</summary>

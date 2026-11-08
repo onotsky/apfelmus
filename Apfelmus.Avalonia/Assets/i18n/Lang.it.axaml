@@ -12,6 +12,7 @@
     <sys:String x:Key="m_coreexit">Termina core</sys:String>
     <sys:String x:Key="m_help">Aiuto</sys:String>
     <sys:String x:Key="m_checkupdate">Controlla aggiornamenti</sys:String>
+    <sys:String x:Key="m_github">Apfelmus su GitHub</sys:String>
     <sys:String x:Key="upd_checking">Controllo aggiornamenti …</sys:String>
     <sys:String x:Key="upd_available">Aggiornamento {0} disponibile</sys:String>
     <sys:String x:Key="upd_current">Hai la versione più recente.</sys:String>

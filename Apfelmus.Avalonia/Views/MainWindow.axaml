@@ -56,6 +56,7 @@
             </MenuItem>
             <MenuItem Header="{DynamicResource m_help}">
                 <MenuItem Header="{DynamicResource m_checkupdate}" Command="{Binding CheckForUpdatesCommand}" />
+                <MenuItem Header="{DynamicResource m_github}" Command="{Binding OpenGitHubCommand}" />
             </MenuItem>
         </Menu>
 
