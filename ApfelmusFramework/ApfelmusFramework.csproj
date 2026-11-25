@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <!--
-    Plattformneutrale Kernbibliothek (net10.0, KEIN WPF/Windows).
+    Plattformneutrale Kernbibliothek (net11.0, KEIN WPF/Windows).
     Enthaelt nur Core-Kommunikation (WebConnect), Datenmodelle/DTOs, XML-(De)Serialisierung,
     Config und Hilfslogik - alles UI-frameworkunabhaengig, damit sowohl der WPF-Client
     (Projekt Apfelmus) als auch eine kuenftige Avalonia-Umsetzung diese Bibliothek teilen koennen.
@@ -12,7 +12,7 @@
   -->
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net11.0</TargetFramework>
     <RootNamespace>ApfelmusFramework</RootNamespace>
     <AssemblyName>ApfelmusFramework</AssemblyName>
   </PropertyGroup>

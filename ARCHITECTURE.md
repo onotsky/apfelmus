@@ -28,7 +28,7 @@ Es gibt kein Testprojekt und keinen Lint-Schritt. Änderungen lassen sich bauen 
 | Projekt | Inhalt |
 |---|---|
 | `Apfelmus.Avalonia` | Die Anwendung: `Views/` (Fenster, Dialoge), `ViewModels/`, `Converters/`, `Services/`, `Assets/` (Bilder, Sprachdateien `i18n/Lang.*.axaml`), Themes in `App.axaml` |
-| `ApfelmusFramework` | Plattformneutrale Bibliothek (`net10.0`, kein UI-Bezug): Core-Kommunikation (`Classes/Logic/WebConnect.cs`), Datenmodelle/DTOs für die XML-Antworten (`Classes/Modified`, `Allgemein`, `Settings`, `Share`, …), Config, MD5-Hilfe |
+| `ApfelmusFramework` | Plattformneutrale Bibliothek (`net11.0`, kein UI-Bezug): Core-Kommunikation (`Classes/Logic/WebConnect.cs`), Datenmodelle/DTOs für die XML-Antworten (`Classes/Modified`, `Allgemein`, `Settings`, `Share`, …), Config, MD5-Hilfe |
 
 Versionsnummer und gemeinsame Assembly-Metadaten stehen **einmal** in `Directory.Build.props` (SemVer; bei einer Änderung den Patch-Stand hochzählen, mehrere zusammengehörige Änderungen dürfen sich eine Version teilen).
 
@@ -79,7 +79,7 @@ Es gibt bewusst **keine** `BinaryFormatter`-Abhängigkeit in diesem Repo. Alte `
 
 ## Releases
 
-`release.sh` baut sechs Artefakte (Windows/Linux x64+arm64 als ZIP, macOS arm64+x64 als DMG), setzt den Tag `v<Version>` auf HEAD, erstellt das GitHub-Release und **löscht ältere Releases samt Tags** (nur `AJ_KEEP` und das neue bleiben). Ein bestehendes Release mit gleicher Nummer wird ersetzt.
+`release.sh` baut sechs Artefakte (Windows/Linux x64+arm64 als ZIP, macOS arm64+x64 als DMG), setzt den Tag `v<Version>` auf HEAD, erstellt das GitHub-Release und behält die **letzten fünf Releases** samt Release-Notes (`AJ_KEEP_COUNT`, zusätzlich geschützte Tags über `AJ_KEEP`); erst ältere werden samt Tag gelöscht. Ein bestehendes Release mit gleicher Nummer wird ersetzt.
 
 - Die Builds sind **self-contained** und enthalten die .NET-Runtime des Build-SDKs. Vor jedem Release das SDK auf den aktuellen Patch-Stand bringen (`dotnet sdk check`), sonst wird eine Runtime mit bekannten Sicherheitslücken ausgeliefert.
 - Das GitHub-Token liegt in der Datei, auf die `AJ_TOKEN_FILE` zeigt (Standard `~/aj_token`). Tokens laufen ab; schlägt der Tag-Push mit „Bad credentials“ fehl, ist meist das die Ursache.

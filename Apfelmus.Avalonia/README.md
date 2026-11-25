@@ -4,7 +4,7 @@ Plattformübergreifende Desktop-GUI für das **appleJuice**-P2P-Netzwerk, gebaut
 [Avalonia](https://avaloniaui.net/) und lauffähig unter **Windows, macOS und Linux**.
 Die Anwendung verbindet sich über eine XML/HTTP-API mit einem separat laufenden
 appleJuice-**Core** und zeigt bzw. steuert dessen Zustand. Der Netzwerk-/Datenkern
-liegt in der plattformneutralen Bibliothek `ApfelmusFramework` (`net10.0`); Avalonia
+liegt in der plattformneutralen Bibliothek `ApfelmusFramework` (`net11.0`); Avalonia
 liefert die gesamte Oberfläche (Views, ViewModels, Converter, Themes).
 
 Anthrazit-/Grün-Design mit umschaltbarem Hell-/Dunkel-Theme, mehrsprachig
@@ -63,7 +63,7 @@ holt sich dabei in den Vordergrund und wechselt auf den Downloads-Tab.
 
 ## Bauen & Starten
 
-Voraussetzung: .NET-SDK (net10.0).
+Voraussetzung: .NET-SDK (net11.0).
 
 ```bash
 dotnet restore

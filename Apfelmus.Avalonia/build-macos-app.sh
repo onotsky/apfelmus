@@ -69,7 +69,7 @@ cat > "$APP/Contents/Info.plist" <<PLIST
     <key>CFBundleExecutable</key><string>${EXE}</string>
     <key>CFBundleIconFile</key><string>Apfelmus.icns</string>
     <key>NSHighResolutionCapable</key><true/>
-    <key>LSMinimumSystemVersion</key><string>11.0</string>
+    <key>LSMinimumSystemVersion</key><string>14.0</string>
     <key>CFBundleURLTypes</key>
     <array>
         <dict>

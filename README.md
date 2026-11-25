@@ -34,7 +34,7 @@ Geklickte `ajfsp://`-Links aus dem Browser werden an Apfelmus (und damit an den 
 | Projekt | Inhalt |
 |---|---|
 | `Apfelmus.Avalonia` | Die Avalonia-GUI (Views, ViewModels, Converter, Themes, i18n, Services) – die eigentliche Anwendung |
-| `ApfelmusFramework` | **Plattformneutrale Kernbibliothek (`net10.0`):** Core-Kommunikation (XML/HTTP-API), Datenmodelle/DTOs, XML-(De)Serialisierung, Config und Hilfslogik. Bewusst UI-frameworkunabhängig |
+| `ApfelmusFramework` | **Plattformneutrale Kernbibliothek (`net11.0`):** Core-Kommunikation (XML/HTTP-API), Datenmodelle/DTOs, XML-(De)Serialisierung, Config und Hilfslogik. Bewusst UI-frameworkunabhängig |
 
 Der alte WPF-Client (`Apfelmus`, `WpfCustomControlLibrary1`) liegt im Branch `wpf-legacy`.
 
@@ -47,6 +47,8 @@ Das frühere Migrationstool `ConfigMigrator` ist nicht mehr Teil von `main`, wei
 ## Installation aus den [Releases](../../releases)
 
 Alle Downloads sind **self-contained** – ein separat installiertes .NET wird **nicht** benötigt. In jedem Fall muss ein appleJuice-**Core** laufen, gegen den sich die GUI verbindet (Standard: `localhost:9851`).
+
+Systemvoraussetzungen (.NET 11): macOS ab Version 14; unter Windows und Linux auf Intel/AMD eine 64-Bit-CPU mit **x86-64-v2** (SSE4.2, POPCNT – praktisch alles ab etwa 2009). In virtuellen Maschinen muss die virtuelle CPU diese Befehle durchreichen (unter QEMU/Proxmox z. B. CPU-Typ `host` oder `x86-64-v2-AES` statt `kvm64`).
 
 ### Windows – `Apfelmus.Avalonia-<version>-win-x64.zip` bzw. `-win-arm64.zip` (ARM, z. B. Snapdragon/Surface)
 
@@ -117,7 +119,7 @@ Die Verbindung ist unverschlüsselt (HTTP) und durch Token und Netzfreigabe gesc
 
 ## Bauen & Starten
 
-Voraussetzung: .NET-SDK (`net10.0`). Es muss ein appleJuice-**Core** laufen, gegen den sich die GUI verbindet (Standard: `localhost:9851`).
+Voraussetzung: .NET-SDK (`net11.0`). Es muss ein appleJuice-**Core** laufen, gegen den sich die GUI verbindet (Standard: `localhost:9851`).
 
 ```bash
 dotnet restore

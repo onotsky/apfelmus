@@ -110,8 +110,10 @@
             <!-- ===================== START ===================== -->
             <TabItem Header="{DynamicResource t_start}">
                 <ScrollViewer>
-                    <WrapPanel Margin="12">
-                        <Border Classes="card" Width="280" Height="110">
+                    <!-- 2x2-Raster: die Karten wachsen mit Fensterbreite und Inhalt, die untere Zeile fuellt
+                         die restliche Hoehe. Passt es nicht, scrollt die ganze Seite. -->
+                    <Grid Margin="12" ColumnDefinitions="*,*" RowDefinitions="Auto,*">
+                        <Border Classes="card" Grid.Row="0" Grid.Column="0">
                             <StackPanel Spacing="4">
                                 <TextBlock Text="{DynamicResource c_client}" Classes="cardheader" />
                                 <Grid ColumnDefinitions="120,*" RowDefinitions="Auto,Auto,Auto">
@@ -128,7 +130,7 @@
                             </StackPanel>
                         </Border>
 
-                        <Border Classes="card" Width="300" Height="230">
+                        <Border Classes="card" Grid.Row="0" Grid.Column="1">
                             <StackPanel Spacing="4">
                                 <TextBlock Text="{DynamicResource c_network}" Classes="cardheader" />
                                 <Grid ColumnDefinitions="150,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto">
@@ -153,7 +155,7 @@
                             </StackPanel>
                         </Border>
 
-                        <Border Classes="card" Width="420" Height="230">
+                        <Border Classes="card" Grid.Row="1" Grid.Column="0">
                             <StackPanel Spacing="4">
                                 <TextBlock Text="{DynamicResource c_server}" Classes="cardheader" />
                                 <Grid ColumnDefinitions="120,*" RowDefinitions="Auto,Auto">
@@ -163,23 +165,19 @@
                                     <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding ConnectedSince}" Classes="val" />
                                 </Grid>
                                 <TextBlock Text="{DynamicResource c_message}" Classes="lbl" Margin="0,6,0,0" />
-                                <ScrollViewer Height="120">
-                                    <!-- Inlines werden im Code-Behind aus dem HTML der Servernachricht gebaut. -->
-                                    <TextBlock x:Name="WelcomeText" Classes="val" TextWrapping="Wrap" />
-                                </ScrollViewer>
+                                <!-- Inlines werden im Code-Behind aus dem HTML der Servernachricht gebaut. -->
+                                <TextBlock x:Name="WelcomeText" Classes="val" TextWrapping="Wrap" />
                             </StackPanel>
                         </Border>
 
                         <!-- News-Seite des appleJuice-Projekts, passend zur Core-Version (Inlines im Code-Behind). -->
-                        <Border Classes="card" Width="420" Height="230">
+                        <Border Classes="card" Grid.Row="1" Grid.Column="1">
                             <StackPanel Spacing="4">
                                 <TextBlock Text="{DynamicResource c_news}" Classes="cardheader" />
-                                <ScrollViewer Height="180">
-                                    <TextBlock x:Name="NewsText" Classes="val" TextWrapping="Wrap" />
-                                </ScrollViewer>
+                                <TextBlock x:Name="NewsText" Classes="val" TextWrapping="Wrap" />
                             </StackPanel>
                         </Border>
-                    </WrapPanel>
+                    </Grid>
                 </ScrollViewer>
             </TabItem>
 

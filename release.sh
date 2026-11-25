@@ -1,20 +1,21 @@
 #!/usr/bin/env bash
 #
 # release.sh - baut alle sechs Plattform-Artefakte, setzt den Tag, erstellt das GitHub-
-# Release und raeumt ueberholte Releases auf. Version kommt zentral aus Directory.Build.props.
+# Release und behaelt die letzten fuenf Releases. Version kommt zentral aus Directory.Build.props.
 #
 # Voraussetzungen: macOS (fuer die .app-Bundles: sips/iconutil/codesign), dotnet-SDK,
 # gh (GitHub CLI), git. Token-Datei mit einem GitHub-Token (repo-Scope) fuer Push + gh.
 #
 # Aufruf:
 #   ./release.sh                      # baut + released die Version aus Directory.Build.props
-#   ./release.sh -n notes.md          # Release-Notes aus Datei (sonst Minimal-Notiz)
+#   ./release.sh -n notes.md          # Release-Notes aus Datei (sonst Commit-Liste seit dem letzten Release)
 #   ./release.sh --dry-run            # nur bauen, NICHT taggen/releasen/aufraeumen
 #
 # Umgebungsvariablen (mit Defaults):
 #   AJ_TOKEN_FILE  Pfad zur Token-Datei            (Default: ~/aj_token)
 #   AJ_REPO        GitHub-Repo owner/name          (Default: onotsky/apfelmus)
-#   AJ_KEEP        Tags, die beim Aufraeumen bleiben (Default: leer - nur das neue Release bleibt)
+#   AJ_KEEP        Tags, die beim Aufraeumen bleiben (Default: leer)
+#   AJ_KEEP_COUNT  Anzahl der neuesten Releases, die bleiben (Default: 5)
 #
 set -euo pipefail
 
@@ -24,6 +25,7 @@ PROJ="$HERE/Apfelmus.Avalonia/Apfelmus.Avalonia.csproj"
 TOKEN_FILE="${AJ_TOKEN_FILE:-$HOME/aj_token}"
 REPO="${AJ_REPO:-onotsky/apfelmus}"
 KEEP="${AJ_KEEP:-}"              # leerzeichengetrennte Liste geschuetzter Tags
+KEEP_COUNT="${AJ_KEEP_COUNT:-5}"  # so viele der neuesten Releases bleiben erhalten
 NOTES_FILE=""
 DRY_RUN=0
 
@@ -109,7 +111,12 @@ git -C "$HERE" push -f "$PUSH_URL" "refs/tags/$TAG" 2>&1 | grep -vi x-access-tok
 if [ -n "$NOTES_FILE" ] && [ -f "$NOTES_FILE" ]; then
   NOTES="$(cat "$NOTES_FILE")"
 else
+  PREV="$(git -C "$HERE" describe --tags --abbrev=0 --match 'v*' "$TAG^" 2>/dev/null || true)"
+  CHANGES="$(git -C "$HERE" log --format='- %s' ${PREV:+"$PREV..$TAG"} -n 30)"
   NOTES="Apfelmus $VER
+
+Aenderungen${PREV:+ seit $PREV}:
+$CHANGES
 
 Artefakte:
 - win-x64 / win-arm64 / linux-x64 / linux-arm64: self-contained, entpacken und Apfelmus.Avalonia starten.
@@ -128,10 +135,16 @@ echo "== Release $TAG erstellen =="
 gh release create "$TAG" --repo "$REPO" --title "Apfelmus $VER" --notes "$NOTES" \
   "$A_WIN" "$A_WARM" "$A_LIN" "$A_LARM" "$A_ARM" "$A_X64" ${EXTRA[@]+"${EXTRA[@]}"}
 
-# --- Ueberholte Releases aufraeumen (KEEP + aktuelles Tag bleiben) -----------
-echo "== Aufraeumen (behalte: $KEEP $TAG) =="
-for old in $(gh release list --repo "$REPO" --json tagName -q '.[].tagName' 2>/dev/null); do
+# --- Alte Releases aufraeumen -------------------------------------------------
+# Die KEEP_COUNT hoechsten Versionen bleiben samt Release-Notes erhalten (dazu immer das
+# aktuelle Tag und alles aus AJ_KEEP). Erst was darueber hinausgeht, wird samt Tag geloescht.
+echo "== Aufraeumen (behalte die letzten $KEEP_COUNT Releases${KEEP:+ sowie $KEEP}) =="
+ALL="$(gh release list --repo "$REPO" --limit 200 --json tagName -q '.[].tagName')"
+n=0
+for old in $(printf '%s\n' "$ALL" | sort -rV); do
+  n=$((n+1))
   keep=0
+  [ "$n" -le "$KEEP_COUNT" ] && keep=1
   [ "$old" = "$TAG" ] && keep=1
   for k in $KEEP; do [ "$old" = "$k" ] && keep=1; done
   if [ "$keep" -eq 0 ]; then
